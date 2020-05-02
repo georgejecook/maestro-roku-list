@@ -1,7 +1,7 @@
 {
   "name": "maestro-roku-ioc-sample",
   "version": "0.1.0",
-  "description": "IOC framewokr example, extracted frommaestro framework",
+  "description": "Fast, flexible list example, extracted from maestro framework",
   "main": "index.js",
   "directories": {
     "doc": "docs"
