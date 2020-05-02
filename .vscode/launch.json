@@ -1,0 +1,60 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+  
+    {
+      "type": "brightscript",
+      "request": "launch",
+      "name": "Run",
+      "preLaunchTask": "app",
+      "internalConsoleOptions": "neverOpen",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "host": "${env:ROKU_DEV_TARGET}",
+      "password": "${env:ROKU_DEVPASSWORD}",
+      "outDir": "${workspaceFolder}/out",
+      "rootDir": "${workspaceFolder}/build",
+      "sourceDirs": [
+        "${workspaceFolder}/src"
+      ],
+      "consoleOutput": "normal",
+      "stopOnEntry": false,
+      "retainDeploymentArchive": true,
+      "retainStagingFolder": true,
+      "files": [
+        "manifest",
+        "source/**/*.*",
+        "components/**/*.*",
+        "images/**/*.*",
+        "!**/tests/**/*.*"
+      ],
+      "enableDebuggerAutoRecovery": true,
+      "stopDebuggerOnAppExit": true
+    },
+    {
+      "type": "brightscript",
+      "request": "launch",
+      "name": "Test",
+      "preLaunchTask": "test",
+      "internalConsoleOptions": "neverOpen",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "host": "${env:ROKU_DEV_TARGET}",
+      "password": "${env:ROKU_DEVPASSWORD}",
+      "outDir": "${workspaceFolder}/out",
+      "rootDir": "${workspaceFolder}/build",
+      "debugRootDir": "${workspaceFolder}/src",
+      "consoleOutput": "normal",
+      "stopOnEntry": false,
+      "retainDeploymentArchive": true,
+      "retainStagingFolder": true,
+      "files": [
+        "manifest",
+        "source/**/*.*",
+        "components/**/*.*",
+        "images/**/*.*"
+      ]
+    }
+  ]
+}

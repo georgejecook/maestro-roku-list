@@ -1,0 +1,223 @@
+
+function init()
+  print "in FocusTestScene init"
+  createObject("roSGNode", "TrackerTask")
+  m.infoLabel = m.top.findNode("infoLabel")
+  
+  m.cellProvider = createObject("roSGNode", "CellProvider") 
+  m.top._cellProvider = m.cellProvider
+  m.global.addFields({ "cellProvider": m.cellProvider })
+  
+  
+  m.cellTracker = createObject("roSGNode", "CellTracker") 
+  m.top._cellTracker = m.cellTracker
+  m.global.addFields({ "cellTracker": m.cellTracker })
+  m.top.addFields({ "_global": m.global })
+  
+  listHolder = m.top.findNode("listHolder")
+  
+  'create after we've set up our cell tracker and provider
+  m.list = listHolder.createChild("MList")
+  m.list2 = listHolder.createChild("MList")
+  m.list2.translation = [300, 300]
+  m.list.translation = [0, 250]
+  
+  m.contentId = 0
+  onResetChange()
+  m.list.observeField("itemFocused", "itemFocusedChanged")
+  m.list.observeField("itemUnfocused", "itemUnfocusedChanged")
+  m.list.observeField("itemSelected", "itemSelectedChanged")
+  m.list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
+  m.list.observeField("rowFocused", "onInfoChange")
+  m.cellTracker.observeField("numberOfCellsInUse", "onInfoChange")
+  m.cellTracker.observeField("numberOfCells", "onInfoChange")
+  m.cellProvider.observeField("numberOfCellsInUse", "onInfoChange")
+  m.cellProvider.observeField("numberOfCells", "onInfoChange")
+  
+  m.list.setFocus(true)
+end function
+
+
+function onDebugMChange()
+  m.top._m = m
+end function
+
+function onResetChange()
+  ? "resetting"
+  m.list.content = invalid
+  m.list2.content = invalid
+  m.cellProvider.callFunc("reset", invalid)
+  m.cellTracker.callFunc("reset", invalid)
+  prebakeCells()
+  m.list.content = createData()
+  ' m.list2.content = createData()
+end function
+
+function prebakeCells()
+  ? "adding prebaked cells"
+  
+  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellOnes, "SimpleCell")
+  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellTwos, "SimpleCell2")
+  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellComplex, "ComplexCell")
+  
+  ? "finished adding prebaked cells"
+end function
+
+function createData()
+  
+  content = createObject("roSGNode", "ContentNode")
+  
+  for i = 0 to m.top._numberOfRows
+    row = content.createChild("ContentNode")
+    row.title = "ROW " + str(i)
+    ' row.addFields({
+      ' "isHidden": false
+    ' })
+    row.addField("isHidden", "boolean", true)
+    row.appendChildren(makeItems(m.top._defaultCellType, 20))
+  end for
+  return content
+end function
+
+function itemFocusedChanged()
+  print "itemFocused changed to: "; m.list.itemFocused
+end function
+
+function itemUnfocusedChanged()
+  print "itemUnfocused changed to: "; m.list.itemUnfocused
+end function
+
+function itemSelectedChanged()
+  print "itemSelected changed to: "; m.list.itemSelected
+end function
+
+function onInfoChange()
+  m.infoLabel.text = "Row: " + str(m.list.rowFocused) + " Light cells (" + str(m.cellTracker.numberOfCellsInUse) + "/" + str(m.cellTracker.numberOfCells) + ") - Real cells (" + str(m.cellProvider.numberOfCellsInUse) + "/" + str(m.cellProvider.numberOfCells) + ")"
+end function
+
+function currFocusItemIndexChanged()
+end function
+
+function onAddTypeOnes()
+  addItems("SimpleCell", m.top._addTypeOnes)
+end function
+
+function onAddComplex()
+  addItems("ComplexCell", m.top._addTypeComplex)
+end function
+
+function onAddTypeTwos()
+  addItems("SimpleCell2", m.top._addTypeTwos)
+end function
+
+function onAddTypeOnePrebakes()
+  m.cellProvider.callfunc("addPreBakedCells", m.top._addTypeOnePrebakes, "SimpleCell")
+end function
+
+function onAddTypeTwoPrebakes()
+  m.cellProvider.callfunc("addPreBakedCells", m.top._addTypeTwoPrebakes, "SimpleCell2")
+end function
+
+function addItems(cellType, number)
+  row = m.list.content.getChild(focusedRow)
+  row.appendChildren(makeItems(cellType, number))
+end function
+
+function makeItems(cellType, number)
+  
+  items = []
+  for i = 0 to number
+    child = createObject("roSGNode", "ContentNode")
+    child.id = str(m.contentId).trim()
+    child.description = "some really long " + child.id + "text in here " + child.id
+    child.HDGRIDPOSTERURL = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
+    child.title = "Item " + child.id.tostr()
+    child.addFields({
+      "cellType": cellType
+    })
+    
+    items.push(child)
+    m.contentId++
+  end for
+  return items
+end function
+
+function onRemove()
+  row = m.list.content.getChild(focusedRow)
+  
+  startIndex = row.getChildCount() - m.top._removeItems
+  children = row.getChildren(m.top._removeItems, startIndex)
+  row.removeChildren(children)
+  
+end function
+
+function toggleCellState(items, state)
+  
+  for each item in items
+    if item <> invalid
+      dynamicCell = m.cellTracker.callFunc("getCellForContentId", item.id)
+      if dynamicCell <> invalid
+        ' ? "setting viewstate on dynamic cell " ; dynamicCell.trackingId ; " content Id " ; item.id
+        dynamicCell.viewState = state
+      end if
+    end if
+  end for
+  
+end function
+
+function onHideRow()
+  ? "onHide" 
+  
+  row = m.list.content.getChild(focusedRow)
+  toggleCellState(getRowItems(row, m.top._hideRowItems), "hide")
+end function
+
+
+function onShowRow()
+  ? "onShow"
+  
+  row = m.list.content.getChild(focusedRow)
+  toggleCellState(getRowItems(row, m.top._showRowItems), "show")
+end function
+
+function getRowItems(row, number)
+  items = []
+  for i = 0 to number
+    items.push(row.getChild(i))
+  end for
+  
+  return items
+end function
+
+function onHide()
+  for i = 0 to m.top._hideItems
+    dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
+    if dynamicCell <> invalid
+      dynamicCell.viewState = "hide"
+    end if
+  end for
+end function
+
+function onShow()
+  for i = 0 to m.top._showItems
+    dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
+    if dynamicCell <> invalid
+      dynamicCell.viewState = "show"
+    end if
+  end for
+end function
+
+function onKeyEvent(key as string, press as boolean) as boolean
+  handled = false
+  if press
+    ? "press "; key
+    if key = "option"
+      if m.list.hasFocus()
+        m.list2.setFocus()
+      else
+        m.list.setFocus()
+      end if
+    end if
+  end if
+  return true
+end function

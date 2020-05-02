@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<component
+    name='SimpleCell'
+    extends='Group'>
+
+  <script
+      type='text/brightscript'
+      uri='SimpleCell.brs' />
+
+  <!-- Note that target and rect are both set during the interpolation -->
+  <interface>
+    <field
+        id='index'
+        type='int' />
+    <field
+        id='groupHasFocus'
+        type='boolean'
+        onChange='focusPercentChanged' />
+    <field
+        id='itemContent'
+        type='node'
+        onChange='itemContentChanged' />
+    <field
+        id='currTarget'
+        type='float'
+        onChange='currTargetChanged' />
+    <field
+        id='currRect'
+        type='rect2d'
+        onChange='currRectChanged' />
+    <field
+        id='focusPercent'
+        type='float'
+        onChange='focusPercentChanged' />
+  </interface>
+
+
+  <children>
+    <Rectangle
+        id='theRect'
+        color='0x00002080'>
+      <Label
+          id='theLabel'
+          translation='[10, 10]' />
+    </Rectangle>
+    <ColorFieldInterpolator
+        id='focusColorInterp'
+        key='[0.0, 1.0]'
+        keyValue='[0x00002080, 0x000080FF]' />
+  </children>
+
+</component>

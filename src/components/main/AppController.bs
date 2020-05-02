@@ -1,0 +1,13 @@
+import "pkg:/source/rLog/rLogMixin.brs" 
+import "pkg:/source/maestro/ioc/IOCMixin.bs" 
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ Initialization
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function Init()
+  registerLogger("AppController")
+  'get nav items from our tab controller
+  m.feedbackLabel = m.top.findNode("feedbackLabel")
+  m.top.appendChild("ListScreen")
+end function

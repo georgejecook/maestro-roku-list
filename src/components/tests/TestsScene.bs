@@ -1,0 +1,8 @@
+import "pkg:/source/rLog/rLogMixin.brs"
+import "pkg:/source/tests/rooibosDist.bs"
+import "pkg:/source/rooibosFunctionMap.bs"
+
+function init()
+  m._rLog = initializeRLog(false, true)
+  registerLogger("testScene")
+end function

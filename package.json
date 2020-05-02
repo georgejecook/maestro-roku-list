@@ -1,0 +1,59 @@
+{
+  "name": "maestro-roku-ioc-sample",
+  "version": "0.1.0",
+  "description": "IOC framewokr example, extracted frommaestro framework",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "gulp-header": "^2.0.7",
+    "roku-deploy": "^2.0.0",
+    "ts-node": "^8.1.0"
+  },
+  "devDependencies": {
+    "burp-brightscript": "^0.3.2",
+    "del": "^3.0.0",
+    "docdash": "^0.4.0",
+    "gulp": "^4.0.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-copy": "^4.0.1",
+    "gulp-rm-lines": "0.0.9",
+    "gulpclass": "^0.2.0",
+    "ink-docstrap": "1.3.0",
+    "jsdoc": "3.5.5",
+    "maestro-cli-roku": "^0.15.2",
+    "rooibos-cli": "^1.2.0",
+    "minami": "^1.2.3",
+    "typescript": "^3.4.5",
+    "vinyl-paths": "^2.1.0"
+  },
+  "scripts": {
+    "app": "gulp prePublish",
+    "test": "gulp prePublishTests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/georgejecook/roku-ioc.git"
+  },
+  "keywords": [
+    "brightscript",
+    "mvvm",
+    "framework",
+    "fun"
+  ],
+  "author": "George Cook",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/georgejecook/roku-ioc/issues"
+  },
+  "homepage": "https://github.com/georgejecook/roku-ioc#readme",
+  "ts-node": {
+    "transpileOnly": true,
+    "compileOptions": {
+      "incremental": true,
+      "allowJs": false
+    }
+  }
+}

@@ -1,0 +1,11 @@
+.DS_Store
+artifacts/*
+assets/*
+build/*
+artifacts/*
+*.swp
+node_modules/*
+package-lock.json
+.history
+*.orig
+lcov*.info

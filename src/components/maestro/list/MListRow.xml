@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<component
+    name='MListRow'
+    extends='Group'>
+
+  <interface>
+    <field
+        id='index'
+        type='integer' />
+    <field
+        id='isHidden'
+        type='boolean'
+        value='false'
+        onChange='onIsHiddenChange' />
+    <field
+        id='content'
+        type='node'
+        onChange='onContentChange' />
+    <field
+        id='isFocused'
+        type='boolean'
+        onChange='onIsFocusedChange' />
+    <field
+        id='viewState'
+        type='string'
+        onChange='onViewStateChange'
+        alwaysNotify='true' />
+
+    <field
+        id='cellSize'
+        type='floatArray'
+        value='[300,300]' />
+    <field
+        id='cellSpacing'
+        type='floatArray'
+        value='[20,20]' />
+    <field
+        id='numCols'
+        type='integer'
+        value='12' />
+    <field
+        id='unfocusCellScale'
+        type='float'
+        value='0.5' />
+    <field
+        id='unfocusCount'
+        type='float'
+        value='3' />
+
+    <field
+        id='itemFocused'
+        alias='list.itemFocused' />
+    <field
+        id='itemUnfocused'
+        alias='list.itemUnfocused' />
+    <field
+        id='itemSelected'
+        alias='list.itemSelected' />
+    <field
+        id='currFocusItemIndex'
+        alias='list.currFocusItemIndex'
+        onChange='onCurrFocusItemIndexChange' />
+  </interface>
+
+  <script
+      type='text/brightscript'
+      uri='MListRow.brs' />
+
+  <children>
+    <Label id='header' />
+    <TargetList id='list' />
+  </children>
+
+</component>

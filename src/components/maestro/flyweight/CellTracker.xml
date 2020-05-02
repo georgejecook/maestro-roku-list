@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<component
+    name='CellTracker'
+    extends='Group'>
+  <script
+      type='text/brightscript'
+      uri='CellTracker.brs' />
+
+  <interface>
+    <field
+        id='_debugM'
+        type='boolean'
+        onChange='onDebugMChange'
+        alwaysNotify='true' />
+    <field
+        id='_m'
+        type='assocarray' />
+    <field
+        id='trackingId'
+        type='integer'
+        value='0' />
+    <field
+        id='numberOfCellsInUse'
+        type='integer'
+        value='0' />
+    <field
+        id='numberOfCells'
+        type='integer'
+        value='0' />
+
+    <function name='reset' />
+
+    <function name='getCell' />
+    <function name='getCellForContentId' />
+    <function name='bindCellToContent' />
+    <function name='unbindCellFromContent' />
+  </interface>
+</component>

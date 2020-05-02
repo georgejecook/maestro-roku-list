@@ -1,0 +1,43 @@
+import "pkg:/source/rLog/rLogMixin.brs" 
+import "pkg:/source/maestro/ioc/IOCMixin.bs" 
+
+function Init() as void
+  CreateObject("roSGNode", "TrackerTask")
+  m.top._global = m.global
+  MIOC.init()
+  m.top.rLog = initializeRlog()
+  m.top.rLog.logLevel = 5
+  m.top.rLog.excludeFilters = ["TabController"]  
+
+  registerLogger("MainScene")
+  logInfo("init")
+end function
+  
+  ' /**
+  '  * @member begin
+  '  * @memberof module:MainScene
+  '  * @instance
+  '  * @description This would be called when all initial data is loaded. The app would show a loading spinner and loading background until this point
+  '  * @param {paramType} paramDescription
+  '  * @returns {returnType} returnDescription
+  '  */
+function begin(args = invalid)
+  logInfo("begin")
+  MIOC.setInstance("launchArgs", args)
+  logInfo("starting the bootstrap task to orchestrate our app init/loading tasks")
+  ' my apps have a task here that manages the various app initialization activities
+  ' m.bootstrapSequence = crateObject("roSGNode", "bootstrapTasks")
+  ' m.loadingSequence.observeField("isComplete", "onIsBootstrapTasksComplete")
+  ' let's just pretend it did it for now
+  onIsBootstrapTasksComplete()
+end function
+
+function onIsBootstrapTasksComplete()
+  logInfo("boot strap is complete - showing main screen")
+
+  m.top.appController = createObject("roSGNode", "AppController")
+  MIOC.setInstance("appController", m.top.appController)
+  m.top.appendChild(m.top.appController)
+  m.top.appController.callFunc("_initialize", invalid)
+  m.top.appController.setFocus(true)
+end function

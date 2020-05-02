@@ -1,0 +1,188 @@
+function init()
+  m.list = m.top.findNode("list")
+  m.header = m.top.findNode("header")
+  m.cellProvider = m.global.cellProvider
+  m.cellTracker = m.global.cellTracker
+  m.previousContent = invalid
+  m.previousViewState = ""
+end function
+
+function onContentIsHiddenChange()
+  m.top.isHidden = m.top.content.isHidden = true
+end function
+
+function onContentChange()
+  if m.previousContent = invalid or not m.previousContent.isSameNode(m.top.content)
+    toggleContentListener(false)
+    m.previousContent = m.top.content
+    if m.top.content.isHidden <> true
+      configureList(m.list)
+      toggleContentListener(true)
+      m.list.content = m.top.content 
+    else
+      m.list.content = invalid
+    end if
+  end if
+end function
+
+function toggleContentListener(isActive)
+  if m.top.content <> invalid
+    if isActive
+      m.top.content.observeField("isHidden", "onContentIsHiddenChange")
+    else
+      m.top.content.unObserveField("isHidden")
+    end if
+  end if
+end function
+
+function configureList(list)
+  ? ">> configuring list"
+  focusedTargetSet = createObject("roSGNode", "TargetSet")
+  list.itemComponentName = "DynamicCell"
+  list.focusedTargetSet = focusedTargetSet
+  
+  cw = m.top.cellSize[0]
+  ch = m.top.cellSize[1]
+  rects = []
+  sw = m.top.cellSpacing[0]
+  w = 0
+  for i = 0 to m.top.numCols
+    rects.push({ x: w, y: 0, width: cw, height: ch })
+    w += cw + sw
+  end for
+  focusedTargetSet.targetRects = [
+    { x: -134, y: -64, width: 100, height: 128 },
+    { x: -134, y: -64, width: 100, height: 128 },
+    { x: -134, y: -64, width: 100, height: 128 },
+    { x: -14, y: -64, width: 100, height: 128 },
+    { x: 106, y: -90, width: 144, height: 180 },
+    { x: 270, y: -125, width: 200, height: 250 },
+    { x: 490, y: -188, width: 300, height: 376 }, ' focus
+    { x: 810, y: -125, width: 200, height: 250 },
+    { x: 1030, y: -90, width: 144, height: 180 },
+    { x: 1194, y: -64, width: 100, height: 128 },
+    { x: 1314, y: -64, width: 100, height: 128 },
+    { x: 1314, y: -64, width: 100, height: 128 },
+    { x: 1314, y: -64, width: 100, height: 128 }
+  ]
+  focusedTargetSet.color = "0x00202020AA"
+  
+  
+  ' focusedTargetSet.targetRects = rects
+  focusedTargetSet.color = "0x00202020AA"
+  
+  unfocusedTargetSet = createObject("roSGNode", "TargetSet")
+  list.unfocusedTargetSet = unfocusedtargetSet
+  
+  rects = []
+  sw = m.top.cellSpacing[0]
+  w = 0
+  for i = 0 to m.top.numCols
+    rects.push({ x: w, y: 0, width: cw, height: ch })
+    w += cw + sw
+  end for
+  ' unfocusedTargetSet.targetRects = rects
+  unfocusedTargetSet.targetRects = [
+    { x: -130, y: -64, width: 100, height: 128 },
+    { x: -10, y: -64, width: 100, height: 128 },
+    { x: 110, y: -64, width: 100, height: 128 },
+    { x: 230, y: -64, width: 100, height: 128 },
+    { x: 350, y: -64, width: 100, height: 128 },
+    { x: 470, y: -64, width: 100, height: 128 },
+    { x: 590, y: -64, width: 100, height: 128 }, ' focus
+    { x: 710, y: -64, width: 100, height: 128 },
+    { x: 830, y: -64, width: 100, height: 128 },
+    { x: 950, y: -64, width: 100, height: 128 },
+    { x: 1070, y: -64, width: 100, height: 128 },
+    { x: 1190, y: -64, width: 100, height: 128 },
+    { x: 1310, y: -64, width: 100, height: 128 }
+  ]
+  
+  unfocusedTargetSet.color = "0x00202020AA"
+  
+  list.targetSet = focusedTargetSet
+  list.defaultTargetSetFocusIndex = 6
+  list.advanceKey = "right" 
+  list.reverseKey = "left"
+end function
+
+function addListListeners()
+  for each list in m.lists
+    list.observeField("itemFocused", "itemFocusedChanged")
+    list.observeField("itemUnfocused", "itemUnfocusedChanged")
+    list.observeField("itemSelected", "itemSelectedChanged")
+    list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
+  end for
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ flyweight heuristics (i.e. cell reuse)
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onViewStateChange()
+  ? "view sate changed" ; m.top.viewState
+  ' if m.top.viewState <> m.previousViewState
+  m.previousViewState = m.top.viewState
+  updateListVisibility(m.top.viewState)
+  ' end if
+end function
+
+function updateListVisibility(state)
+  if m.top.content <> invalid
+    ? "row updateListVisibility " ; state
+    states = {}
+    
+    if m.top.viewState = "hide" or m.top.viewState = "partial"
+      setListStateMap(states, 0 , m.top.content.getChildCount() - 1, "hide")
+    end if
+    
+    if m.top.viewState = "show"
+      setListStateMap(states, 0 , m.top.content.getChildCount() - 1, "show")
+    else if m.top.viewState = "partial"
+      setListStateMap(states, m.list.itemFocused - 5, m.list.itemFocused + 5, "show")
+    end if
+    
+    ? "row updateListVisibility " ; formatJson(states)
+    toggleCellStates(states)
+  end if
+end function
+
+function setListStateMap(states, startIndex, endIndex, state)
+  for i = startIndex to endIndex
+    
+    if i > 0 and i < m.top.content.getChildCount() - 1
+      states[m.top.content.getChild(i).id] = state
+    end if
+  end for
+end function
+
+function toggleCellStates(states)
+  
+  for each id in states
+    dynamicCell = m.cellTracker.callFunc("getCellForContentId", id)
+    if dynamicCell <> invalid
+      dynamicCell.viewState = states[id]
+    else
+      ? " could not find cell for id " ; id
+    end if
+  end for
+  
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ key handling
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+function onCurrFocusItemIndexChange()
+  if m.top.viewState <> "show"
+    m.top.viewState = "show"
+    
+  end if
+end function
+
+function onIsFocusedChange()
+  if m.top.isFocused 
+    m.list.setFocus(true)
+  end if 
+end function

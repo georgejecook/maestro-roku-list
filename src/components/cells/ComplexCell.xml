@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<component
+    name='ComplexCell'
+    extends='Group'>
+
+  <script
+      type='text/brightscript'
+      uri='ComplexCell.brs' />
+
+  <!-- Note that target and rect are both set during the interpolation -->
+  <interface>
+    <field
+        id='index'
+        type='int' />
+    <field
+        id='groupHasFocus'
+        type='boolean'
+        onChange='focusPercentChanged' />
+    <field
+        id='itemContent'
+        type='node'
+        onChange='itemContentChanged' />
+    <field
+        id='currTarget'
+        type='float'
+        onChange='currTargetChanged' />
+    <field
+        id='currRect'
+        type='rect2d'
+        onChange='currRectChanged' />
+    <field
+        id='focusPercent'
+        type='float'
+        onChange='focusPercentChanged' />
+  </interface>
+
+
+  <children>
+    <Rectangle
+        id='theRect'
+        color='0x00002080'>
+    </Rectangle>
+    <Poster
+        id='poster'
+        translation='[20,20]'
+        loadWidth='200'
+        loadHeight='150'
+        width='200'
+        height='150'
+        loadDisplayMode='scaleToFit' />
+    <Poster
+        id='poster2'
+        translation='[100,50]'
+        loadWidth='150'
+        loadHeight='100'
+        width='150'
+        height='200'
+        loadDisplayMode='scaleToFit' />
+    <Poster
+        id='poster3'
+        translation='[150,0]'
+        loadWidth='50'
+        loadHeight='50'
+        width='50'
+        height='50'
+        loadDisplayMode='scaleToFit' />
+    <Rectangle
+        opacity='0.3'
+        width='200'
+        height='100' />
+    <Label
+        id='theLabel'
+        translation='[10, 10]' />
+    <Label
+        id='theLabel2'
+        text='some text in here here is some text filing'
+        wrap='true'
+        maxLines='3'
+        width='100'
+        color='#ff00ff'
+        translation='[10, 30]' />
+
+    <Label
+        id='theLabel3'
+        text='some text in here here is some text filing'
+        wrap='true'
+        maxLines='3'
+        width='100'
+        color='#ff0000'
+        translation='[10, 50]' />
+
+    <ColorFieldInterpolator
+        id='focusColorInterp'
+        key='[0.0, 1.0]'
+        keyValue='[0x00002080, 0x000080FF]' />
+  </children>
+
+</component>

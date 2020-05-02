@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<component
+    name='MList'
+    extends='Group'>
+
+  <script
+      type='text/brightscript'
+      uri='MList.brs' />
+  <interface>
+    <field
+        id='_debugM'
+        type='boolean'
+        onChange='onDebugMChange'
+        alwaysNotify='true' />
+    <field
+        id='cellSize'
+        type='floatArray'
+        value='[300,300]' />
+    <field
+        id='cellSpacing'
+        type='floatArray'
+        value='[20,20]' />
+    <field
+        id='numCols'
+        type='integer'
+        value='12' />
+    <field
+        id='unfocusCellScale'
+        type='float'
+        value='0.5' />
+    <field
+        id='unfocusCount'
+        type='float'
+        value='3' />
+    <field
+        id='_m'
+        type='assocarray' />
+    <field
+        id='content'
+        type='node'
+        onChange='onContentChange' />
+    <field
+        id='rowFocused'
+        type='integer' />
+    <field
+        id='itemFocused'
+        type='integer' />
+    <field
+        id='itemUnfocused'
+        type='integer' />
+    <field
+        id='itemSelected'
+        type='integer' />
+    <field
+        id='currFocusItemIndex'
+        type='integer' />
+
+  </interface>
+  <children>
+    <Group id='rowsGroup' />
+  </children>
+
+</component>

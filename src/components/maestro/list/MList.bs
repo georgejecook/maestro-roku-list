@@ -1,0 +1,184 @@
+function init()
+  print "in FocusTestScene init"
+  createObject("roSGNode", "TrackerTask")
+  m.rowsGroup = m.top.findNode("rowsGroup") 
+  m.cellProvider = m.global.cellProvider
+  m.cellTracker = m.global.cellTracker
+  m.previousContent = invalid
+  m.numberOfRowsToShow = 3
+  m.visibleLists = []
+  m.hiddenLists = []
+  m.lists = []
+  resetState()
+end function
+
+function resetState()
+  m.currentY = 0
+  m.focusIndex = 0
+  m.listIndex = 0
+  m.rowsGroup.removeChildren(m.rowsGroup.getChildren( - 1, 0))
+  
+  m.lists = []
+  
+  if m.top.content <> invalid
+    for each item in m.top.content.getChildren(-1, 0)
+      list = makeList(item)
+      m.lists.push(list)
+    end for
+  end if
+  
+  layoutLists()
+  addListListeners()
+  m.currentList = m.visibleLists[m.focusIndex]
+  moveYFocus(0)
+end function
+
+function layoutLists()
+  m.currentY = 0
+  
+  m.visibleLists = []
+  m.hiddenLists = []
+  for each list in m.lists
+    list.visible = not list.isHidden
+    if list.visible
+      list.translation = [0, m.currentY]
+      m.currentY += m.top.cellSize[1] + m.top.cellSpacing[1]
+      m.visibleLists.push(list)
+    else
+      m.hiddenLists.push(list)
+    end if
+  end for
+  
+end function
+
+function onDebugMChange()
+  m.top._m = m
+end function
+
+function onContentChange()
+  if m.previousContent = invalid or not m.previousContent.isSameNode(m.top.content)
+    m.previousContent = m.top.content
+    resetState()
+  end if
+end function
+
+function makeList(rowContent)
+  list = m.rowsGroup.createChild("MListRow")
+  list.id = str(m.listIndex).trim()
+  list.cellSize = m.top.cellSize
+  list.cellSpacing = m.top.cellSpacing
+  list.numCols = m.top.numCols
+  list.unfocusCellScale = m.top.unfocusCellScale
+  list.unfocusCount = m.top.unfocusCount
+  list.content = rowContent
+  
+  m.listIndex++
+  
+  return list
+end function
+
+function addListListeners()
+  for each list in m.visibleLists
+    list.observeField("itemFocused", "itemFocusedChanged")
+    list.observeField("itemUnfocused", "itemUnfocusedChanged")
+    list.observeField("itemSelected", "itemSelectedChanged")
+    list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
+    list.observeField("isHidden", "onListIsHiddenChange")
+  end for
+end function
+
+function itemFocusedChanged()
+  m.top.itemFocused = m.currentList.itemFocused
+end function
+
+function itemUnfocusedChanged()
+  m.top.itemUnfocused = m.currentList.itemUnfocused
+end function
+
+function itemSelectedChanged()
+  m.top.itemSelected = m.currentList.itemSelected
+end function
+
+function currFocusItemIndexChanged()
+  m.top.currFocusItemIndex = m.currentList.currFocusItemIndex
+end function
+
+function onListIsHiddenChange(evt)
+  layoutLists()
+end function
+
+function onKeyEvent(key as string, press as boolean) as boolean
+  handled = false
+  if press
+    ? "list keypress "; key
+    
+    if key = "up"
+      moveYFocus( - 1)
+    end if
+    if key = "down"
+      moveYFocus(1)
+    end if
+    
+  end if
+  return true
+end function
+
+function moveYFocus(offset)
+  newIndex = m.focusIndex + offset
+  if newIndex < 0
+    newIndex = m.visibleLists.count() - 1
+  end if
+  
+  if newIndex > m.visibleLists.count() - 1
+    newIndex = 0
+  end if
+  
+  updateRowVisibilities(newIndex, m.focusIndex)
+  m.focusIndex = newIndex
+  m.top.rowFocused = newIndex
+  
+  currentList = m.visibleLists[m.focusIndex]
+  
+  if currentList <> invalid
+    currentList.isFocused = false
+  end if
+  
+  if m.currentList = invalid or not m.currentList.isSameNode(currentList)
+    m.currentList = currentList 
+    
+    if m.currentList <> invalid
+      m.rowsGroup.translation = [0, - m.currentList.translation[1]]
+      m.currentList.isFocused = true
+      ' m.currentList.setFocus(true)
+    end if
+  end if
+end function
+
+function updateRowVisibilities(newIndex, oldIndex) as void
+  states = {}
+  if m.top.content = invalid
+    return 
+  end if
+  
+  setListStateMap(states, oldIndex - m.numberOfRowsToShow / 3, oldIndex + m.numberOfRowsToShow, "hide")
+  setListStateMap(states, newIndex - m.numberOfRowsToShow / 3, newIndex + m.numberOfRowsToShow, "partial")
+  
+  ? "updating states: " ; formatJson(states)
+  for each rowId in states
+    list = m.visibleLists[rowId.toInt()]
+    list.viewState = states[rowId]
+  end for
+end function
+
+function setListStateMap(states, startIndex, endIndex, state)
+  for i = startIndex to endIndex
+    
+    if i > 0 and i < m.visibleLists.count() - 1
+      row = m.visibleLists[i]
+      
+      if row <> invalid
+        states[row.id] = state
+      end if
+    end if
+  end for
+end function
