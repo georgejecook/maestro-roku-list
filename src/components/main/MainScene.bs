@@ -1,26 +1,26 @@
 import "pkg:/source/rLog/rLogMixin.brs" 
 import "pkg:/source/maestro/ioc/IOCMixin.bs" 
+import "pkg:/components/maestro/view/mixin/FocusMixin.bs" 
 
 function Init() as void
   CreateObject("roSGNode", "TrackerTask")
   m.top._global = m.global
-  MIOC.init()
-  m.top.rLog = initializeRlog()
+  m.top.rLog = initializeRlog(false, true)
   m.top.rLog.logLevel = 5
-  m.top.rLog.excludeFilters = ["TabController"]  
-
   registerLogger("MainScene")
+  MIOC.init()
+  initializeFocusManager(m.global)
   logInfo("init")
 end function
-  
-  ' /**
-  '  * @member begin
-  '  * @memberof module:MainScene
-  '  * @instance
-  '  * @description This would be called when all initial data is loaded. The app would show a loading spinner and loading background until this point
-  '  * @param {paramType} paramDescription
-  '  * @returns {returnType} returnDescription
-  '  */
+
+' /**
+'  * @member begin
+'  * @memberof module:MainScene
+'  * @instance
+'  * @description This would be called when all initial data is loaded. The app would show a loading spinner and loading background until this point
+'  * @param {paramType} paramDescription
+'  * @returns {returnType} returnDescription
+'  */
 function begin(args = invalid)
   logInfo("begin")
   MIOC.setInstance("launchArgs", args)
@@ -34,10 +34,9 @@ end function
 
 function onIsBootstrapTasksComplete()
   logInfo("boot strap is complete - showing main screen")
-
+  
   m.top.appController = createObject("roSGNode", "AppController")
   MIOC.setInstance("appController", m.top.appController)
   m.top.appendChild(m.top.appController)
-  m.top.appController.callFunc("_initialize", invalid)
-  m.top.appController.setFocus(true)
+  setFocus(m.top.appController)
 end function

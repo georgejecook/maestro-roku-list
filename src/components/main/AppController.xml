@@ -1,17 +1,13 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <component
     name='AppController'
-    extends='Group'>
+    extends='BaseScreen'>
   <interface>
 
 	</interface>
 
   <children>
-    <LayoutGroup>
-      <Label text='press up to increase up count, left to login, right to logut, and down to descres up count' />
-      <Label id='feedbackLabel' />
-
-    </LayoutGroup>
+    <NavController id="navController" />
   </children>
 
 </component>

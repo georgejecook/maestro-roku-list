@@ -54,7 +54,4 @@
     <function name="UIThread_removeAllRulerLines" />
   </interface>
 
-  <script type="text/brightscript" uri="RALETrackerTask.brs"/>
-
-
 </component>

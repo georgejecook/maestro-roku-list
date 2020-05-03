@@ -9,6 +9,9 @@
         id='index'
         type='integer' />
     <field
+        id='cell'
+        type='node' />
+    <field
         id='trackingId'
         type='string' />
     <field
@@ -37,12 +40,5 @@
         onChange='focusPercentChanged' />
 
   </interface>
-
-  <script
-      type='text/brightscript'
-      uri='DynamicCell.brs' />
-
-  <children>
-  </children>
 
 </component>

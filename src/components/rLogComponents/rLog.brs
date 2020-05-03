@@ -1,24 +1,19 @@
-' /**
-'  * @module rLog
-'  * @description implementation of rLog node
-'  */
-
 function Init() as void
   m.transportImpls = []
   m.top.filters = []
   m.top.excludeFilters = []
-  m.top.transports = ["printTransport"]
+  m.top.transports = ["printTransport", "rLogSGTransport"]
   m.top.functionName = "execRunLoop"
   m.pendingItems = []
-  m.top.control="run"
+  m.top.control = "run"
 end function
 
 function execRunLoop()
   port = CreateObject("roMessagePort")
   m.top.observeField("logEntry", port)
-
+  
   while true
-    msg = wait(0, port)
+    msg = MTU_waitPort(0, port)
     if type(msg) = "roSGNodeEvent"
       field = msg.getField()
       data = msg.getData()
@@ -41,7 +36,7 @@ end function
 function addItemToPending(item) as void
   m.pendingItems.push(item)
   if m.pendingItems.count() > 20
-    for i = 0 to m.pendingItems.count() -1
+    for i = 0 to m.pendingItems.count() - 1
       logItem(m.pendingItems[i])
     end for
     m.pendingItems = []
@@ -49,12 +44,10 @@ function addItemToPending(item) as void
 end function
 
 function logItem(args) as void
-  passesFilter = m.top.logLevel >= args.level and matchesFilter(args) and not isExcluded(args)
-  passesFilter = true
+  ' passesFilter = m.top.logLevel >= args.level and matchesFilter(args) and not isExcluded(args)
+  ' passesFilter = true
   for each transport in m.transportImpls
-    if not transport.managesFiltering or passesFilter
-      transport.log(args)
-    end if
+    transport.log(args)
   end for
 end function
 
@@ -68,7 +61,7 @@ function matchesFilter(args) as boolean
       end if
     end for
   end if
-
+  
   return false
 end function
 
@@ -82,7 +75,7 @@ function isExcluded(args) as boolean
       end if
     end for
   end if
-
+  
   return false
 end function
 

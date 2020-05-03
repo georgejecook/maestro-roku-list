@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="TabChildScreen" extends="BaseScreen">
+
+  <interface>
+      <!-- invoking this will return to the root of the grid controller's stack -->
+      <function name="reset" />
+    </interface>
+
+    <children>
+
+      <!-- Navcontroller that contains all views to be shown in a TabController. -->
+      <NavController 
+        id="navController" 
+        name="tabChildNavController"
+        visible="false"
+        isAutoFocusEnabled="true" />
+    </children>
+</component>

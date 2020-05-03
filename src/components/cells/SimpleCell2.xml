@@ -4,10 +4,6 @@
     name='SimpleCell2'
     extends='Group'>
 
-  <script
-      type='text/brightscript'
-      uri='SimpleCell.brs' />
-
   <!-- Note that target and rect are both set during the interpolation -->
   <interface>
     <field

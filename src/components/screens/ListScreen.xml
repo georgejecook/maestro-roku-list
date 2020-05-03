@@ -1,18 +1,8 @@
 <?xml version='1.0' encoding='utf-8' ?>
-
 <component
-    name='TargetListFocusTestScene'
-    extends='Group'>
-
-  <script
-      type='text/brightscript'
-      uri='scene.brs' />
+    name='ListScreen'
+    extends='BaseScreen'>
   <interface>
-    <field
-        id='_debugM'
-        type='boolean'
-        onChange='onDebugMChange'
-        alwaysNotify='true' />
     <field
         id='_cellProvider'
         type='node' />

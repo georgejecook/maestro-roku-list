@@ -36,9 +36,29 @@ function toggleContentListener(isActive)
 end function
 
 function configureList(list)
+  list.itemComponentName = "DynamicCell"
+  list.advanceKey = "right" 
+  list.reverseKey = "left"
+  
+  ? "configuring list " ; m.top.focusType
+  if m.top.focusType = "fixed"
+    configureListFixed(list)
+  else if m.top.focusType = "fixedWrap"
+    configureListFixedWrap(list)
+  else if m.top.focusType = "floating"
+    configureListFloating(list)
+  else if m.top.focusType = "zoom"
+    configureListZoom(list)
+  else
+    ? " ERROR no valid list type; and no row override, dropping back to fixed"
+    configureListFixed(list)
+    
+  end if
+end function
+
+function configureListFixed(list)
   ? ">> configuring list"
   focusedTargetSet = createObject("roSGNode", "TargetSet")
-  list.itemComponentName = "DynamicCell"
   list.focusedTargetSet = focusedTargetSet
   
   cw = m.top.cellSize[0]
@@ -50,7 +70,47 @@ function configureList(list)
     rects.push({ x: w, y: 0, width: cw, height: ch })
     w += cw + sw
   end for
-  focusedTargetSet.targetRects = [
+  focusedTargetSet.color = "0x00202020AA"
+  focusedTargetSet.targetRects = rects
+  
+  focusedTargetSet.color = "0x00202020AA"
+  
+  unfocusedTargetSet = createObject("roSGNode", "TargetSet")
+  list.unfocusedTargetSet = unfocusedtargetSet
+  
+  rects = []
+  sw = m.top.cellSpacing[0]
+  w = 0
+  for i = 0 to m.top.numCols
+    rects.push({ x: w, y: 0, width: cw, height: ch })
+    w += cw + sw
+  end for
+  unfocusedTargetSet.targetRects = rects
+  
+  unfocusedTargetSet.color = "0x00202020AA"
+  
+  list.targetSet = focusedTargetSet
+  m.top.defaultTargetSetFocusIndex = 2
+end function
+
+function configureListZoom(list)
+  ? "configureListZoom"
+  focusedTargetSet = createObject("roSGNode", "TargetSet")
+  
+  list.focusedTargetSet = focusedTargetSet
+  
+  cw = m.top.cellSize[0]
+  ch = m.top.cellSize[1]
+  rects = []
+  sw = m.top.cellSpacing[0]
+  w = 0
+  'TODO calculate
+  ' for i = 0 to m.top.numCols
+  '   rects.push({ x: w, y: 0, width: cw, height: ch })
+  '   w += cw + sw
+  ' end for
+  
+  rects = [
     { x: -134, y: -64, width: 100, height: 128 },
     { x: -134, y: -64, width: 100, height: 128 },
     { x: -134, y: -64, width: 100, height: 128 },
@@ -65,24 +125,19 @@ function configureList(list)
     { x: 1314, y: -64, width: 100, height: 128 },
     { x: 1314, y: -64, width: 100, height: 128 }
   ]
+  focusedTargetSet.rects = rects
   focusedTargetSet.color = "0x00202020AA"
-  
-  
-  ' focusedTargetSet.targetRects = rects
-  focusedTargetSet.color = "0x00202020AA"
-  
-  unfocusedTargetSet = createObject("roSGNode", "TargetSet")
-  list.unfocusedTargetSet = unfocusedtargetSet
   
   rects = []
   sw = m.top.cellSpacing[0]
   w = 0
-  for i = 0 to m.top.numCols
-    rects.push({ x: w, y: 0, width: cw, height: ch })
-    w += cw + sw
-  end for
-  ' unfocusedTargetSet.targetRects = rects
-  unfocusedTargetSet.targetRects = [
+  
+  'TODO calculate
+  ' for i = 0 to m.top.numCols
+  '   rects.push({ x: w, y: 0, width: cw, height: ch })
+  '   w += cw + sw
+  ' end for
+  rects = [
     { x: -130, y: -64, width: 100, height: 128 },
     { x: -10, y: -64, width: 100, height: 128 },
     { x: 110, y: -64, width: 100, height: 128 },
@@ -98,12 +153,142 @@ function configureList(list)
     { x: 1310, y: -64, width: 100, height: 128 }
   ]
   
+  unfocusedTargetSet = createObject("roSGNode", "TargetSet")
+  list.unfocusedTargetSet = unfocusedTargetSet
+  
+  unfocusedTargetSet.targetRects = rects
   unfocusedTargetSet.color = "0x00202020AA"
   
-  list.targetSet = focusedTargetSet
-  list.defaultTargetSetFocusIndex = 6
-  list.advanceKey = "right" 
-  list.reverseKey = "left"
+  list.targetSet = list.focusedTargetSet
+  m.top.defaultTargetSetFocusIndex = 6
+end function
+
+function configureListFloating(list)
+  ? "configureListFloating"
+  
+end function
+
+function configureListFixedWrap(list)
+  ? "configureListFixedWrap"
+  focusedTargetSet1 = createObject("roSGNode", "TargetSet")
+  focusedTargetSet2 = createObject("roSGNode", "TargetSet")
+  focusedTargetSet3 = createObject("roSGNode", "TargetSet")
+  focusedTargetSet4 = createObject("roSGNode", "TargetSet")
+  focusedTargetSet5 = createObject("roSGNode", "TargetSet")
+  list.focusedTargetSet = [focusedTargetSet1, focusedTargetSet2, focusedTargetSet3, focusedTargetSet4, focusedTargetSet5]
+  
+  focusedTargetSet1.targetRects = [
+    { x: -192, y: -64, width: 100, height: 128 },
+    { x: -192, y: -64, width: 100, height: 128 },
+    { x: -192, y: -90, width: 144, height: 180 },
+    { x: -192, y: -125, width: 200, height: 250 },
+    { x: 28, y: -188, width: 300, height: 376 }, ' focus
+    { x: 348, y: -125, width: 200, height: 250 },
+    { x: 568, y: -90, width: 144, height: 180 },
+    { x: 732, y: -64, width: 100, height: 128 },
+    { x: 852, y: -64, width: 100, height: 128 },
+    { x: 972, y: -64, width: 100, height: 128 },
+    { x: 1092, y: -64, width: 100, height: 128 },
+    { x: 1212, y: -64, width: 100, height: 128 },
+    { x: 1332, y: -64, width: 100, height: 128 }
+  ]
+  focusedTargetSet1.focusIndex = 4
+  focusedTargetSet1.color = "0x00202020AA"
+  
+  focusedTargetSet2.targetRects = [
+    { x: -164, y: -64, width: 100, height: 128 },
+    { x: -164, y: -64, width: 100, height: 128 },
+    { x: -164, y: -64, width: 100, height: 128 },
+    { x: -164, y: -90, width: 144, height: 180 },
+    { x: 0, y: -125, width: 200, height: 250 },
+    { x: 220, y: -188, width: 300, height: 376 }, ' focus
+    { x: 540, y: -125, width: 200, height: 250 },
+    { x: 760, y: -90, width: 144, height: 180 },
+    { x: 924, y: -64, width: 100, height: 128 },
+    { x: 1044, y: -64, width: 100, height: 128 },
+    { x: 1164, y: -64, width: 100, height: 128 },
+    { x: 1284, y: -64, width: 100, height: 128 },
+    { x: 1404, y: -64, width: 100, height: 128 }
+  ]
+  focusedTargetSet2.focusIndex = 5
+  focusedTargetSet2.color = "0x00202020AA"
+  
+  focusedTargetSet3.targetRects = [
+    { x: -134, y: -64, width: 100, height: 128 },
+    { x: -134, y: -64, width: 100, height: 128 },
+    { x: -134, y: -64, width: 100, height: 128 },
+    { x: -14, y: -64, width: 100, height: 128 },
+    { x: 106, y: -90, width: 144, height: 180 },
+    { x: 270, y: -125, width: 200, height: 250 },
+    { x: 490, y: -188, width: 300, height: 376 }, ' focus
+    { x: 810, y: -125, width: 200, height: 250 },
+    { x: 1030, y: -90, width: 144, height: 180 },
+    { x: 1194, y: -64, width: 100, height: 128 },
+    { x: 1314, y: -64, width: 100, height: 128 },
+    { x: 1314, y: -64, width: 100, height: 128 },
+    { x: 1314, y: -64, width: 100, height: 128 }
+  ]
+  focusedTargetSet3.focusIndex = 6
+  focusedTargetSet3.color = "0x00202020AA"
+  
+  focusedTargetSet4.targetRects = [
+    { x: -204, y: -64, width: 100, height: 128 }
+    { x: -204, y: -64, width: 100, height: 128 },
+    { x: 16, y: -64, width: 100, height: 128 },
+    { x: 136, y: -64, width: 100, height: 128 },
+    { x: 256, y: -64, width: 100, height: 128 },
+    { x: 376, y: -90, width: 144, height: 180 },
+    { x: 540, y: -125, width: 200, height: 250 },
+    { x: 760, y: -188, width: 300, height: 376 }, ' focus
+    { x: 1080, y: -125, width: 200, height: 250 },
+    { x: 1300, y: -90, width: 144, height: 180 },
+    { x: 1464, y: -64, width: 100, height: 128 },
+    { x: 1584, y: -64, width: 100, height: 128 },
+    { x: 1704, y: -64, width: 100, height: 128 },
+  ]
+  focusedTargetSet4.focusIndex = 7
+  focusedTargetSet4.color = "0x00202020AA"
+  
+  focusedTargetSet5.targetRects = [
+    { x: -152, y: -64, width: 100, height: 128 },
+    { x: -32, y: -64, width: 100, height: 128 }
+    { x: 88, y: -64, width: 100, height: 128 },
+    { x: 208, y: -64, width: 100, height: 128 },
+    { x: 328, y: -64, width: 100, height: 128 },
+    { x: 448, y: -64, width: 100, height: 128 },
+    { x: 568, y: -90, width: 144, height: 180 },
+    { x: 732, y: -125, width: 200, height: 250 },
+    { x: 952, y: -188, width: 300, height: 376 }, ' focus
+    { x: 1272, y: -125, width: 200, height: 250 },
+    { x: 1272, y: -90, width: 144, height: 180 },
+    { x: 1272, y: -64, width: 100, height: 128 },
+    { x: 1272, y: -64, width: 100, height: 128 },
+  ]
+  focusedTargetSet5.focusIndex = 8
+  focusedTargetSet5.color = "0x00202020AA"
+  
+  unfocusedTargetSet = createObject("roSGNode", "TargetSet")
+  list.unfocusedTargetSet = unfocusedtargetSet
+  
+  unfocusedTargetSet.targetRects = [
+    { x: -130, y: -64, width: 100, height: 128 },
+    { x: -10, y: -64, width: 100, height: 128 },
+    { x: 110, y: -64, width: 100, height: 128 },
+    { x: 230, y: -64, width: 100, height: 128 },
+    { x: 350, y: -64, width: 100, height: 128 },
+    { x: 470, y: -64, width: 100, height: 128 },
+    { x: 590, y: -64, width: 100, height: 128 }, ' focus
+    { x: 710, y: -64, width: 100, height: 128 },
+    { x: 830, y: -64, width: 100, height: 128 },
+    { x: 950, y: -64, width: 100, height: 128 },
+    { x: 1070, y: -64, width: 100, height: 128 },
+    { x: 1190, y: -64, width: 100, height: 128 },
+    { x: 1310, y: -64, width: 100, height: 128 }
+  ]
+  unfocusedTargetSet.focusIndex = 6 ' should not matter?
+  unfocusedTargetSet.color = "0x00202020AA"
+  
+  list.targetSet = list.focusedTargetSet[0]
 end function
 
 function addListListeners()

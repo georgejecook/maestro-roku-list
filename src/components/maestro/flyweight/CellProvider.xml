@@ -3,9 +3,6 @@
 <component
     name='CellProvider'
     extends='Group'>
-  <script
-      type='text/brightscript'
-      uri='CellProvider.brs' />
 
   <interface>
     <field

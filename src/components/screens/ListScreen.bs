@@ -3,25 +3,23 @@ function init()
   print "in FocusTestScene init"
   createObject("roSGNode", "TrackerTask")
   m.infoLabel = m.top.findNode("infoLabel")
-  
+
   m.cellProvider = createObject("roSGNode", "CellProvider") 
   m.top._cellProvider = m.cellProvider
   m.global.addFields({ "cellProvider": m.cellProvider })
-  
-  
+
+
   m.cellTracker = createObject("roSGNode", "CellTracker") 
   m.top._cellTracker = m.cellTracker
   m.global.addFields({ "cellTracker": m.cellTracker })
   m.top.addFields({ "_global": m.global })
-  
+
   listHolder = m.top.findNode("listHolder")
-  
+
   'create after we've set up our cell tracker and provider
   m.list = listHolder.createChild("MList")
-  m.list2 = listHolder.createChild("MList")
-  m.list2.translation = [300, 300]
   m.list.translation = [0, 250]
-  
+
   m.contentId = 0
   onResetChange()
   m.list.observeField("itemFocused", "itemFocusedChanged")
@@ -33,45 +31,37 @@ function init()
   m.cellTracker.observeField("numberOfCells", "onInfoChange")
   m.cellProvider.observeField("numberOfCellsInUse", "onInfoChange")
   m.cellProvider.observeField("numberOfCells", "onInfoChange")
-  
-  m.list.setFocus(true)
-end function
 
-
-function onDebugMChange()
-  m.top._m = m
 end function
 
 function onResetChange()
   ? "resetting"
   m.list.content = invalid
-  m.list2.content = invalid
   m.cellProvider.callFunc("reset", invalid)
   m.cellTracker.callFunc("reset", invalid)
   prebakeCells()
   m.list.content = createData()
-  ' m.list2.content = createData()
 end function
 
 function prebakeCells()
   ? "adding prebaked cells"
-  
+
   m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellOnes, "SimpleCell")
   m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellTwos, "SimpleCell2")
   m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellComplex, "ComplexCell")
-  
+
   ? "finished adding prebaked cells"
 end function
 
 function createData()
-  
+
   content = createObject("roSGNode", "ContentNode")
-  
+
   for i = 0 to m.top._numberOfRows
     row = content.createChild("ContentNode")
     row.title = "ROW " + str(i)
     ' row.addFields({
-      ' "isHidden": false
+    ' "isHidden": false
     ' })
     row.addField("isHidden", "boolean", true)
     row.appendChildren(makeItems(m.top._defaultCellType, 20))
@@ -124,7 +114,7 @@ function addItems(cellType, number)
 end function
 
 function makeItems(cellType, number)
-  
+
   items = []
   for i = 0 to number
     child = createObject("roSGNode", "ContentNode")
@@ -135,7 +125,7 @@ function makeItems(cellType, number)
     child.addFields({
       "cellType": cellType
     })
-    
+
     items.push(child)
     m.contentId++
   end for
@@ -144,15 +134,15 @@ end function
 
 function onRemove()
   row = m.list.content.getChild(focusedRow)
-  
+
   startIndex = row.getChildCount() - m.top._removeItems
   children = row.getChildren(m.top._removeItems, startIndex)
   row.removeChildren(children)
-  
+
 end function
 
 function toggleCellState(items, state)
-  
+
   for each item in items
     if item <> invalid
       dynamicCell = m.cellTracker.callFunc("getCellForContentId", item.id)
@@ -162,12 +152,12 @@ function toggleCellState(items, state)
       end if
     end if
   end for
-  
+
 end function
 
 function onHideRow()
   ? "onHide" 
-  
+
   row = m.list.content.getChild(focusedRow)
   toggleCellState(getRowItems(row, m.top._hideRowItems), "hide")
 end function
@@ -175,7 +165,7 @@ end function
 
 function onShowRow()
   ? "onShow"
-  
+
   row = m.list.content.getChild(focusedRow)
   toggleCellState(getRowItems(row, m.top._showRowItems), "show")
 end function
@@ -185,7 +175,7 @@ function getRowItems(row, number)
   for i = 0 to number
     items.push(row.getChild(i))
   end for
-  
+
   return items
 end function
 
@@ -207,17 +197,23 @@ function onShow()
   end for
 end function
 
-function onKeyEvent(key as string, press as boolean) as boolean
-  handled = false
-  if press
-    ? "press "; key
-    if key = "option"
-      if m.list.hasFocus()
-        m.list2.setFocus()
-      else
-        m.list.setFocus()
-      end if
-    end if
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ keypresses
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onKeyPressOption() as boolean
+  ? "alive"
+end function
+
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ lifecycle
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onGainedFocus(isSelfFocused)
+  logInfo("onGainedFocus", isSelfFocused)
+  if isSelfFocused
+    setFocus(m.list)
   end if
-  return true
 end function

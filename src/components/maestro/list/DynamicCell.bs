@@ -1,5 +1,6 @@
 function init()
   m.cell = invalid
+  m.top.cell = invalid
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
   m.cellTracker.numberOfCells++
@@ -19,10 +20,12 @@ function updateCell() as void
   if m.cell <> invalid and (m.top.itemContent = invalid or m.cell.subType() <> m.top.itemContent.cellType)
     m.cellProvider.callFunc("releaseCell", m.cell) 
     m.cell = invalid
+    m.top.cell = invalid
   end if
   
   if m.cell = invalid
     m.cell = m.cellProvider.callFunc("getCell", m.top.itemContent.cellType)
+    m.top.cell = m.cell
     m.top.appendChild(m.cell)
   end if
   
@@ -48,6 +51,7 @@ function onViewStateChange(evt)
   else if evt.getData() = "hide" and m.cell <> invalid
     m.cellProvider.callFunc("releaseCell", m.cell) 
     m.cell = invalid
+    m.top.cell = invalid
   end if
 end function
 

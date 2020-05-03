@@ -1,0 +1,51 @@
+import "../../lib/Utils.bs"
+import "pkg:/source/rLog/rLogMixin.brs"
+import "../../observable/BaseObservable.bs"
+
+namespace MVMM
+
+' /**
+'  * @module ViewModelMixin
+'  * @description Mixin method for helping with ViewModelIntegration. These are all private methods, handled by the framework
+'  */
+
+function isVM(vm)
+  return MOM_isObservable(vm) and vm.__viewModel = true
+end function
+
+function onFocusIdChange(focusId)
+  logVerbose("onFocusIdChange", focusId, m.top.isShown)
+
+  if focusId <> invalid and focusId <> "" and m.top.isShown
+    control = m[focusId]
+  
+    if control <> invalid
+      setFocus(control)
+    else
+      logError("the focus map contained a focusId that did not exist!", focusId)
+    end if
+
+  end if
+end function
+
+
+function initializeBindings(isUsingViewModelFocusId)
+  if MU.isFunction(m_initBindings)
+    m_initBindings()
+  end if
+
+  if MU.isFunction(M_initStaticBindings)
+    M_initStaticBindings()
+  end if
+
+  if isUsingViewModelFocusId
+    MOM.observeField(m.vm, "focusId", MVMM.onFocusIdChange)
+  end if
+    
+end function
+
+function findViewWithId(id)
+  return m[id]
+end function
+
+end namespace

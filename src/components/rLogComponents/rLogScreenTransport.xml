@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component name="rLogScreenTransport" 
-  extends="Group" 
-  >
-
+<component name="rLogScreenTransport" extends="Group">
   <script type="text/brightscript"  uri="rLogScreenTransport.brs" />
 
   <interface>

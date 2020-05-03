@@ -1,11 +1,6 @@
-' /**
-'  * @module rLogSGNodeTransport
-'  * @description implementation of rLog node transport used for sending logs to RALE inspectable nodes
-'  */
-
 function Init() as void
     'IMPLEMENT ME!
-    m.top.logOutput = []
+    m.top._logOutput = []
     m.top._rawItems = []
 end function
 

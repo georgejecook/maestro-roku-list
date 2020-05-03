@@ -1,8 +1,3 @@
-' /**
-'  * @module rLogScreenTransport
-'  * @description implementation of rLog screen transport
-'  */
-
 function init()
   m.top.observeField("logLine", "onLogLineChange")
   m.displayedLines = []

@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component
-  name="rLog"
-  extends="ContentNode"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  
->
-  
+<component name="rLog" extends="ContentNode">
   <script type="text/brightscript" uri="rLog.brs" />
   <script type="text/brightscript" uri="pkg:/source/rLog/transports/printTransport.brs" />
   <script type="text/brightscript" uri="pkg:/source/rLog/transports/rLogSGTransport.brs" />
   <script type="text/brightscript" uri="pkg:/source/rLog/transports/rLogScreenTransport.brs" />
+  <script type="text/brightscript" uri="pkg:/source/maestro/lib/ThreadUtils.brs" />
 
   <interface>
     <field id="logEntry" type="assocarray" onChange="onLogEntryChange" alwaysNotify="true"/>
@@ -20,7 +15,6 @@
     <field id="isForcedOff" type="boolean" value="false"/>
     <field id="isLightForcedOn" type="boolean" value="false"/>
     <field id="isLightForcedOff" type="boolean" value="false"/>
-    <field id="isPrintingName" type="boolean" value="false"/>
     
     <!-- if configured, you can view your log output here -->
     <field id="_nodeLogger" type="node"/>

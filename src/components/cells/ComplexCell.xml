@@ -4,10 +4,6 @@
     name='ComplexCell'
     extends='Group'>
 
-  <script
-      type='text/brightscript'
-      uri='ComplexCell.brs' />
-
   <!-- Note that target and rect are both set during the interpolation -->
   <interface>
     <field
@@ -33,6 +29,10 @@
         id='focusPercent'
         type='float'
         onChange='focusPercentChanged' />
+    <field
+        id='_toggleButton'
+        type='boolean'
+        onChange='onChangeButtonFocus' />
   </interface>
 
 
@@ -94,6 +94,19 @@
         id='focusColorInterp'
         key='[0.0, 1.0]'
         keyValue='[0x00002080, 0x000080FF]' />
+
+    <Button
+        id='button'
+        text='title'
+        width='300'
+        height='30' />
+    <Button
+        id='button2'
+        text='title'
+        translation='[0,40]'
+        width='300'
+        height='30' />
+
   </children>
 
 </component>

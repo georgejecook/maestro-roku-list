@@ -1,12 +1,7 @@
 <?xml version='1.0' encoding='utf-8' ?>
-
 <component
     name='MList'
     extends='Group'>
-
-  <script
-      type='text/brightscript'
-      uri='MList.brs' />
   <interface>
     <field
         id='_debugM'
@@ -55,10 +50,19 @@
     <field
         id='currFocusItemIndex'
         type='integer' />
+    <field
+        id='_focusedRenderer'
+        type='node' />
+    <function name='getBoundsForIndex' />
+    <function name='getFocusedBounds' />
 
   </interface>
   <children>
     <Group id='rowsGroup' />
+    <Rectangle
+        id='overlay'
+        color='#ff0000'
+        opacity='0.5' />
   </children>
 
 </component>

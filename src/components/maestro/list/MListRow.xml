@@ -7,6 +7,11 @@
     <field
         id='index'
         type='integer' />
+    <!-- fixed|floating|fixedWrap|zoom -->
+    <field
+        id='focusType'
+        value="fixedWrap"
+        type='string' />
     <field
         id='isHidden'
         type='boolean'
@@ -57,14 +62,18 @@
         id='itemSelected'
         alias='list.itemSelected' />
     <field
+        id='currTargetSet'
+        alias='list.currTargetSet' />
+    <field
+        id='defaultTargetSetFocusIndex'
+        alias='list.defaultTargetSetFocusIndex'
+        value='0' />
+    <field
         id='currFocusItemIndex'
         alias='list.currFocusItemIndex'
         onChange='onCurrFocusItemIndexChange' />
-  </interface>
 
-  <script
-      type='text/brightscript'
-      uri='MListRow.brs' />
+  </interface>
 
   <children>
     <Label id='header' />

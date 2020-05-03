@@ -2,6 +2,7 @@ function init()
   print "in FocusTestScene init"
   createObject("roSGNode", "TrackerTask")
   m.rowsGroup = m.top.findNode("rowsGroup") 
+  m.overlay = m.top.findNode("overlay") 
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
   m.previousContent = invalid
@@ -21,7 +22,7 @@ function resetState()
   m.lists = []
   
   if m.top.content <> invalid
-    for each item in m.top.content.getChildren(-1, 0)
+    for each item in m.top.content.getChildren( - 1, 0)
       list = makeList(item)
       m.lists.push(list)
     end for
@@ -84,6 +85,7 @@ function addListListeners()
     list.observeField("itemSelected", "itemSelectedChanged")
     list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
     list.observeField("isHidden", "onListIsHiddenChange")
+    list.observeField("currTarget", "onCurrTargetChange")
   end for
 end function
 
@@ -99,13 +101,28 @@ function itemSelectedChanged()
   m.top.itemSelected = m.currentList.itemSelected
 end function
 
-function currFocusItemIndexChanged()
-  m.top.currFocusItemIndex = m.currentList.currFocusItemIndex
+function currFocusItemIndexChanged() 
+  ? "currFocusItemIndexChanged " ; 
+  index = m.currentLIst.currFocusItemIndex
+  m.top.currFocusItemIndex = index
+  rect = getFocusedBounds()
+  ? " rect is "; formatJson(rect)
+  m.overlay.width = rect.width
+  m.overlay.height = rect.height
+  m.overlay.translation = [rect.x, rect.y]
 end function
 
 function onListIsHiddenChange(evt)
   layoutLists()
 end function
+
+
+function onCurrTargetChange(evt)
+  currTarget = m.currentList.currTarget
+  ? "currTargetSet"; formatJson(currTarget)
+end function
+
+
 
 function onKeyEvent(key as string, press as boolean) as boolean
   handled = false
@@ -125,12 +142,15 @@ end function
 
 function moveYFocus(offset)
   newIndex = m.focusIndex + offset
+  
+  'TODO - I have no need for vertical wrapping; if someone wants it
+  'they are free to submit a pr :)
   if newIndex < 0
-    newIndex = m.visibleLists.count() - 1
+    newIndex = 0
   end if
   
   if newIndex > m.visibleLists.count() - 1
-    newIndex = 0
+    newIndex = m.visibleLists.count() - 1
   end if
   
   updateRowVisibilities(newIndex, m.focusIndex)
@@ -149,6 +169,15 @@ function moveYFocus(offset)
     if m.currentList <> invalid
       m.rowsGroup.translation = [0, - m.currentList.translation[1]]
       m.currentList.isFocused = true
+      
+      if m.currentList.content <> invalid
+        focusedItem = m.currentList.content.getChild(m.currentList.itemFocused)
+        if focusedItem <> invalid
+          m.top._focusedRenderer = m.cellTracker@.getCellForContentId(focusedItem.id)
+        else
+          m.top._focusedRenderer = invalid
+        end if
+      end if
       ' m.currentList.setFocus(true)
     end if
   end if
@@ -181,4 +210,40 @@ function setListStateMap(states, startIndex, endIndex, state)
       end if
     end if
   end for
+end function
+
+
+function getBoundsForIndex(index)
+  rect = invalid
+  if m.currentList <> invalid
+    ' item = m.currentList.content.getChild(index)
+    ' if item <> invalid
+    '   dynamicCell = m.cellTracker@.getCellForContentId(item.id)
+      
+    '   if dynamicCell <> invalid
+    '     cell = dynamicCell.cell
+    '   end if
+    ' end if
+    set = m.currentList.currTargetSet
+    if set <> invalid
+      return set.targetRects[set.focusIndex]
+    end if
+  end if
+  
+  if rect <> invalid
+    ' ? "INDEX" ; index ; " " ; formatJson(dynamicCell.boundingRect()); "  " ; formatJson(dynamicCell.localBoundingRect()); "  " ; formatJson(dynamicCell.sceneBoundingRect()); "  " 
+    return rect
+  else
+    ? "could not find target "
+    return {
+      width: 0
+      height: 0
+      translation: [0, 0]
+    }
+  end if
+  
+end function
+
+function getFocusedBounds(args = invalid)
+  return getBoundsForIndex(int(m.currentList.currFocusItemIndex))
 end function
