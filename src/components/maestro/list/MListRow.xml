@@ -7,16 +7,20 @@
     <field
         id='index'
         type='integer' />
-    <!-- fixed|floating|fixedWrap|zoom -->
+    <!-- fixed|floating|focusWrap|zoom|custom -->
     <field
         id='focusType'
-        value="fixedWrap"
+        value='floating'
         type='string' />
     <field
         id='isHidden'
         type='boolean'
         value='false'
         onChange='onIsHiddenChange' />
+    <field
+        id='isFocusable'
+        type='boolean'
+        value='true' />
     <field
         id='content'
         type='node'
@@ -43,6 +47,10 @@
         id='numCols'
         type='integer'
         value='12' />
+    <field
+        id='focusIndexOffset'
+        type='integer'
+        value='0' />
     <field
         id='unfocusCellScale'
         type='float'
@@ -76,7 +84,7 @@
   </interface>
 
   <children>
-    <Label id='header' />
+    <Label id='header' text="header"/>
     <TargetList id='list' />
   </children>
 

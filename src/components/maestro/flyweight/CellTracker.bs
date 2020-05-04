@@ -70,7 +70,7 @@ function bindCellToContent(cell, content, scope = "all")
   
   if content <> invalid
     m.top.numberOfCellsInUse++
-    ? ">> binding content id "; content.id ; " to "; cell.trackingId
+    ' ? ">> binding content id "; content.id ; " to "; cell.trackingId
     trackers.cellIdsByContentId[content.id] = cell.trackingId
     trackers.cellsById[cell.trackingId] = cell
     trackers.contentIdsByCellId[cell.trackingId] = content.id

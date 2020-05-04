@@ -1,7 +1,6 @@
 
 function init()
   print "in FocusTestScene init"
-  createObject("roSGNode", "TrackerTask")
   m.infoLabel = m.top.findNode("infoLabel")
 
   m.cellProvider = createObject("roSGNode", "CellProvider") 
