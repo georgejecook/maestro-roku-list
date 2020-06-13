@@ -1,55 +1,43 @@
 
 function init()
   print "in FocusTestScene init"
-  m.infoLabel = m.top.findNode("infoLabel")
 
-  m.cellProvider = createObject("roSGNode", "CellProvider") 
-  m.top._cellProvider = m.cellProvider
-  m.global.addFields({ "cellProvider": m.cellProvider })
-
-
-  m.cellTracker = createObject("roSGNode", "CellTracker") 
-  m.top._cellTracker = m.cellTracker
-  m.global.addFields({ "cellTracker": m.cellTracker })
-  m.top.addFields({ "_global": m.global })
 
   listHolder = m.top.findNode("listHolder")
 
   'create after we've set up our cell tracker and provider
+  ' m.list = listHolder.createChild("RowList")
+  '   m.list.rowHeights = [400]
+  '   m.list.focusXOffset = [100]
+  '   m.list.rowSpacings = []
+  '   m.list.rowItemSize = [400,350]
+  '   m.list.rowItemSpacing = [0,0]
+  '   m.list.showRowLabel = [true]
+  '   m.list.itemSize = [1920, 280]
+  '   m.list.numRows = 3
+  '   m.list.itemComponentName = "DynamicCell"
+
   m.list = listHolder.createChild("MList")
   m.list.translation = [0, 250]
-
+  m.cellProvider = m.global.cellProvider
+  m.top._cellProvider = m.global.cellProvider
+  m.cellTracker = m.global.cellTracker
+  m.top._cellTracker = m.global.cellTracker
   m.contentId = 0
   onResetChange()
+  m.list.observeField("itemSelected", "itemSelcetedChanged")
   m.list.observeField("itemFocused", "itemFocusedChanged")
   m.list.observeField("itemUnfocused", "itemUnfocusedChanged")
   m.list.observeField("itemSelected", "itemSelectedChanged")
   m.list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
-  m.list.observeField("rowFocused", "onInfoChange")
-  m.cellTracker.observeField("numberOfCellsInUse", "onInfoChange")
-  m.cellTracker.observeField("numberOfCells", "onInfoChange")
-  m.cellProvider.observeField("numberOfCellsInUse", "onInfoChange")
-  m.cellProvider.observeField("numberOfCells", "onInfoChange")
+  ' m.list.observeField("rowFocused", "onInfoChange")
 
 end function
 
 function onResetChange()
   ? "resetting"
   m.list.content = invalid
-  m.cellProvider.callFunc("reset", invalid)
-  m.cellTracker.callFunc("reset", invalid)
-  prebakeCells()
   m.list.content = createData()
-end function
-
-function prebakeCells()
-  ? "adding prebaked cells"
-
-  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellOnes, "SimpleCell")
-  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellTwos, "SimpleCell2")
-  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellComplex, "ComplexCell")
-
-  ? "finished adding prebaked cells"
 end function
 
 function createData()
@@ -63,13 +51,21 @@ function createData()
     ' "isHidden": false
     ' })
     row.addField("isHidden", "boolean", true)
-    row.appendChildren(makeItems(m.top._defaultCellType, 20))
+    row.addField("isFocusable", "boolean", true)
+    row.appendChildren(makeItems(m.top._defaultCellType, 60))
   end for
   return content
 end function
 
 function itemFocusedChanged()
   print "itemFocused changed to: "; m.list.itemFocused
+end function
+
+function itemSelcetedChanged()
+  print "itemFocused changed to: "; m.list.itemFocused
+  newScreen = createObject("roSGNode", "ListScreen")
+  push(newScreen)
+  setFocus(newScreen)
 end function
 
 function itemUnfocusedChanged()
@@ -80,9 +76,6 @@ function itemSelectedChanged()
   print "itemSelected changed to: "; m.list.itemSelected
 end function
 
-function onInfoChange()
-  m.infoLabel.text = "Row: " + str(m.list.rowFocused) + " Light cells (" + str(m.cellTracker.numberOfCellsInUse) + "/" + str(m.cellTracker.numberOfCells) + ") - Real cells (" + str(m.cellProvider.numberOfCellsInUse) + "/" + str(m.cellProvider.numberOfCells) + ")"
-end function
 
 function currFocusItemIndexChanged()
 end function
@@ -119,8 +112,16 @@ function makeItems(cellType, number)
     child = createObject("roSGNode", "ContentNode")
     child.id = str(m.contentId).trim()
     child.description = "some really long " + child.id + "text in here " + child.id
-    child.HDGRIDPOSTERURL = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
+    child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 400).trim() + "/360/300"
+    ' child.HDGRIDPOSTERURL = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
     child.title = "Item " + child.id.tostr()
+    
+    if m.contentId mod 20 = 0
+      cellType = "SimpleCell"
+    else if m.contentId mod 10 = 0
+      cellType = "SimpleCell2"
+    end if
+
     child.addFields({
       "cellType": cellType
     })
@@ -158,7 +159,7 @@ function onHideRow()
   ? "onHide" 
 
   row = m.list.content.getChild(focusedRow)
-  toggleCellState(getRowItems(row, m.top._hideRowItems), "hide")
+  toggleCellState(getRowItems(row, m.top._hideRowItems), "hidden")
 end function
 
 
@@ -178,16 +179,16 @@ function getRowItems(row, number)
   return items
 end function
 
-function onHide()
+function onHideItems()
   for i = 0 to m.top._hideItems
     dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
     if dynamicCell <> invalid
-      dynamicCell.viewState = "hide"
+      dynamicCell.viewState = "hidden"
     end if
   end for
 end function
 
-function onShow()
+function onShowItems()
   for i = 0 to m.top._showItems
     dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
     if dynamicCell <> invalid
@@ -202,13 +203,38 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onKeyPressOption() as boolean
-  ? "alive"
+  ? "pressed option"
+  return true
 end function
 
+function onKeyPressFastForward() as boolean
+  return true
+end function
+
+function onKeyPressBack() as boolean
+  ? "going back!"
+
+  if m.top.isRoot
+    return false
+  else
+    m.list.isHidden = true
+    pop()
+  end if
+  return true
+end function
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ lifecycle
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onShow()
+  m.list.isHidden = false
+  setFocus(m.list)
+end function
+
+function onHide()
+  m.list.isHidden = true
+end function
 
 function onGainedFocus(isSelfFocused)
   logInfo("onGainedFocus", isSelfFocused)

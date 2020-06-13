@@ -1,7 +1,7 @@
 import { series } from "gulp";
 import { RooibosProcessor, createProcessorConfig } from 'rooibos-cli';
 import { BurpConfig, BurpProcessor } from "burp-brightscript";
-import { MaestroProjectProcessor, createMaestroConfig } from 'maestro-cli-roku';
+import { ProgramBuilder } from 'brighterscript';
 
 const gulp = require('gulp');
 const gulpClean = require('gulp-clean');
@@ -34,28 +34,11 @@ export async function deploy(cb) {
 }
 
 async function compile(cb) {
-  let config = createMaestroConfig({
-    filePattern: ['**/*.bs', '**/*.brs', '**/*.xml'],
-    sourcePaths: ['./src'],
-    outputPath: outDir,
-    logLevel: 2,
-    processingExcludedPaths: [
-      'components/rLogComponents/**/*.*',
-      'source/rLog/**/*.*',
-      'source/tests/rooibosDist.brs',
-      'source/tests/rooibosFunctionMap.brs',
-      'source/AdobeAccessEnabler/adobeAuthorizationTemplate.xml'
-    ],
-    nonCheckedImports: [
-      'source/zapp.brs',
-      'source/MRuntime.brs',
-      'source/rLog/rLogMixin.brs',
-      'source/tests/rooibosDist.brs',
-      'source/rooibosFunctionMap.brs'
-    ]
+  let builder = new ProgramBuilder();
+  await builder.run({
+    stagingFolderPath: outDir,
+    createPackage: false
   });
-  let processor = new MaestroProjectProcessor(config);
-  await processor.processFiles();
 }
 
 async function prepareTests(cb) {
@@ -123,7 +106,7 @@ export function applyBurpPreprocessing(cb) {
       }
     ];
   }
-  
+
   // add crash resilience to tests
   if (process.env.buildType === 'test') {
     replacements.push({

@@ -52,6 +52,7 @@ function bindCellToContent(cell, content, scope = "all")
     ' ? ">>cell has never been bound"
     'never been bound
     m.top.trackingId ++
+    m.top.numberOfCells ++
     cell.trackingId = str(m.top.trackingId).trim()
   else
     existingId = trackers.contentIdsByCellId[cell.trackingId]
@@ -72,9 +73,10 @@ function bindCellToContent(cell, content, scope = "all")
     m.top.numberOfCellsInUse++
     ' ? ">> binding content id "; content.id ; " to "; cell.trackingId
     trackers.cellIdsByContentId[content.id] = cell.trackingId
-    trackers.cellsById[cell.trackingId] = cell
     trackers.contentIdsByCellId[cell.trackingId] = content.id
   end if
+
+  trackers.cellsById[cell.trackingId] = cell
 end function
 
 function unbindCell(cell, scope = "all")
@@ -91,4 +93,19 @@ function unbindCell(cell, scope = "all")
       trackers.cellsById.delete(cell.trackingId)
     end if
   end if
+end function
+
+function setViewStates(states)
+
+  for each id in states
+    dynamicCell = getCellForContentId(id)
+    if dynamicCell <> invalid
+      dynamicCell.viewState = states[id]
+      ' ? " setting cell view state"; id ; states[id]
+    else
+      'FIXME
+      ' ? " could not find cell for id " ; id
+    end if
+  end for
+
 end function

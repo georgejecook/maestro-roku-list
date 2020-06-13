@@ -4,6 +4,10 @@
     extends='BaseScreen'>
   <interface>
     <field
+        id='isRoot'
+        type='boolean'
+        value='false' />
+    <field
         id='_cellProvider'
         type='node' />
     <field
@@ -16,7 +20,7 @@
     <field
         id='_numberOfRows'
         type='integer'
-        value='4' />
+        value='20' />
     <field
         id='_addTypeOnes'
         type='integer'
@@ -50,25 +54,13 @@
     <field
         id='_showItems'
         type='integer'
-        onChange='onShow'
+        onChange='onShowItems'
         alwaysNotify='true' />
     <field
         id='_hideItems'
         type='integer'
-        onChange='onHide'
+        onChange='onHideItems'
         alwaysNotify='true' />
-    <field
-        id='_prebakeCellOnes'
-        type='integer'
-        value='10' />
-    <field
-        id='_prebakeCellTwos'
-        type='integer'
-        value='10' />
-    <field
-        id='_prebakeCellComplex'
-        type='integer'
-        value='130' />
     <field
         id='_addTypeOnePrebakes'
         type='integer'
@@ -93,15 +85,7 @@
   </interface>
   <children>
     <Group id='listHolder' />
-    <Rectangle
-        color='#ff0000'
-        width='1920'
-        height='100'
-        translation='[0, 900]' />
-    <Label
-        id='infoLabel'
-        translation='[50, 920]'
-        color='#ffffff' />
   </children>
+
 
 </component>

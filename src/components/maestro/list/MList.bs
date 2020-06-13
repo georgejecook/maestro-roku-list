@@ -1,54 +1,73 @@
 function init()
-  print "in FocusTestScene init"
+  registerLogger("MList")
   m.rowsGroup = m.top.findNode("rowsGroup") 
+  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
+  m.moveAnimation = m.top.findNode("moveAnimation") 
+  m.moveAnimationInterpolator.observeField("fraction", "onAnimationFractionChange")
+
   m.overlay = m.top.findNode("overlay") 
+  m.focusTimer = m.top.findNode("focusTimer") 
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
   m.previousContent = invalid
   m.numberOfRowsToShow = 3
+  m.top.rowFocused = 0
   m.visibleLists = []
   m.hiddenLists = []
   m.lists = []
+  m.lastStates = {}
+  m.focusTimer.observeField("fire", "currFocusItemIndexChanged")
   resetState()
 end function
 
 function resetState()
   m.currentY = 0
-  m.focusIndex = 0
   m.listIndex = 0
-  m.rowsGroup.removeChildren(m.rowsGroup.getChildren( - 1, 0))
-  
+  m.rowsGroup.removeChildren(m.rowsGroup.getChildren(-1, 0))
+
   m.lists = []
-  
+
   if m.top.content <> invalid
-    for each item in m.top.content.getChildren( - 1, 0)
+    for each item in m.top.content.getChildren(-1, 0)
       list = makeList(item)
       m.lists.push(list)
     end for
   end if
-  
-  layoutLists()
+
+  'TODO - MU namespace not resolving - INVESTIGATE
   addListListeners()
-  m.currentList = m.visibleLists[m.focusIndex]
+  m.currentList = m.visibleLists[m.top.rowFocused]
   moveYFocus(0)
+  setInitialTimer = m.top.findNode("setInitialTimer")
+  setInitialTimer.observeField("fire", "onSetInitialTimerFire")
+  setInitialTimer.control = "start"
+end function
+
+function onSetInitialTimerFire()
+  logMethod(">>onSetInitialTimerFire")
+  layoutLists()
+  for each row in m.visibleLists
+    row.viewState = "partial"
+  end for
+  ' updateRowStates(0, 0, 5, 5)
 end function
 
 function layoutLists()
   m.currentY = 0
-  
+
   m.visibleLists = []
   m.hiddenLists = []
   for each list in m.lists
     list.visible = not list.isHidden
     if list.visible
       list.translation = [0, m.currentY]
-      m.currentY += m.top.cellSize[1] + m.top.cellSpacing[1]
+      m.currentY += m.top.cellSize[1] + m.top.cellSpacing[1] + 40
       m.visibleLists.push(list)
     else
       m.hiddenLists.push(list)
     end if
   end for
-  
+
 end function
 
 function onDebugMChange()
@@ -70,10 +89,10 @@ function makeList(rowContent)
   list.numCols = m.top.numCols
   list.unfocusCellScale = m.top.unfocusCellScale
   list.unfocusCount = m.top.unfocusCount
+  list.viewState = "hidden"
   list.content = rowContent
-  
   m.listIndex++
-  
+
   return list
 end function
 
@@ -82,7 +101,7 @@ function addListListeners()
     list.observeField("itemFocused", "itemFocusedChanged")
     list.observeField("itemUnfocused", "itemUnfocusedChanged")
     list.observeField("itemSelected", "itemSelectedChanged")
-    list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
+    ' list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
     list.observeField("isHidden", "onListIsHiddenChange")
     list.observeField("isFocusable", "onListIsFocuableChange")
     list.observeField("currTarget", "onCurrTargetChange")
@@ -102,19 +121,72 @@ function itemSelectedChanged()
 end function
 
 function currFocusItemIndexChanged() 
-  ? "currFocusItemIndexChanged " ; 
-  index = m.currentList.currFocusItemIndex
-  m.top.currFocusItemIndex = index
-  rect = getFocusedBounds()
-  
-  if rect <> invalid
-    ? " rect is "; formatJson(rect)
-    m.overlay.width = rect.width
-    m.overlay.height = rect.height
-    m.overlay.translation = [rect.x, rect.y]
-  else
-    ? " no rect for focused item"
+  ' ? "currFocusItemIndexChanged " ; 
+  if m.currentList <> invalid
+    index = m.currentList.currFocusItemIndex
+    m.top.currFocusItemIndex = index
+    rect = getFocusedBounds()
+
+    if rect <> invalid
+      ' ? " rect is "; formatJson(rect)
+      m.overlay.width = rect.width
+      m.overlay.height = rect.height
+      m.overlay.translation = [rect.x, rect.y]
+    else
+      ? " no rect for focused item"
+    end if
   end if
+end function
+
+function onAnimationFractionChange()
+  ' logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction)
+  y = m.rowsGroup.translation[1]
+  index = getListAtY(y)
+
+  if m.moveAnimationInterpolator.fraction = 1
+    if index = -1
+      index = 0
+    end if
+    updateRowFocus(index)
+  else
+    ' logInfo(">>>", y, index, m.top.rowFocused)
+    if index <> -1 and index <> m.top.rowFocused
+      for i = 0 to m.top.rowFocused + (m.currentDirection * 5) step m.currentDirection
+        row = m.visibleLists[i]
+        if row <> invalid
+          if row.viewState = "hidden"
+            ' ? ">>>>>>>> partially showing row "; i
+            row.viewState = "partial"
+          end if
+        end if
+      end for
+    end if
+    m.top.rowFocused = index
+  end if
+
+end function
+
+
+function updateRowStates(direction, newIndex, beforeCount = 10, afterCount = 10)
+  ? "new Index" ; newIndex; " direction "; direction
+  if direction < 0
+    numberOfRowsToShowBefore = beforeCount
+    numberOfRowsToShowAfter = afterCount
+  else
+    numberOfRowsToShowBefore = beforeCount
+    numberOfRowsToShowAfter = afterCount
+  end if
+  updateRowVisibilities(newIndex, m.top.rowFocused, numberOfRowsToShowBefore, numberOfRowsToShowAfter)
+end function
+
+function getListAtY(yPos)
+  for i = 0 to m.visibleLists.count() - 1
+    if m.visibleLists[i].translation[1] >= abs(yPos)
+      return i
+    end if
+  end for
+
+  return -1
 end function
 
 function onListIsHiddenChange(evt)
@@ -130,91 +202,109 @@ function onCurrTargetChange(evt)
   ? "currTargetSet"; formatJson(currTarget)
 end function
 
-function onKeyEvent(key as string, press as boolean) as boolean
-  handled = false
-  if press
-    ? "list keypress "; key
-    
-    if key = "up"
-      moveYFocus( - 1)
-    end if
-    if key = "down"
-      moveYFocus(1)
-    end if
-    
-  end if
-  return true
-end function
+function moveYFocus(offset, isAnimated = true)
+  logMethod(">>moveYFocus")
+  newIndex = m.top.rowFocused + offset
 
-function moveYFocus(offset)
-  newIndex = m.focusIndex + offset
-  
   'TODO - I have no need for vertical wrapping; if someone wants it
   'they are free to submit a pr :)
   if newIndex < 0
     newIndex = 0
   end if
-  
+
   if newIndex > m.visibleLists.count() - 1
     newIndex = m.visibleLists.count() - 1
   end if
-  
-  direction = newIndex - m.focusIndex
-  
+
+  m.currentDirection = newIndex - m.top.rowFocused
+
   'ensure we dont' move to a non-focusable rowlist
   nextList = m.visibleLists[newIndex]
   while nextList <> invalid and not nextList.isFocusable and newIndex < m.visibleLists.count() - 1 and newIndex > -1
-    newIndex += direction
+    newIndex += m.currentDirection
     nextList = m.visibleLists[newIndex]
   end while
-  
-  ? "new Index" ; newIndex; " direction "; direction
-  if direction < 0
-    numberOfRowsToShowBefore = 3
-    numberOfRowsToShowAfter = 1
-  else
-    numberOfRowsToShowBefore = 1
-    numberOfRowsToShowAfter = 3
+
+  if m.currentList <> invalid
+    m.currentList.isFocused = false
   end if
-  updateRowVisibilities(newIndex, m.focusIndex, numberOfRowsToShowBefore, numberOfRowsToShowAfter)
-  m.focusIndex = newIndex
-  m.top.rowFocused = newIndex
-  
-  currentList = nextList
-  
-  if currentList <> invalid
-    currentList.isFocused = false
-  end if
-  
-  if m.currentList = invalid or not m.currentList.isSameNode(currentList)
-    m.currentList = currentList 
-    
+
+  if m.currentList = invalid or not m.currentList.isSameNode(nextList)
+    m.currentList = nextList 
+
     if m.currentList <> invalid
-      m.rowsGroup.translation = [0, - m.currentList.translation[1]]
-      m.currentList.isFocused = m.currentList.isFocusable
-      
-      if m.currentList.content <> invalid
-        focusedItem = m.currentList.content.getChild(m.currentList.itemFocused)
-        if focusedItem <> invalid
-          m.top._focusedRenderer = m.cellTracker@.getCellForContentId(focusedItem.id)
-        else
-          m.top._focusedRenderer = invalid
-        end if
+      if isAnimated
+        animatetoIndex(m.top.rowFocused, newIndex)
+      else
+        m.rowsGroup.translation = [0, - m.currentList.translation[1]]
+        updateRowFocus(newIndex)
       end if
       ' m.currentList.setFocus(true)
     end if
   end if
 end function
 
+function animateToIndex(oldIndex, index)
+  logMethod("animateToIndex from", oldIndex, "to", index)
+  nextList = m.visibleLists[index]
+
+  if nextList = invalid
+    logError("could not idenitfy next list with index", index)
+    return invalid
+  end if
+
+  targetY = (nextList.translation[1])
+  'TODO count visible rows between oldIndex and newIndex
+  steps = abs(oldIndex - index)
+  if m.moveAnimation.state = "play"
+    m.moveAnimation.control = "pause"
+  end if
+  ? "targetY = "; targetY
+  ' m.moveAnimationInterpolator.keyValue = [[0, 0], [0, targetY]]
+  m.moveAnimationInterpolator.keyValue = [[0.0, m.rowsGroup.translation[1]], [0.0, - targetY]]
+  m.moveAnimation.duration = steps * m.top.animSpeed
+
+  if m.moveAnimation.state = "puse"
+    m.moveAnimation.control = "resume"
+  else
+    m.moveAnimation.control = "start"
+  end if
+
+end function
+
+function updateRowFocus(index)
+  logMethod("updateRowFocus", index)
+  m.currentList = m.visibleLists[index]
+
+  if m.currentList <> invalid 
+    m.top.rowFocused = index
+    m.currentList.isFocused = m.currentList.isFocusable
+
+    if m.currentList.content <> invalid
+      focusedItem = m.currentList.content.getChild(m.currentList.itemFocused)
+      if focusedItem <> invalid
+        m.top._focusedRenderer = m.cellTracker@.getCellForContentId(focusedItem.id)
+      else
+        m.top._focusedRenderer = invalid
+      end if
+    end if
+  else
+    m.top.rowFocused = -1
+  end if
+
+  updateRowStates(0, m.top.rowFocused)
+end function
+
 function updateRowVisibilities(newIndex, oldIndex, numberOfRowsToShowBefore = 1, numberOfRowsToShowAfter = 3) as void
+  logMethod("updateRowVisibilities newIndex", newIndex, "old", oldIndex)
   states = {}
   if m.top.content = invalid
     return 
   end if
-  
-  setListStateMap(states, oldIndex - numberOfRowsToShowBefore, oldIndex + numberOfRowsToShowAfter, "hide")
+
+  setListStateMap(states, oldIndex - numberOfRowsToShowBefore, oldIndex + numberOfRowsToShowAfter, "hidden")
   setListStateMap(states, newIndex - numberOfRowsToShowBefore, newIndex + numberOfRowsToShowAfter, "partial")
-  
+
   ? "updating states: " ; formatJson(states)
   for each rowId in states
     list = m.visibleLists[rowId.toInt()]
@@ -224,14 +314,16 @@ function updateRowVisibilities(newIndex, oldIndex, numberOfRowsToShowBefore = 1,
       ? "ERROR could not find visible list for "; rowId
     end if
   end for
+
+  m.lastStates = states
 end function
 
 function setListStateMap(states, startIndex, endIndex, state)
   for i = startIndex to endIndex
-    
-    if i > 0 and i < m.visibleLists.count() - 1
+
+    if i >= 0 and i < m.visibleLists.count() - 1
       row = m.visibleLists[i]
-      
+
       if row <> invalid
         states[row.id] = state
       end if
@@ -244,12 +336,12 @@ function getBoundsForIndex(index)
   rect = invalid
   if m.currentList <> invalid
     set = m.currentList.currTargetSet
-    ? " set.focusIndex " ; set.focusIndex + m.currentList.focusIndexOffset
+    ' ? " set.focusIndex " ; set.focusIndex + m.currentList.focusIndexOffset
     if set <> invalid
       return set.targetRects[set.focusIndex + m.currentList.focusIndexOffset]
     end if
   end if
-  
+
   if rect <> invalid
     ' ? "INDEX" ; index ; " " ; formatJson(dynamicCell.boundingRect()); "  " ; formatJson(dynamicCell.localBoundingRect()); "  " ; formatJson(dynamicCell.sceneBoundingRect()); "  " 
     return rect
@@ -261,9 +353,90 @@ function getBoundsForIndex(index)
       translation: [0, 0]
     }
   end if
-  
+
+end function
+
+function isHiddenChange()
+  ? "ishiddenchange"
+  if m.top.isHidden
+    for each rowId in m.laststates
+      list = m.visibleLists[rowId.toInt()]
+      if list <> invalid
+        list.viewState = "hidden"
+      else
+        ? "ERROR could not find visible list for "; rowId
+      end if
+    end for
+  else
+    for each rowId in m.laststates
+      list = m.visibleLists[rowId.toInt()]
+      if list <> invalid
+        list.viewState = m.laststates[rowId]
+      else
+        ? "ERROR could not find visible list for "; rowId
+      end if
+    end for
+
+  end if
+
 end function
 
 function getFocusedBounds(args = invalid)
   return getBoundsForIndex(int(m.currentList.currFocusItemIndex))
+end function
+
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ KeyPress
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onKeyPressUp() as boolean
+  logMethod("onKeyPressUp")
+  moveYFocus(-1)
+  return true
+end function
+
+function onKeyPressDown() as boolean
+  logMethod("onKeyPressDown")
+  moveYFocus(1)
+  return true
+end function
+
+
+function getLongPressIntervalForKey(key) as float
+  logMethod("getLongPressIntervalForKey", key)
+  if key = "up" or key = "down"
+    return 0.5
+  else
+    return 0
+  end if
+end function
+
+function onLongPressStart(key) as boolean
+  logMethod(">>>>onLongPressStart", key)
+
+  if key = "up" or key = "down"
+    logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    if key = "up"
+      targetIndex = 0 
+    else
+      targetIndex = m.visibleLists.count() - 1
+    end if
+
+    animateToIndex(m.top.rowFocused, targetIndex)
+    return true
+  end if
+
+  return false
+end function
+
+function onLongPressFinish(key) as boolean
+  if key = "up" or key = "down"
+    logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    index = getListAtY(m.rowsGroup.translation[1])
+    animateToIndex(index, index)
+    return true
+  end if
+
+  return false
 end function

@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="rLog" extends="ContentNode">
-  <script type="text/brightscript" uri="rLog.brs" />
-  <script type="text/brightscript" uri="pkg:/source/rLog/transports/printTransport.brs" />
-  <script type="text/brightscript" uri="pkg:/source/rLog/transports/rLogSGTransport.brs" />
-  <script type="text/brightscript" uri="pkg:/source/rLog/transports/rLogScreenTransport.brs" />
-  <script type="text/brightscript" uri="pkg:/source/maestro/lib/ThreadUtils.brs" />
-
+  
   <interface>
     <field id="logEntry" type="assocarray" onChange="onLogEntryChange" alwaysNotify="true"/>
     <field id="logLevel" type="integer" value="4"/>

@@ -5,8 +5,6 @@ function init()
   m.poster3 = m.top.findNode("poster3")
   m.theLabel = m.top.findNode("theLabel")
   m.theLabel2 = m.top.findNode("theLabel2")
-  m.button = m.top.findNode("button")
-  m.button2 = m.top.findNode("button2")
   m.theLabel3 = m.top.findNode("theLabel3")
   m.focusColorInterp = m.top.findNode("focusColorInterp")
   m.focusColorInterp.fieldToInterp = "theRect.color"
@@ -17,8 +15,8 @@ function itemContentChanged()
   m.theLabel2.text = m.top.itemContent.description
   m.theLabel3.text = m.top.itemContent.description + " " + m.top.itemContent.description
   m.poster.uri = m.top.itemContent.HDGRIDPOSTERURL
-  m.poster2.uri = m.top.itemContent.HDGRIDPOSTERURL
-  m.poster3.uri = m.top.itemContent.HDGRIDPOSTERURL
+  m.poster2.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
+  m.poster3.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
 end function
 
 function currTargetChanged()
@@ -40,17 +38,6 @@ function focusPercentChanged()
     m.focusColorInterp.fraction = 0
   end if
 end function
-
-function onChangeButtonFocus()
-  if m.button.hasFocus()
-  ? "focus on butotn2"
-    m.button2.setFocus(true)
-  else
-  ? "focus on butotn"
-    m.button.setFocus(true)
-  end if
-end function
-
 
 function onKeyEvent(key as string, press as boolean) as boolean
   handled = false

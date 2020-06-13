@@ -80,7 +80,7 @@ function toggleLongPressTimer(interval)
     m.longPressTimer.observeField("fire", "onLongPressTimerFire")
     m.longPressTimer.control = "start"
   else if m.longPressKey <> ""
-    logInfo("finishing longPress on key ", key)
+    ' logInfo("finishing longPress on key ", key)
     if m.isLongPressStarted
       onLongPressFinish(m.longPressKey)
     end if
@@ -92,15 +92,15 @@ end function
 function onLongPressTimerFire()
   if m.isLongPressStarted
     if not onLongPressUpdate(m.longPressKey)
-      logInfo("long press was cancelled by the onLongPressUpdate call")
+      ' logInfo("long press was cancelled by the onLongPressUpdate call")
       toggleLongPressTimer(0)
     end if
   else
     if not onLongPressStart(m.longPressKey)
-      logInfo("long press was rejected by onLongPressStart call")
+      ' logInfo("long press was rejected by onLongPressStart call")
       toggleLongPressTimer(0)
     else
-      logInfo("long press is accepted : starting for key ", m.longPressKey )
+      ' logInfo("long press is accepted : starting for key ", m.longPressKey )
       m.isLongPressStarted = true
     end if
   end if

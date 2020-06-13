@@ -9,15 +9,55 @@ function Init()
   registerLogger("AppController")
   logInfo("in appcontroller init")
   
+  m.cellProvider = createObject("roSGNode", "CellProvider") 
+  m.top._cellProvider = m.cellProvider
+  m.global.addFields({ "cellProvider": m.cellProvider })
+  
+  
+  m.cellTracker = createObject("roSGNode", "CellTracker") 
+  m.top._cellTracker = m.cellTracker
+  m.global.addFields({ "cellTracker": m.cellTracker })
+  m.top.addFields({ "_global": m.global })
+  
+  
+  m.cellTracker.observeField("numberOfCellsInUse", "onInfoChange")
+  m.cellTracker.observeField("numberOfCells", "onInfoChange")
+  m.cellProvider.observeField("numberOfCellsInUse", "onInfoChange")
+  m.cellProvider.observeField("numberOfCells", "onInfoChange")
+  
+  m.infoLabel = m.top.findNode("infoLabel")
+  reset() 
   m.navController = m.top.findNode("navController")
   m.navController@._initialize()
   m.rootScreen = createObject("roSGNode", "ListScreen")
   m.navController@.push(m.rootScreen)
 end function
 
+
+function onInfoChange()
+  m.infoLabel.text = " Light cells (" + str(m.cellTracker.numberOfCellsInUse) + "/" + str(m.cellTracker.numberOfCells) + ") - Real cells (" + str(m.cellProvider.numberOfCellsInUse) + "/" + str(m.cellProvider.numberOfCells) + ")"
+end function
+
+
 function onGainedFocus(isSelfFocused)
   if isSelfFocused
     setFocus(m.navController)
     logInfo("Focused on main content")
   end if
+end function
+
+function reset()
+  m.cellProvider.callFunc("reset", invalid)
+  m.cellTracker.callFunc("reset", invalid)
+  prebakeCells()
+end function
+
+function prebakeCells()
+  ? "adding prebaked cells"
+  
+  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellOnes, "SimpleCell")
+  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellTwos, "SimpleCell2")
+  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellComplex, "ComplexCell")
+  
+  ? "finished adding prebaked cells"
 end function

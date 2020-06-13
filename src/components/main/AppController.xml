@@ -3,11 +3,33 @@
     name='AppController'
     extends='BaseScreen'>
   <interface>
+    <field
+        id='_prebakeCellOnes'
+        type='integer'
+        value='100' />
+    <field
+        id='_prebakeCellTwos'
+        type='integer'
+        value='100' />
+    <field
+        id='_prebakeCellComplex'
+        type='integer'
+        value='150' />
 
-	</interface>
+  </interface>
 
   <children>
-    <NavController id="navController" />
+    <NavController id='navController' />
+
+    <Rectangle
+        color='#ff0000'
+        width='1920'
+        height='100'
+        translation='[0, 900]' />
+    <Label
+        id='infoLabel'
+        translation='[50, 920]'
+        color='#ffffff' />
   </children>
 
 </component>

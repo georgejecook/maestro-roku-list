@@ -1,30 +1,14 @@
+import "pkg:/source/maestro/lib/ThreadUtils.bs"
+import "pkg:/source/rLog/transports/printTransport.bs"
+import "pkg:/source/rLog/transports/rLogSGTransport.bs"
+import "pkg:/source/rLog/transports/rLogScreenTransport.bs"
+
 function Init() as void
   m.transportImpls = []
   m.top.filters = []
   m.top.excludeFilters = []
   m.top.transports = ["printTransport", "rLogSGTransport"]
-  m.top.functionName = "execRunLoop"
   m.pendingItems = []
-  m.top.control = "run"
-end function
-
-function execRunLoop()
-  port = CreateObject("roMessagePort")
-  m.top.observeField("logEntry", port)
-  
-  while true
-    msg = MTU_waitPort(0, port)
-    if type(msg) = "roSGNodeEvent"
-      field = msg.getField()
-      data = msg.getData()
-      if (field = "logEntry")
-        if (data <> invalid)
-          ' addItemToPending(data)
-          logItem(data)
-        end if
-      end if
-    end if
-  end while
 end function
 
 function onLogEntryChange() as void
@@ -61,7 +45,7 @@ function matchesFilter(args) as boolean
       end if
     end for
   end if
-  
+
   return false
 end function
 
@@ -75,7 +59,7 @@ function isExcluded(args) as boolean
       end if
     end for
   end if
-  
+
   return false
 end function
 
@@ -94,10 +78,10 @@ end function
 
 function getTransport(transportType)
   if transportType = "printTransport"
-    return PrintTransport(m.top)
+    return new RLog.Transports.PrintTransport(m.top)
   else if transportType = "rLogSGTransport"
-    return rLogSGTransport(m.top)
+    return new RLog.Transports.NodeTransport(m.top)
   else if transportType = "rLogScreenTransport"
-    return rLogScreenTransport(m.top)
+    return new RLog.Transports.ScreenTransport(m.top)
   end if
 end function

@@ -1,4 +1,13 @@
 {
     "rootDir": "src",
-    "autoImportComponentScript": true
+    "files": [
+      "manifest",
+      "source/**/*.*",
+      "components/**/*.*",
+      "images/**/*.*"
+    ],
+    "autoImportComponentScript": true,
+    "diagnosticFilters": [{
+      "src": "components/RALETRackerTask.brs"
+    }]
 }

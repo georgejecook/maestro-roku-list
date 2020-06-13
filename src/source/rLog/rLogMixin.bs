@@ -19,13 +19,13 @@
 '  * @returns {RLog} RLog instance for further configuration
 '  */
 function initializeRLog(isForcedOff = false, isLightForcedOn = false, isLightForcedOff = false, isPrintingName = false) as object
-  rLog = CreateObject("roSGNode", "rLog")
-  m.global.addFields({"rLog": rLog})
-  rLog.isLightForcedOff = isLightForcedOff
-  rLog.isLightForcedOn = isLightForcedOn
-  rLog.isForcedOff = isForcedOff
-  rLog.isPrintingName = isPrintingName
-  return rLog
+  rLogger = CreateObject("roSGNode", "rLog")
+  m.global.addFields({"rLog": rLogger})
+  rLogger.isLightForcedOff = isLightForcedOff
+  rLogger.isLightForcedOn = isLightForcedOn
+  rLogger.isForcedOff = isForcedOff
+  rLogger.isPrintingName = isPrintingName
+  return rLogger
 end function
 
 ' /**

@@ -31,6 +31,7 @@
     <function name='getCellForContentId' />
     <function name='bindCellToContent' />
     <function name='unbindCellFromContent' />
+    <function name='setViewStates' />
   </interface>
 
 </component>

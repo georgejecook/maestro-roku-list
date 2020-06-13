@@ -29,10 +29,6 @@
         id='focusPercent'
         type='float'
         onChange='focusPercentChanged' />
-    <field
-        id='_toggleButton'
-        type='boolean'
-        onChange='onChangeButtonFocus' />
   </interface>
 
 
@@ -43,11 +39,11 @@
     </Rectangle>
     <Poster
         id='poster'
-        translation='[20,20]'
-        loadWidth='200'
-        loadHeight='150'
-        width='200'
-        height='150'
+        translation='[0,0]'
+        loadWidth='370'
+        loadHeight='300'
+        width='370'
+        height='300'
         loadDisplayMode='scaleToFit' />
     <Poster
         id='poster2'
@@ -59,53 +55,42 @@
         loadDisplayMode='scaleToFit' />
     <Poster
         id='poster3'
-        translation='[150,0]'
+        translation='[300,320]'
         loadWidth='50'
         loadHeight='50'
         width='50'
         height='50'
         loadDisplayMode='scaleToFit' />
     <Rectangle
-        opacity='0.3'
-        width='200'
-        height='100' />
+        opacity='0.8'
+        color="#000000"
+        width='360'
+        height='40' />
     <Label
         id='theLabel'
         translation='[10, 10]' />
     <Label
         id='theLabel2'
-        text='some text in here here is some text filing'
+        text='Description test in here with wrap'
         wrap='true'
         maxLines='3'
-        width='100'
+        width='350'
         color='#ff00ff'
-        translation='[10, 30]' />
+        translation='[10, 50]' />
 
     <Label
         id='theLabel3'
-        text='some text in here here is some text filing'
+        text='Summary text in here'
         wrap='true'
         maxLines='3'
-        width='100'
-        color='#ff0000'
-        translation='[10, 50]' />
+        width='350'
+        color='#000000'
+        translation='[10, 250]' />
 
     <ColorFieldInterpolator
         id='focusColorInterp'
         key='[0.0, 1.0]'
         keyValue='[0x00002080, 0x000080FF]' />
-
-    <Button
-        id='button'
-        text='title'
-        width='300'
-        height='30' />
-    <Button
-        id='button2'
-        text='title'
-        translation='[0,40]'
-        width='300'
-        height='30' />
 
   </children>
 

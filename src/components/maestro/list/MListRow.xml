@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <component
     name='MListRow'
-    extends='Group'>
+    extends='BaseView'>
 
   <interface>
     <field
@@ -10,7 +10,7 @@
     <!-- fixed|floating|focusWrap|zoom|custom -->
     <field
         id='focusType'
-        value='floating'
+        value='fixed'
         type='string' />
     <field
         id='isHidden'
@@ -18,17 +18,9 @@
         value='false'
         onChange='onIsHiddenChange' />
     <field
-        id='isFocusable'
-        type='boolean'
-        value='true' />
-    <field
         id='content'
         type='node'
         onChange='onContentChange' />
-    <field
-        id='isFocused'
-        type='boolean'
-        onChange='onIsFocusedChange' />
     <field
         id='viewState'
         type='string'
@@ -85,7 +77,7 @@
 
   <children>
     <Label id='header' text="header"/>
-    <TargetList id='list' />
+    <TargetList id='list' translation='[0,20]'/>
   </children>
 
 </component>

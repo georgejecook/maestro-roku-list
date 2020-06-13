@@ -1,5 +1,3 @@
-import "pkg:/source/rLog/rLogMixin.bs"
-
 function init()
   registerLogger("MultiContainer", true)
   m.layoutGroup = m.top.findNode("container_layoutGroup")

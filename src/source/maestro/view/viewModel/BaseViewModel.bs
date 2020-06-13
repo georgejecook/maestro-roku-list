@@ -7,7 +7,7 @@ namespace MBVM
 '  * @module BaseViewModel
 '  * @description Base class for all ViewModels
 '  */
-class BaseViewModel extends BaseObservable
+class BaseViewModel extends MBO.BaseObservable
 
 ' /**
 '  * @member new
@@ -22,24 +22,24 @@ class BaseViewModel extends BaseObservable
 '  * @param {string} name to use in logs, etc
 '  */
 
-public function new(name = "BaseViewModel")
+function new(name = "BaseViewModel")
   super()
   m.name = name
   registerLogger(name, true, m)
 end function
 
-public state = "none"
-public focusId = invalid
-public name = ""
-public isFocused = false
+state = "none"
+focusId = invalid
+name = ""
+isFocused = false
 
 private __viewModel = true
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-'++ public API
+'++ Public API
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-public function initialize()
+function initialize()
   m.logMethod("initialize")
   if MU.isFunction(m._initialize)
     m._initialize()
@@ -47,29 +47,29 @@ public function initialize()
   m.state = "initialized"
 end function
 
-override public function destroy()
+override function destroy()
   super.destroy()
   m.state = "destroyed"
 end function
 
-public function onShow()
+function onShow()
 end function
 
-public function onHide()
+function onHide()
 end function
 
-public function onGainedFocus(isSelfFocused)
+function onGainedFocus(isSelfFocused)
   if isSelfFocused
     m.isFocused = true
     m.setFocusId(m.focusId)
   end if
 end function
 
-public function onLostFocus()
+function onLostFocus()
   m.isFocused = false
 end function
 
-public function setFocusId(id)
+function setFocusId(id)
   if m.isFocused
     m.setField("focusId", id)
   else
@@ -81,7 +81,7 @@ end function
 '++ KEY HANDLING
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-public function onKeyEvent(key as string, press as boolean) as boolean
+function onKeyEvent(key as string, press as boolean) as boolean
   result = false
   if press
     if MU.isFunction(m.isAnyKeyPressLocked) and m.isAnyKeyPressLocked()
@@ -134,7 +134,7 @@ end function
 '  * @description wrapper for push
 '  * @param {view} the view to push, if this is a string, then it is looked up on m - so you can push views by their id, as well as actual views
 '  */
-public function push(view)
+function push(view)
   
   if MU.isString(view)
     view = MVMM.findViewWithId(view)
@@ -143,11 +143,11 @@ public function push(view)
   push(view)
 end function
 
-public function pop() as object
+function pop() as object
   return(pop())
 end function
 
-public function getViewById(id)
+function getViewById(id)
   view = MVMM.findViewWithId(id)
   
   if view = invalid
@@ -157,11 +157,11 @@ public function getViewById(id)
   return view
 end function
 
-public function resetNavControllerToRoot()
+function resetNavControllerToRoot()
   resetNavControllerToRoot()
 end function
 
-public function resetNavController(newFirstScreen = invalid, endIndex = -1)
+function resetNavController(newFirstScreen = invalid, endIndex = -1)
   resetNavController(newFirstScreen, endIndex)
 end function
 

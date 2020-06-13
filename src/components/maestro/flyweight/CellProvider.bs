@@ -82,7 +82,7 @@ end function
 
 function createCell(cellType)
   trackers = getTrackers(cellType)
-  cell = creteObject("roSGNode", cellType)
+  cell = createObject("roSGNode", cellType)
   cell.id = str(trackers.numberOfCellsInPool).trim()
   trackers.allCells.push(cell)
   trackers.freeCellsById[cell.id] = cell

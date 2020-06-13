@@ -3,7 +3,8 @@ function init()
   m.top.cell = invalid
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
-  m.cellTracker.numberOfCells++
+  m.cellTracker.callFunc("bindCellToContent", m.top)
+  
   m.top.observeField("viewState", "onViewStateChange")
 end function
 
@@ -48,7 +49,7 @@ function onViewStateChange(evt)
       m.cell.focusPercent = m.top.focusPercent
       m.cell.groupHasFocus = m.top.groupHasFocus
     end if
-  else if evt.getData() = "hide" and m.cell <> invalid
+  else if evt.getData() = "hidden" and m.cell <> invalid
     m.cellProvider.callFunc("releaseCell", m.cell) 
     m.cell = invalid
     m.top.cell = invalid

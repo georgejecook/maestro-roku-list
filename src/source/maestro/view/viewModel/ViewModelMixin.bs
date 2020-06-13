@@ -1,6 +1,8 @@
 import "../../lib/Utils.bs"
 import "pkg:/source/rLog/rLogMixin.brs"
 import "../../observable/BaseObservable.bs"
+import "../../observable/ObservableMixin.bs"
+import "pkg:/components/maestro/view/mixin/FocusMixin.bs"
 
 namespace MVMM
 
@@ -10,7 +12,7 @@ namespace MVMM
 '  */
 
 function isVM(vm)
-  return MOM_isObservable(vm) and vm.__viewModel = true
+  return MOM.isObservable(vm) and vm.__viewModel = true
 end function
 
 function onFocusIdChange(focusId)
@@ -31,10 +33,12 @@ end function
 
 function initializeBindings(isUsingViewModelFocusId)
   if MU.isFunction(m_initBindings)
+    'bs:disable-next-line
     m_initBindings()
   end if
 
   if MU.isFunction(M_initStaticBindings)
+    'bs:disable-next-line
     M_initStaticBindings()
   end if
 

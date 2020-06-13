@@ -1,21 +1,20 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <component
     name='MList'
-    extends='Group'>
+    extends='BaseView'>
   <interface>
-    <field
-        id='_debugM'
-        type='boolean'
-        onChange='onDebugMChange'
-        alwaysNotify='true' />
     <field
         id='cellSize'
         type='floatArray'
-        value='[300,300]' />
+        value='[363,406]' />
+    <field
+        id='animSpeed'
+        type='float'
+        value='0.2' />
     <field
         id='cellSpacing'
         type='floatArray'
-        value='[20,20]' />
+        value='[44,40]' />
     <!-- fixed|floating|focusWrap|zoom|custom -->
     <field
         id='rowFocusAnimationStyle'
@@ -28,7 +27,7 @@
     <field
         id='focusIndexOffset'
         type='integer'
-        value='0' />
+        value='112' />
     <field
         id='unfocusCellScale'
         type='float'
@@ -62,16 +61,42 @@
     <field
         id='_focusedRenderer'
         type='node' />
+    <field
+        id='isHidden'
+        type='boolean'
+        onChange='isHiddenChange' />
     <function name='getBoundsForIndex' />
     <function name='getFocusedBounds' />
 
   </interface>
   <children>
+    <Timer
+        id='setInitialTimer'
+        duration='0.1'/>
+    <Timer
+        id='focusTimer'
+        duration='0.01'
+        control='start'
+        repeat='true' />
     <Group id='rowsGroup' />
     <Rectangle
         id='overlay'
         color='#ff0000'
+        visible='false'
         opacity='0.5' />
+
+    <Animation
+        id='moveAnimation'
+        duration='0.1'
+        repeat='false'
+        control='stop'
+        easeFunction='linear'>
+      <Vector2DFieldInterpolator
+          id='moveAnimationInterpolator'
+          key='[0.0, 1.0]'
+          keyValue='[ [0, 60], [0, 606] ]'
+          fieldToInterp='rowsGroup.translation' />
+    </Animation>
   </children>
 
 </component>
