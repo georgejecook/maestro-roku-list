@@ -4,7 +4,7 @@ function init()
   m.poster2 = m.top.findNode("poster2")
   m.poster3 = m.top.findNode("poster3")
   m.theLabel = m.top.findNode("theLabel")
-  m.theLabel2 = m.top.findNode("theLabel2")
+  ' m.theLabel2 = m.top.findNode("theLabel2")
   m.theLabel3 = m.top.findNode("theLabel3")
   m.focusColorInterp = m.top.findNode("focusColorInterp")
   m.focusColorInterp.fieldToInterp = "theRect.color"
@@ -12,10 +12,10 @@ end function
 
 function itemContentChanged()
   m.theLabel.text = "C" + m.top.itemContent.title
-  m.theLabel2.text = m.top.itemContent.description
+  ' m.theLabel2.text = m.top.itemContent.description
   m.theLabel3.text = m.top.itemContent.description + " " + m.top.itemContent.description
   m.poster.uri = m.top.itemContent.HDGRIDPOSTERURL
-  m.poster2.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
+  ' m.poster2.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
   m.poster3.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
 end function
 
@@ -27,7 +27,7 @@ end function
 
 function currRectChanged()
   m.theRect.width = m.top.currRect.width
-  m.theRect.height = m.top.currRect.height
+  m.theRect.height = m.top.currRect.height - 100
 end function
 
 function focusPercentChanged()

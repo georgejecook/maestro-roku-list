@@ -11,15 +11,16 @@ function reset(args = invalid)
   m.trackers = {}
   m.top.numberOfCells = 0
   m.top.numberOfCellsInUse = 0
-  
+
 end function
 
 function getTrackers(scope = "all")
   trackers = m.trackers[scope]
   if trackers = invalid
     trackers = { 
-      contentIdsByCellId : {}
-      cellIdsByContentId : {}
+      contentIdsByCellId: {}
+      viewStatesByContentId: {}
+      cellIdsByContentId: {}
       cellsById: {}
     }
     m.trackers[scope] = trackers 
@@ -29,14 +30,14 @@ end function
 
 function getCell(cellId, scope = "all")
   trackers = getTrackers(scope)
-  
+
   return trackers.cellsById[cellId]
 end function
 
 function getCellForContentId(id, scope = "all")
   trackers = getTrackers(scope)
   cellId = trackers.cellIdsByContentId[id]
-  
+
   if cellId <> invalid
     return trackers.cellsById[cellId]
   else
@@ -45,14 +46,14 @@ function getCellForContentId(id, scope = "all")
 end function
 
 function bindCellToContent(cell, content, scope = "all")
-  
+
   trackers = getTrackers(scope)
-  
+
   if cell.trackingId = ""
     ' ? ">>cell has never been bound"
     'never been bound
-    m.top.trackingId ++
-    m.top.numberOfCells ++
+    m.top.trackingId++
+    m.top.numberOfCells++
     cell.trackingId = str(m.top.trackingId).trim()
   else
     existingId = trackers.contentIdsByCellId[cell.trackingId]
@@ -66,9 +67,9 @@ function bindCellToContent(cell, content, scope = "all")
         unbindCell(cell)
       end if
     end if
-    
+
   end if
-  
+
   if content <> invalid
     m.top.numberOfCellsInUse++
     ' ? ">> binding content id "; content.id ; " to "; cell.trackingId
@@ -82,11 +83,11 @@ end function
 function unbindCell(cell, scope = "all")
   trackers = getTrackers(scope)
   contentId = trackers.contentIdsByCellId[cell.trackingId]
-  
+
   if contentId <> invalid
     trackers.contentIdsByCellId.delete(cell.trackingId)
     existingCellId = trackers.cellIdsByContentId[contentId]
-    
+
     if existingCellId <> invalid and existingCellId = cell.trackingId
       m.top.numberOfCellsInUse--
       trackers.cellIdsByContentId.delete(contentId)
@@ -95,10 +96,13 @@ function unbindCell(cell, scope = "all")
   end if
 end function
 
-function setViewStates(states)
+function setViewStates(states, scope = "all")
+
+  trackers = getTrackers(scope)
 
   for each id in states
     dynamicCell = getCellForContentId(id)
+    trackers.viewStatesByContentId[id] = states[id]
     if dynamicCell <> invalid
       dynamicCell.viewState = states[id]
       ' ? " setting cell view state"; id ; states[id]
@@ -108,4 +112,9 @@ function setViewStates(states)
     end if
   end for
 
+end function
+
+function getStateForContentId(id, scope = "all")
+  trackers = getTrackers(scope)
+  return trackers.viewStatesByContentId[id]
 end function

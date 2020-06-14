@@ -10,7 +10,7 @@
     <field
         id='animSpeed'
         type='float'
-        value='0.2' />
+        value='0.4' />
     <field
         id='cellSpacing'
         type='floatArray'
@@ -20,6 +20,20 @@
         id='rowFocusAnimationStyle'
         value='fixed'
         type='string' />
+    <!-- indicates what to set a row to when it's considered hidden (hidden|partial) -->
+    <field
+        id='rowHidingMode'
+        value='partial'
+        type='string' />
+    <field
+        id='animateToRow'
+        type='integer'
+        onChange='onAnimateToRowChange'
+        value='0' />
+    <field
+        id='fastAnimationSpeed'
+        type='float'
+        value='1' />
     <field
         id='numCols'
         type='integer'
@@ -72,7 +86,7 @@
   <children>
     <Timer
         id='setInitialTimer'
-        duration='0.1'/>
+        duration='0.1' />
     <Timer
         id='focusTimer'
         duration='0.01'

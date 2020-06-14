@@ -16,11 +16,12 @@
     <field
         id='_defaultCellType'
         type='string'
-        value='ComplexCell' />
+        value='Imagecell' />
+        <!-- value='ComplexCell' /> -->
     <field
         id='_numberOfRows'
         type='integer'
-        value='20' />
+        value='50' />
     <field
         id='_addTypeOnes'
         type='integer'
@@ -84,6 +85,10 @@
 
   </interface>
   <children>
+    <Rectangle
+        width='1920'
+        height='1080'
+        color='#00000' />
     <Group id='listHolder' />
   </children>
 

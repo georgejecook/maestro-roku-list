@@ -17,7 +17,7 @@ end function
 
 function currRectChanged()
   m.theRect.width = m.top.currRect.width
-  m.theRect.height = m.top.currRect.height
+  m.theRect.height = m.top.currRect.height - 200
 end function
 
 function focusPercentChanged()

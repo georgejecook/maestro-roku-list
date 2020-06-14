@@ -7,15 +7,15 @@ function init()
 
   'create after we've set up our cell tracker and provider
   ' m.list = listHolder.createChild("RowList")
-  '   m.list.rowHeights = [400]
+  '   m.list.rowHeights = [450]
   '   m.list.focusXOffset = [100]
   '   m.list.rowSpacings = []
   '   m.list.rowItemSize = [400,350]
   '   m.list.rowItemSpacing = [0,0]
   '   m.list.showRowLabel = [true]
-  '   m.list.itemSize = [1920, 280]
+  '   m.list.itemSize = [1920, 450]
   '   m.list.numRows = 3
-  '   m.list.itemComponentName = "DynamicCell"
+  '   m.list.itemComponentName = "ImageCell"
 
   m.list = listHolder.createChild("MList")
   m.list.translation = [0, 250]
@@ -106,21 +106,22 @@ function addItems(cellType, number)
 end function
 
 function makeItems(cellType, number)
-
+  d = createObject("roDateTime")
+  nonce = str(d.asSeconds()).trim()
   items = []
   for i = 0 to number
     child = createObject("roSGNode", "ContentNode")
     child.id = str(m.contentId).trim()
     child.description = "some really long " + child.id + "text in here " + child.id
-    child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 400).trim() + "/360/300"
+    child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/360/300?n=" + nonce
     ' child.HDGRIDPOSTERURL = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
     child.title = "Item " + child.id.tostr()
     
-    if m.contentId mod 20 = 0
-      cellType = "SimpleCell"
-    else if m.contentId mod 10 = 0
-      cellType = "SimpleCell2"
-    end if
+    ' if m.contentId mod 5 = 0
+    '   cellType = "SimpleCell"
+    ' else if m.contentId mod 7 = 0
+    '   cellType = "SimpleCell2"
+    ' end if
 
     child.addFields({
       "cellType": cellType

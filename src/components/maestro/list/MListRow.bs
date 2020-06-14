@@ -4,23 +4,23 @@ function init()
   m.header = m.top.findNode("header")
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
-  m.previousContent = invalid
   m.previousViewState = ""
+  m.content = invalid
 end function
 
 function onContentIsHiddenChange()
-  m.top.isHidden = m.top.content.isHidden = true
+  m.top.isHidden = m.content.isHidden = true
 end function
 
 function onContentChange()
-  if m.previousContent = invalid or not m.previousContent.isSameNode(m.top.content)
+  if m.content = invalid or not m.content.isSameNode(m.top.content)
     toggleContentListener(false)
-    m.previousContent = m.top.content
-    if m.top.content.isHidden <> true
+    m.content = m.top.content
+    if m.content.isHidden <> true
       configureHeader()
       configureList(m.list)
       toggleContentListener(true)
-      m.list.content = m.top.content 
+      m.list.content = m.content 
       onViewStateChange()
     else
       m.list.content = invalid
@@ -29,19 +29,19 @@ function onContentChange()
 end function
 
 function configureHeader()
-  if m.top.content <> invalid
-    m.header.text = m.top.content.title
+  if m.content <> invalid
+    m.header.text = m.content.title
   else
     m.header.text = ""
   end if
 end function
 
 function toggleContentListener(isActive)
-  if m.top.content <> invalid
+  if m.content <> invalid
     if isActive
-      m.top.content.observeField("isHidden", "onContentIsHiddenChange")
+      m.content.observeField("isHidden", "onContentIsHiddenChange")
     else
-      m.top.content.unObserveField("isHidden")
+      m.content.unObserveField("isHidden")
     end if
   end if
 end function
@@ -361,29 +361,29 @@ end function
 
 function onViewStateChange()
   ' logInfo("onViewStateChange", m.top.index, m.top.viewState)
-  ' if m.top.viewState <> m.previousViewState
-  m.previousViewState = m.top.viewState
-  updateListVisibility(m.top.viewState)
-  ' end if
+  if m.top.viewState <> m.previousViewState
+    m.previousViewState = m.top.viewState
+    updateListVisibility(m.top.viewState)
+  end if
 end function
 
 function updateListVisibility(state)
-  if m.top.content <> invalid
+  if m.content <> invalid
     ' logMethod("updateListVisibility", m.top.index, state)
     states = {}
 
     if state = "hidden" or state = "partial"
-      setListStateMap(states, 0, m.top.content.getChildCount() - 1, "hidden")
+      setListStateMap(states, 0, m.content.getChildCount(), "hidden")
     end if
 
     if state = "show"
-      setListStateMap(states, 0, m.top.content.getChildCount() - 1, "show")
+      setListStateMap(states, 0, m.content.getChildCount(), "show")
     else if state = "partial"
       'TODO - calcculate this!
       setListStateMap(states, m.list.itemFocused - 1, m.list.itemFocused + 4, "show")
     end if
 
-    ? "row updateListVisibility " ; formatJson(states)
+    ' ? "row updateListVisibility " ; formatJson(states)
     toggleCellStates(states)
   end if
 end function
@@ -392,8 +392,8 @@ function setListStateMap(states, startIndex, endIndex, state)
   ' logMethod("setListStateMap", startIndex, endIndex, state)
   for i = startIndex to endIndex
 
-    if i >= 0 and i < m.top.content.getChildCount() - 1
-      states[m.top.content.getChild(i).id] = state
+    if i >= 0 and i < m.content.getChildCount()
+      states[m.content.getChild(i).id] = state
     end if
   end for
 end function

@@ -4,18 +4,19 @@ function init()
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
   m.moveAnimation = m.top.findNode("moveAnimation") 
   m.moveAnimationInterpolator.observeField("fraction", "onAnimationFractionChange")
-
+  m.top.clippingRect = [0,0,1920,550]
   m.overlay = m.top.findNode("overlay") 
   m.focusTimer = m.top.findNode("focusTimer") 
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
-  m.previousContent = invalid
+  m.content = invalid
   m.numberOfRowsToShow = 3
   m.top.rowFocused = 0
   m.visibleLists = []
   m.hiddenLists = []
   m.lists = []
   m.lastStates = {}
+  m.content = invalid
   m.focusTimer.observeField("fire", "currFocusItemIndexChanged")
   resetState()
 end function
@@ -27,8 +28,8 @@ function resetState()
 
   m.lists = []
 
-  if m.top.content <> invalid
-    for each item in m.top.content.getChildren(-1, 0)
+  if m.content <> invalid
+    for each item in m.content.getChildren(-1, 0)
       list = makeList(item)
       m.lists.push(list)
     end for
@@ -41,6 +42,7 @@ function resetState()
   setInitialTimer = m.top.findNode("setInitialTimer")
   setInitialTimer.observeField("fire", "onSetInitialTimerFire")
   setInitialTimer.control = "start"
+  updateRowFocus(0)
 end function
 
 function onSetInitialTimerFire()
@@ -49,7 +51,7 @@ function onSetInitialTimerFire()
   for each row in m.visibleLists
     row.viewState = "partial"
   end for
-  ' updateRowStates(0, 0, 5, 5)
+  ' updateRowStates(0, 0, 2, 5)
 end function
 
 function layoutLists()
@@ -75,9 +77,15 @@ function onDebugMChange()
 end function
 
 function onContentChange()
-  if m.previousContent = invalid or not m.previousContent.isSameNode(m.top.content)
-    m.previousContent = m.top.content
+  if m.content = invalid or not m.content.isSameNode(m.top.content)
+    m.content = m.top.content
     resetState()
+  end if
+end function
+
+function onAnimateToRowChange()
+  if m.content <> invalid
+    animateToIndex(m.top.rowFocused, m.top.animateToRow, m.top.fastAnimationSpeed)
   end if
 end function
 
@@ -151,15 +159,7 @@ function onAnimationFractionChange()
   else
     ' logInfo(">>>", y, index, m.top.rowFocused)
     if index <> -1 and index <> m.top.rowFocused
-      for i = 0 to m.top.rowFocused + (m.currentDirection * 5) step m.currentDirection
-        row = m.visibleLists[i]
-        if row <> invalid
-          if row.viewState = "hidden"
-            ' ? ">>>>>>>> partially showing row "; i
-            row.viewState = "partial"
-          end if
-        end if
-      end for
+      updateRowStates(m.currentDirection, index)
     end if
     m.top.rowFocused = index
   end if
@@ -167,7 +167,7 @@ function onAnimationFractionChange()
 end function
 
 
-function updateRowStates(direction, newIndex, beforeCount = 10, afterCount = 10)
+function updateRowStates(direction, newIndex, beforeCount = 2, afterCount = 5)
   ? "new Index" ; newIndex; " direction "; direction
   if direction < 0
     numberOfRowsToShowBefore = beforeCount
@@ -180,7 +180,7 @@ function updateRowStates(direction, newIndex, beforeCount = 10, afterCount = 10)
 end function
 
 function getListAtY(yPos)
-  for i = 0 to m.visibleLists.count() - 1
+  for i = 0 to m.visibleLists.count() -1
     if m.visibleLists[i].translation[1] >= abs(yPos)
       return i
     end if
@@ -239,12 +239,11 @@ function moveYFocus(offset, isAnimated = true)
         m.rowsGroup.translation = [0, - m.currentList.translation[1]]
         updateRowFocus(newIndex)
       end if
-      ' m.currentList.setFocus(true)
     end if
   end if
 end function
 
-function animateToIndex(oldIndex, index)
+function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
   logMethod("animateToIndex from", oldIndex, "to", index)
   nextList = m.visibleLists[index]
 
@@ -262,7 +261,7 @@ function animateToIndex(oldIndex, index)
   ? "targetY = "; targetY
   ' m.moveAnimationInterpolator.keyValue = [[0, 0], [0, targetY]]
   m.moveAnimationInterpolator.keyValue = [[0.0, m.rowsGroup.translation[1]], [0.0, - targetY]]
-  m.moveAnimation.duration = steps * m.top.animSpeed
+  m.moveAnimation.duration = (steps * m.top.animSpeed) / fastAnimationSpeed
 
   if m.moveAnimation.state = "puse"
     m.moveAnimation.control = "resume"
@@ -287,6 +286,8 @@ function updateRowFocus(index)
       else
         m.top._focusedRenderer = invalid
       end if
+      m.currentList.setFocus(true)
+
     end if
   else
     m.top.rowFocused = -1
@@ -298,11 +299,11 @@ end function
 function updateRowVisibilities(newIndex, oldIndex, numberOfRowsToShowBefore = 1, numberOfRowsToShowAfter = 3) as void
   logMethod("updateRowVisibilities newIndex", newIndex, "old", oldIndex)
   states = {}
-  if m.top.content = invalid
+  if m.content = invalid
     return 
   end if
 
-  setListStateMap(states, oldIndex - numberOfRowsToShowBefore, oldIndex + numberOfRowsToShowAfter, "hidden")
+  setListStateMap(states, oldIndex - numberOfRowsToShowBefore, oldIndex + numberOfRowsToShowAfter, m.top.rowHidingMode)
   setListStateMap(states, newIndex - numberOfRowsToShowBefore, newIndex + numberOfRowsToShowAfter, "partial")
 
   ? "updating states: " ; formatJson(states)
@@ -321,7 +322,7 @@ end function
 function setListStateMap(states, startIndex, endIndex, state)
   for i = startIndex to endIndex
 
-    if i >= 0 and i < m.visibleLists.count() - 1
+    if i >= 0 and i < m.visibleLists.count()
       row = m.visibleLists[i]
 
       if row <> invalid

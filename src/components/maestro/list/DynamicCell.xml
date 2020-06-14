@@ -17,7 +17,7 @@
     <field
         id='viewState'
         type='string'
-        value='hide' />
+        value='hidden' />
     <field
         id='groupHasFocus'
         type='boolean'

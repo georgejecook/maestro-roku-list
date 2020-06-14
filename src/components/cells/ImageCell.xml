@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8' ?>
 
 <component
-    name='ComplexCell'
+    name='Imagecell'
     extends='Group'>
 
   <!-- Note that target and rect are both set during the interpolation -->
@@ -11,8 +11,7 @@
         type='int' />
     <field
         id='groupHasFocus'
-        type='boolean'
-        onChange='focusPercentChanged' />
+        type='boolean'/>
     <field
         id='itemContent'
         type='node'
@@ -23,12 +22,10 @@
         onChange='currTargetChanged' />
     <field
         id='currRect'
-        type='rect2d'
-        onChange='currRectChanged' />
+        type='rect2d' />
     <field
         id='focusPercent'
-        type='float'
-        onChange='focusPercentChanged' />
+        type='float' />
   </interface>
 
 
@@ -55,46 +52,11 @@
         width='150'
         height='200'
         loadDisplayMode='scaleToFit' /> -->
-    <Rectangle
-        opacity='0.8'
-        color='#000000'
-        width='370'
-        height='70' />
-    <Poster
-        id='poster3'
-        translation='[300,10]'
-        loadWidth='50'
-        loadHeight='50'
-        width='50'
-        height='50'
-        loadDisplayMode='scaleToFit' />
-    <Label
+    <!-- <Label
         id='theLabel'
         width='350'
         horizontalAlign='center'
-        translation='[10, 10]' />
-    <!-- <Label
-        id='theLabel2'
-        text='Description test in here with wrap'
-        wrap='true'
-        maxLines='3'
-        width='350'
-        color='#ff00ff'
-        translation='[10, 50]' /> -->
-
-    <Label
-        id='theLabel3'
-        text='Summary text in here'
-        wrap='true'
-        maxLines='2'
-        width='360'
-        color='#ffffff'
-        translation='[10, 300]' />
-
-    <ColorFieldInterpolator
-        id='focusColorInterp'
-        key='[0.0, 1.0]'
-        keyValue='[0x00002080, 0x000080FF]' />
+        translation='[10, 10]' /> -->
 
   </children>
 

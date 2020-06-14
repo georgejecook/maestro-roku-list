@@ -55,6 +55,7 @@ end function
 function prebakeCells()
   ? "adding prebaked cells"
   
+  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeImageCells, "ImageCell")
   m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellOnes, "SimpleCell")
   m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellTwos, "SimpleCell2")
   m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellComplex, "ComplexCell")
