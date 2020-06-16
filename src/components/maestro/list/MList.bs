@@ -72,10 +72,6 @@ function layoutLists()
 
 end function
 
-function onDebugMChange()
-  m.top._m = m
-end function
-
 function onContentChange()
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     m.content = m.top.content
