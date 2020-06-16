@@ -1,12 +1,19 @@
+import * as path from 'path';
+import * as fs from 'fs-extra';
 import { series } from "gulp";
 import { RooibosProcessor, createProcessorConfig } from 'rooibos-cli';
 import { BurpConfig, BurpProcessor } from "burp-brightscript";
-import { ProgramBuilder } from 'brighterscript';
+import { inspect } from 'util';
+import { ProgramBuilder, BsConfig } from 'brighterscript';
 
+const exec = require('child_process').exec;
+const tmpBuildDir = '/tmp/buildTmp';
 const gulp = require('gulp');
 const gulpClean = require('gulp-clean');
 const outDir = './build';
 const rokuDeploy = require('roku-deploy');
+const util = require('util');
+const sleep = util.promisify(setTimeout);
 
 let args = {
   host: process.env.ROKU_HOST || '192.168.16.3',
@@ -20,7 +27,7 @@ let args = {
 
 export function clean() {
   console.log('Doing a clean at ' + outDir);
-  return gulp.src(['out', outDir], { allowEmpty: true }).pipe(gulpClean({ force: true }));
+  return gulp.src(['out', outDir, tmpBuildDir], { allowEmpty: true }).pipe(gulpClean({ force: true }));
 }
 
 export function createDirectories() {
@@ -33,11 +40,38 @@ export async function deploy(cb) {
   await rokuDeploy.publish(args);
 }
 
-async function compile(cb) {
+async function copyFiles() {
+  let oldPath = path.resolve(process.cwd());
+
+  try {
+    fs.mkdirSync(tmpBuildDir);
+    let sourcePaths = ['src'];
+    let sourcePathText = sourcePaths.map((p) => {
+      p = path.resolve(p);
+      p = p.endsWith('/') ? p : p + '/';
+      return p;
+    }).join(' ');
+
+    await exec(`rsync -az ${sourcePathText} ${tmpBuildDir}`);
+    console.log(`files copied to ${tmpBuildDir} dir is now ${process.cwd()}`);
+  } catch (err) {
+    console.error(err);
+  }
+  process.chdir(oldPath);
+}
+
+export async function compile(cb) {
+  // copy all sources to tmp folder
+  // so we can add the line numbers to them prior to transpiling
+  await copyFiles();
+  await sleep(100);
+  await applyBurpPreprocessing();
   let builder = new ProgramBuilder();
   await builder.run({
     stagingFolderPath: outDir,
-    createPackage: false
+    createPackage: false,
+    "rootDir": tmpBuildDir,
+    "autoImportComponentScript": true,
   });
 }
 
@@ -84,7 +118,7 @@ async function prepareTests(cb) {
 
   cb();
 }
-export function applyBurpPreprocessing(cb) {
+export async function applyBurpPreprocessing() {
   const currentPath = process.cwd();
   let replacements = null;
   if (process.env.buildType === 'prod') {
@@ -114,20 +148,21 @@ export function applyBurpPreprocessing(cb) {
       replacement: '  if not m.currentResult.isFail then $1'
     });
   }
+  console.log('using replacements' + inspect(replacements));
   let config: BurpConfig = {
-    sourcePath: outDir,
-    globPattern: '**/*.brs',
+    sourcePath: tmpBuildDir,
+    filePattern: ['**/*.bs','**/*.brs'],
     replacements: replacements
   };
 
+  console.log('applying burp processing')
   const processor = new BurpProcessor(config);
-  processor.processFiles();
-  console.log(`Resetting path to ${currentPath}`);
+  await processor.processFiles();
+  console.log(`Finished applying burp processing. Resetting path to ${currentPath}`);
   process.chdir(currentPath);
-  cb();
 }
 
 
-exports.build = series(clean, createDirectories, compile, applyBurpPreprocessing);
+exports.build = series(clean, createDirectories, compile);
 exports.prePublish = series(exports.build)
 exports.prePublishTests = series(exports.build, prepareTests);
