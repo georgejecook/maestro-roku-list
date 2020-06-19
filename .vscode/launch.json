@@ -31,7 +31,8 @@
         "!**/tests/**/*.*"
       ],
       "enableDebuggerAutoRecovery": true,
-      "stopDebuggerOnAppExit": true
+      "stopDebuggerOnAppExit": true,
+      "enableDebugProtocol": false
     },
     {
       "type": "brightscript",

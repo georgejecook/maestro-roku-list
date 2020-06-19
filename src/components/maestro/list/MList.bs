@@ -4,7 +4,7 @@ function init()
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
   m.moveAnimation = m.top.findNode("moveAnimation") 
   m.moveAnimationInterpolator.observeField("fraction", "onAnimationFractionChange")
-  m.top.clippingRect = [0,0,1920,550]
+  ' m.top.clippingRect = [0,0,1920,550]
   m.overlay = m.top.findNode("overlay") 
   m.focusTimer = m.top.findNode("focusTimer") 
   m.cellProvider = m.global.cellProvider
@@ -30,7 +30,11 @@ function resetState()
 
   if m.content <> invalid
     for each item in m.content.getChildren(-1, 0)
-      list = makeList(item)
+      if item.cellType <> invalid and item.cellType = "RectComp"
+        list = makeRectComp(item)
+      else
+        list = makeList(item)
+      end if
       m.lists.push(list)
     end for
   end if
@@ -63,7 +67,11 @@ function layoutLists()
     list.visible = not list.isHidden
     if list.visible
       list.translation = [0, m.currentY]
-      m.currentY += m.top.cellSize[1] + m.top.cellSpacing[1] + 40
+      if list.subType() = "Rectangle"
+        m.currentY += list.height + 40
+      else
+        m.currentY += m.top.cellSize[1] + m.top.cellSpacing[1] + 40
+      end if
       m.visibleLists.push(list)
     else
       m.hiddenLists.push(list)
@@ -100,6 +108,22 @@ function makeList(rowContent)
   return list
 end function
 
+function makeRectComp(rowContent)
+  list = m.rowsGroup.createChild("Rectangle")
+  list.id = str(m.listIndex).trim()
+  list.color = "#aaffaa"
+  list.addFields({ "content": rowContent })
+  list.addFields({ "isFocusable": true })
+  list.addFields({ "isHidden": false })
+  list.addFields({ "isFocused": false })
+  list.width = 1920
+  list.height = 300
+  list.content = rowContent
+  m.listIndex++
+
+  return list
+end function
+
 function addListListeners()
   for each list in m.visibleLists
     list.observeField("itemFocused", "itemFocusedChanged")
@@ -126,16 +150,23 @@ end function
 
 function currFocusItemIndexChanged() 
   ' ? "currFocusItemIndexChanged " ; 
-  if m.currentList <> invalid
-    index = m.currentList.currFocusItemIndex
+  list = m.visibleLists[m.top.rowFocused]
+  if list <> invalid and list.subType() = "MListRow"
+    index = list.currFocusItemIndex
     m.top.currFocusItemIndex = index
-    rect = getFocusedBounds()
+    rect = getBoundsForIndex(m.top.rowFocused, int(index))
 
     if rect <> invalid
       ' ? " rect is "; formatJson(rect)
-      m.overlay.width = rect.width
-      m.overlay.height = rect.height
-      m.overlay.translation = [rect.x, rect.y]
+      m.overlay.width = rect.height
+      m.overlay.height = rect.width
+      yOffset = list.translation[1] + m.rowsGroup.translation[1]
+
+      'floating
+      ' if m.list.content.yOffset <> invalid
+      '   yOffset -= m.currentList.content.yOffset 
+      ' end if
+      m.overlay.translation = [rect.x, rect.y + yOffset]
     else
       ? " no rect for focused item"
     end if
@@ -143,7 +174,7 @@ function currFocusItemIndexChanged()
 end function
 
 function onAnimationFractionChange()
-  ' logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction)
+  logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction)
   y = m.rowsGroup.translation[1]
   index = getListAtY(y)
 
@@ -154,9 +185,9 @@ function onAnimationFractionChange()
     updateRowFocus(index)
   else
     ' logInfo(">>>", y, index, m.top.rowFocused)
-    if index <> -1 and index <> m.top.rowFocused
-      updateRowStates(m.currentDirection, index)
-    end if
+    ' if index <> -1 and index <> m.top.rowFocused
+    '   updateRowStates(m.currentDirection, index)
+    ' end if
     m.top.rowFocused = index
   end if
 
@@ -176,8 +207,9 @@ function updateRowStates(direction, newIndex, beforeCount = 2, afterCount = 5)
 end function
 
 function getListAtY(yPos)
-  for i = 0 to m.visibleLists.count() -1
-    if m.visibleLists[i].translation[1] >= abs(yPos)
+  for i = 0 to m.visibleLists.count() - 1
+    listYPos = getListFocusYPosition(i)
+    if listYPos >= abs(yPos)
       return i
     end if
   end for
@@ -248,7 +280,7 @@ function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
     return invalid
   end if
 
-  targetY = (nextList.translation[1])
+  targetY = getListFocusYPosition(index)
   'TODO count visible rows between oldIndex and newIndex
   steps = abs(oldIndex - index)
   if m.moveAnimation.state = "play"
@@ -267,21 +299,35 @@ function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
 
 end function
 
+function getListFocusYPosition(index) 
+  list = m.visibleLists[index] 
+  y = 0
+  if list <> invalid
+    y = list.translation[1]
+    if list.content <> invalid and list.content.yOffset <> invalid
+      y -= list.content.yOffset
+      ' logInfo("list", index, "has a yoffset", list.content.yOffset)
+    end if
+  end if
+  return y
+end function
+
 function updateRowFocus(index)
   logMethod("updateRowFocus", index)
   m.currentList = m.visibleLists[index]
 
-  if m.currentList <> invalid 
+  if m.currentList <> invalid
     m.top.rowFocused = index
     m.currentList.isFocused = m.currentList.isFocusable
 
-    if m.currentList.content <> invalid
+    if m.currentList.content <> invalid and m.currentList.subType() = "MListRow"
       focusedItem = m.currentList.content.getChild(m.currentList.itemFocused)
       if focusedItem <> invalid
         m.top._focusedRenderer = m.cellTracker@.getCellForContentId(focusedItem.id)
       else
         m.top._focusedRenderer = invalid
       end if
+      logWarn("focusing on list ", m.currentList.content.title)
       m.currentList.setFocus(true)
 
     end if
@@ -295,7 +341,7 @@ end function
 function updateRowVisibilities(newIndex, oldIndex, numberOfRowsToShowBefore = 1, numberOfRowsToShowAfter = 3) as void
   logMethod("updateRowVisibilities newIndex", newIndex, "old", oldIndex)
   states = {}
-  if m.content = invalid
+  if m.content = invalid or newIndex = oldIndex
     return 
   end if
 
@@ -329,13 +375,14 @@ function setListStateMap(states, startIndex, endIndex, state)
 end function
 
 
-function getBoundsForIndex(index)
+function getBoundsForIndex(rowIndex, index)
   rect = invalid
-  if m.currentList <> invalid
-    set = m.currentList.currTargetSet
-    ' ? " set.focusIndex " ; set.focusIndex + m.currentList.focusIndexOffset
+  list = m.visibleLIsts[rowIndex]
+  if list <> invalid and list.subType() = "MListRow"
+    set = list.currTargetSet
+    ' ? " set.focusIndex " ; set.focusIndex + list.focusIndexOffset
     if set <> invalid
-      return set.targetRects[set.focusIndex + m.currentList.focusIndexOffset]
+      return set.targetRects[set.focusIndex + list.focusIndexOffset]
     end if
   end if
 
@@ -378,8 +425,8 @@ function isHiddenChange()
 
 end function
 
-function getFocusedBounds(args = invalid)
-  return getBoundsForIndex(int(m.currentList.currFocusItemIndex))
+function getFocusedBounds()
+  return getBoundsForIndex(m.top.rowFocused, int(m.currentList.currFocusItemIndex))
 end function
 
 
@@ -429,9 +476,23 @@ end function
 
 function onLongPressFinish(key) as boolean
   if key = "up" or key = "down"
+    'fixed focus 
     logVerbose("long press finished on key", key, "going to animate to final scroll position")
     index = getListAtY(m.rowsGroup.translation[1])
-    animateToIndex(index, index)
+    if m.currentDirection = -1
+      nextIndex = index - 1
+    else
+      nextIndex = index
+      index -= m.currentDirection
+    end if
+
+    if nextIndex < 0
+      nextIndex = 0
+    else if index > m.visibleLists.count() - 1
+      nextIndex = m.visibleLists.count() - 1
+    end if
+
+    animateToIndex(index, nextIndex)
     return true
   end if
 

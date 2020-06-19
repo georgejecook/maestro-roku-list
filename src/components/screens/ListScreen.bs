@@ -18,7 +18,7 @@ function init()
   '   m.list.itemComponentName = "ImageCell"
 
   m.list = listHolder.createChild("MList")
-  m.list.translation = [0, 250]
+  m.list.translation = [0, 0]
   m.cellProvider = m.global.cellProvider
   m.top._cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
@@ -47,11 +47,42 @@ function createData()
   for i = 0 to m.top._numberOfRows
     row = content.createChild("ContentNode")
     row.title = "ROW " + str(i)
-    ' row.addFields({
-    ' "isHidden": false
-    ' })
     row.addField("isHidden", "boolean", true)
     row.addField("isFocusable", "boolean", true)
+    if i <> 0
+      if i mod 9 = 0
+        row.addFields({ "focusType": "floatingWrap" })
+        row.title += " floating"
+      else
+        row.addFields({ "focusType": "fixed" })
+        row.title += " fixed"
+      end if
+      if i = 1
+        row.addFields({ "yOffset": 650 })
+        row.title += " post hero"
+      else if i mod 5 = 0
+        row.addFields({ "yOffset": 400 })
+        row.title += " 400"
+      else if i mod 5 = 3
+        row.addFields({ "yOffset": 400 })
+        row.title += " 700"
+      else
+        row.addFields({ "yOffset": 0 })
+        row.title += " 0"
+      end if
+    end if
+
+    if i = 10 or i = 14 or i = 19 or i = 22 or i = 23 or i = 28
+      cellType = "RectComp"
+      ' else if m.contentId mod 7 = 0
+      ' cellType = "SimpleCell2"
+      row.addFields({
+        "cellType": cellType
+      })
+    end if
+
+
+
     row.appendChildren(makeItems(m.top._defaultCellType, 60))
   end for
   return content
@@ -116,7 +147,7 @@ function makeItems(cellType, number)
     child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/360/300?n=" + nonce
     ' child.HDGRIDPOSTERURL = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
     child.title = "Item " + child.id.tostr()
-    
+
     ' if m.contentId mod 5 = 0
     '   cellType = "SimpleCell"
     ' else if m.contentId mod 7 = 0
@@ -126,7 +157,6 @@ function makeItems(cellType, number)
     child.addFields({
       "cellType": cellType
     })
-
     items.push(child)
     m.contentId++
   end for
@@ -215,9 +245,7 @@ end function
 function onKeyPressBack() as boolean
   ? "going back!"
 
-  if m.top.isRoot
-    return false
-  else
+  if not m.top.isRoot
     m.list.isHidden = true
     pop()
   end if

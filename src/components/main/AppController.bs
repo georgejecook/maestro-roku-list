@@ -8,28 +8,29 @@ import "pkg:/source/maestro/ioc/IOCMixin.bs"
 function Init()
   registerLogger("AppController")
   logInfo("in appcontroller init")
-  
+
   m.cellProvider = createObject("roSGNode", "CellProvider") 
   m.top._cellProvider = m.cellProvider
   m.global.addFields({ "cellProvider": m.cellProvider })
-  
-  
+
+
   m.cellTracker = createObject("roSGNode", "CellTracker") 
   m.top._cellTracker = m.cellTracker
   m.global.addFields({ "cellTracker": m.cellTracker })
   m.top.addFields({ "_global": m.global })
-  
-  
+
+
   m.cellTracker.observeField("numberOfCellsInUse", "onInfoChange")
   m.cellTracker.observeField("numberOfCells", "onInfoChange")
   m.cellProvider.observeField("numberOfCellsInUse", "onInfoChange")
   m.cellProvider.observeField("numberOfCells", "onInfoChange")
-  
+
   m.infoLabel = m.top.findNode("infoLabel")
   reset() 
   m.navController = m.top.findNode("navController")
   m.navController@._initialize()
   m.rootScreen = createObject("roSGNode", "ListScreen")
+  m.rootScreen.isRoot = true
   m.navController@.push(m.rootScreen)
 end function
 
@@ -54,11 +55,11 @@ end function
 
 function prebakeCells()
   ? "adding prebaked cells"
-  
+
   m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeImageCells, "ImageCell")
   m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellOnes, "SimpleCell")
   m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellTwos, "SimpleCell2")
   m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellComplex, "ComplexCell")
-  
+
   ? "finished adding prebaked cells"
 end function

@@ -10,7 +10,7 @@
     <field
         id='animSpeed'
         type='float'
-        value='0.4' />
+        value='0.3' />
     <field
         id='cellSpacing'
         type='floatArray'
@@ -96,7 +96,7 @@
     <Rectangle
         id='overlay'
         color='#ff0000'
-        visible='false'
+        visible='true'
         opacity='0.5' />
 
     <Animation

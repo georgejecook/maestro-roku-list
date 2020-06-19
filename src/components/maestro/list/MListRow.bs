@@ -12,12 +12,16 @@ function onContentIsHiddenChange()
   m.top.isHidden = m.content.isHidden = true
 end function
 
-function onContentChange()
+function onContentChange(evt)
+  logInfo("onContentChange", evt.getField())
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     toggleContentListener(false)
     m.content = m.top.content
     if m.content.isHidden <> true
       configureHeader()
+      if m.content.focusType <> invalid
+        m.top.focusType = m.content.focusType
+      end if
       configureList(m.list)
       toggleContentListener(true)
       m.list.content = m.content 
@@ -54,7 +58,7 @@ function configureList(list)
   ? "configuring list " ; m.top.focusType
   if m.top.focusType = "fixed"
     configureListFixed(list)
-  else if m.top.focusType = "focusWrap"
+  else if m.top.focusType = "floatingWrap"
     configureListFocusWrap(list)
   else if m.top.focusType = "floating"
     configureListFloating(list)
@@ -344,6 +348,9 @@ function configureListFocusWrap(list)
   unfocusedTargetSet.color = "0x00202020AA"
 
   list.targetSet = list.focusedTargetSet[0]
+  ' list.showTargetRects = true
+  m.top.defaultTargetSetFocusIndex = 6
+
 end function
 
 function addListListeners()

@@ -77,7 +77,7 @@
 
   <children>
     <Label id='header' text="header"/>
-    <TargetList id='list' translation='[0,20]'/>
+    <TargetList id='list' translation='[0,20]'    />
   </children>
 
 </component>
