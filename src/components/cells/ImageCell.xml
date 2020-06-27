@@ -57,7 +57,16 @@
         width='350'
         horizontalAlign='center'
         translation='[10, 10]' /> -->
-
+<Animation id="scaleAnimation"
+       duration="3"
+       repeat="true"
+       easeFunction="linear"
+       control="start" >
+    <Vector2DFieldInterpolator id = "myInterp"
+    key="[0.0, 0.5, 1.0]"
+    keyValue="[ [1.0, 1.0], [1.5, 1.5], [1.0, 1.0]]"
+    fieldToInterp="poster.scale" />
+</Animation>
   </children>
 
 </component>
