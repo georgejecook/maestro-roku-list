@@ -55,7 +55,7 @@ function onSetInitialTimerFire()
   for each row in m.visibleLists
     row.viewState = "partial"
   end for
-  ' updateRowStates(0, 0, 2, 5)
+  ' updateRowStates(0, 0, 5, 10)
 end function
 
 function layoutLists()
@@ -174,7 +174,7 @@ function currFocusItemIndexChanged()
 end function
 
 function onAnimationFractionChange()
-  logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction)
+  ' logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction)
   y = m.rowsGroup.translation[1]
   index = getListAtY(y)
 
@@ -185,17 +185,17 @@ function onAnimationFractionChange()
     updateRowFocus(index)
   else
     ' logInfo(">>>", y, index, m.top.rowFocused)
-    ' if index <> -1 and index <> m.top.rowFocused
-    '   updateRowStates(m.currentDirection, index)
-    ' end if
+    if index <> -1 and index <> m.top.rowFocused and ((index mod 10) = 0 or index < 10 or index < m.content.getchildCount() -10)
+      updateRowStates(m.currentDirection, index)
+    end if
     m.top.rowFocused = index
   end if
 
 end function
 
 
-function updateRowStates(direction, newIndex, beforeCount = 2, afterCount = 5)
-  ? "new Index" ; newIndex; " direction "; direction
+function updateRowStates(direction, newIndex, beforeCount = 5, afterCount = 10)
+  ' ? "new Index" ; newIndex; " direction "; direction
   if direction < 0
     numberOfRowsToShowBefore = beforeCount
     numberOfRowsToShowAfter = afterCount
@@ -227,7 +227,7 @@ end function
 
 function onCurrTargetChange(evt)
   currTarget = m.currentList.currTarget
-  ? "currTargetSet"; formatJson(currTarget)
+  ' ? "currTargetSet"; formatJson(currTarget)
 end function
 
 function moveYFocus(offset, isAnimated = true)
@@ -286,7 +286,7 @@ function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
   if m.moveAnimation.state = "play"
     m.moveAnimation.control = "pause"
   end if
-  ? "targetY = "; targetY
+  ' ? "targetY = "; targetY
   ' m.moveAnimationInterpolator.keyValue = [[0, 0], [0, targetY]]
   m.moveAnimationInterpolator.keyValue = [[0.0, m.rowsGroup.translation[1]], [0.0, - targetY]]
   m.moveAnimation.duration = (steps * m.top.animSpeed) / fastAnimationSpeed
@@ -345,16 +345,16 @@ function updateRowVisibilities(newIndex, oldIndex, numberOfRowsToShowBefore = 1,
     return 
   end if
 
-  setListStateMap(states, oldIndex - numberOfRowsToShowBefore, oldIndex + numberOfRowsToShowAfter, m.top.rowHidingMode)
+  setListStateMap(states, 0, m.content.getChildCount(), m.top.rowHidingMode)
   setListStateMap(states, newIndex - numberOfRowsToShowBefore, newIndex + numberOfRowsToShowAfter, "partial")
 
-  ? "updating states: " ; formatJson(states)
+  ' ? "updating states: " ; formatJson(states)
   for each rowId in states
     list = m.visibleLists[rowId.toInt()]
     if list <> invalid
       list.viewState = states[rowId]
     else
-      ? "ERROR could not find visible list for "; rowId
+      ' ? "ERROR could not find visible list for "; rowId
     end if
   end for
 
@@ -382,7 +382,7 @@ function getBoundsForIndex(rowIndex, index)
     set = list.currTargetSet
     ' ? " set.focusIndex " ; set.focusIndex + list.focusIndexOffset
     if set <> invalid
-      return set.targetRects[set.focusIndex + list.focusIndexOffset]
+      return set[index]
     end if
   end if
 

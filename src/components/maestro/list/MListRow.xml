@@ -8,6 +8,19 @@
         id='index'
         type='integer' />
     <!-- fixed|floating|focusWrap|zoom|custom -->
+        <field
+        id='animSpeed'
+        type='float'
+        value='0.3' />
+    <field
+        id='animateToItem'
+        type='integer'
+        onChange='onAnimateToItemChange'
+        value='0' />
+    <field
+        id='fastAnimationSpeed'
+        type='float'
+        value='1' />
     <field
         id='focusType'
         value='fixed'
@@ -54,30 +67,44 @@
 
     <field
         id='itemFocused'
-        alias='list.itemFocused' />
+        type='integer'
+        value='0' />
     <field
         id='itemUnfocused'
-        alias='list.itemUnfocused' />
+        type='integer'  />
     <field
         id='itemSelected'
-        alias='list.itemSelected' />
+        type='integer'  />
     <field
         id='currTargetSet'
-        alias='list.currTargetSet' />
+        type='array'  />
     <field
         id='defaultTargetSetFocusIndex'
-        alias='list.defaultTargetSetFocusIndex'
+        type='integer' 
         value='0' />
     <field
         id='currFocusItemIndex'
-        alias='list.currFocusItemIndex'
+        type='integer' 
         onChange='onCurrFocusItemIndexChange' />
 
   </interface>
 
   <children>
     <Label id='header' text="header"/>
-    <TargetList id='list' translation='[0,20]'    />
+        <Group id = 'cellHolder' translation='[0,20]' />
+
+    <Animation
+        id='moveAnimation'
+        duration='0.1'
+        repeat='false'
+        control='stop'
+        easeFunction='linear'>
+      <Vector2DFieldInterpolator
+          id='moveAnimationInterpolator'
+          key='[0.0, 1.0]'
+          keyValue='[ [0, 20], [0, 20] ]'
+          fieldToInterp='cellHolder.translation' />
+    </Animation>
   </children>
 
 </component>

@@ -10,7 +10,7 @@
     <field
         id='_prebakeCellTwos'
         type='integer'
-        value='100' />
+        value='0' />
     <field
         id='_prebakeImageCells'
         type='integer'
@@ -18,7 +18,7 @@
     <field
         id='_prebakeCellComplex'
         type='integer'
-        value='0' />
+        value='100' />
 
   </interface>
 

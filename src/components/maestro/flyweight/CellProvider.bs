@@ -8,7 +8,7 @@ function onDebugMChange()
 end function
 
 function reset(args = invalid)
-  ? "resetting cell trackers"
+  ' ? "resetting cell trackers"
   m.cellTypes = {}
   m.top.numberOfCells = 0
   m.top.numberOfCellsInUse = 0
@@ -28,7 +28,7 @@ function getTrackers(cellType)
 end function
 
 function addPreBakedCells(number, cellType = "SimpleCell")
-  ? "adding "; number; " cells of type "; cellType
+  ' ? "adding "; number; " cells of type "; cellType
   trackers = getTrackers(cellType)
   for i = 0 to number
     cell = createObject("roSGNode", cellType)
@@ -38,7 +38,7 @@ function addPreBakedCells(number, cellType = "SimpleCell")
     trackers.allCells.push(cell)
     m.top.numberOfCells ++
   end for
-  ? "finished making cells"
+  ' ? "finished making cells"
 end function
 
 function getCell(cellType = "SimpleCell")
@@ -70,7 +70,7 @@ end function
 
 function releaseCell(cell)
   if cell <> invalid
-    ? "releasing cell "; cell.id
+    ' ? "releasing cell "; cell.id
     trackers = getTrackers(cell.subType())
     trackers.usedCellsById.delete(cell.id)
     cell.getParent().removeChild(cell)

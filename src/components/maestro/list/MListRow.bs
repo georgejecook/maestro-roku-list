@@ -1,9 +1,15 @@
 function init()
   registerLogger("MList")
-  m.list = m.top.findNode("list")
+  m.cellHolder = m.top.findNode("cellHolder")
+  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
+  m.moveAnimation = m.top.findNode("moveAnimation") 
+  m.moveAnimationInterpolator.observeField("fraction", "onAnimationFractionChange")
+
   m.header = m.top.findNode("header")
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
+  m.cellsById = {}
+  m.currentDirection = 0
   m.previousViewState = ""
   m.content = invalid
 end function
@@ -13,7 +19,7 @@ function onContentIsHiddenChange()
 end function
 
 function onContentChange(evt)
-  logInfo("onContentChange", evt.getField())
+  ' logInfo("onContentChange", evt.getField())
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     toggleContentListener(false)
     m.content = m.top.content
@@ -22,12 +28,10 @@ function onContentChange(evt)
       if m.content.focusType <> invalid
         m.top.focusType = m.content.focusType
       end if
-      configureList(m.list)
       toggleContentListener(true)
-      m.list.content = m.content 
+      layoutCells()
       onViewStateChange()
     else
-      m.list.content = invalid
     end if
   end if
 end function
@@ -50,28 +54,6 @@ function toggleContentListener(isActive)
   end if
 end function
 
-function configureList(list)
-  list.itemComponentName = "DynamicCell"
-  list.advanceKey = "right" 
-  list.reverseKey = "left"
-
-  ? "configuring list " ; m.top.focusType
-  if m.top.focusType = "fixed"
-    configureListFixed(list)
-  else if m.top.focusType = "floatingWrap"
-    configureListFocusWrap(list)
-  else if m.top.focusType = "floating"
-    configureListFloating(list)
-  else if m.top.focusType = "zoom"
-    configureListZoom(list)
-  else if m.top.focusType = "custom"
-    configureListCustom(list)
-  else
-    ? " ERROR no valid list type; and no row override, dropping back to fixed"
-    configureListFixed(list)
-
-  end if
-end function
 
 function createHorizontalRects(rects, sx, cw, ch, csw, csh, numberOfCols)
   w = sx
@@ -82,284 +64,108 @@ function createHorizontalRects(rects, sx, cw, ch, csw, csh, numberOfCols)
   end for
 end function
 
-function configureListFixed(list)
-  ? ">> configuring list"
-  focusedTargetSet = createObject("roSGNode", "TargetSet")
-  list.focusedTargetSet = focusedTargetSet
-
+function layoutCells()
   cw = m.top.cellSize[0]
   ch = m.top.cellSize[1]
   csw = m.top.cellSpacing[0]
   csh = m.top.cellSpacing[1]
-  rects = []
-  rects.push({ x: - cw, y: 0, width: cw, height: ch })
-  createHorizontalRects(rects, 0, cw, ch, csw, csh, m.top.numCols)
+  m.rects = []
+  'rects.push({ x: - cw, y: 0, width: cw, height: ch })
+  content = m.top.content
+  numCells = content.getChildCount()
+  createHorizontalRects(m.rects, 0, cw, ch, csw, csh, numCells)
 
-  focusedTargetSet.color = "0x00202020AA"
-  focusedTargetSet.targetRects = rects
-
-  focusedTargetSet.color = "0x00202020AA"
-
-  unfocusedTargetSet = createObject("roSGNode", "TargetSet")
-  list.unfocusedTargetSet = unfocusedtargetSet
-
-  rects = []
-  rects.push({ x: - cw, y: 0, width: cw, height: ch })
-  createHorizontalRects(rects, 0, cw, ch, csw, csh, m.top.numCols)
-
-  unfocusedTargetSet.targetRects = rects
-  unfocusedTargetSet.color = "0x00202020AA"
-
-  list.targetSet = focusedTargetSet
-  m.top.defaultTargetSetFocusIndex = 1
-  m.top.focusIndexOffset = 2
+  'create all the content 
+  ' for i = 0 to numCells
+  '   cell = m.cellHolder.createChild("DynamicCell")
+  '   cell.index = i
+  '   cell.itemContent = content.getChild(i)
+  '   currRect = m.rects[i]
+  '   cell.currRect = currRect
+  '   cell.translation = [currRect.x, currRect.y]
+  ' end for
+  m.top.currTargetSet = m.rects
+  'updateListVisibility(m.top.viewState)
 end function
 
+function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
+  logMethod("animateToIndex from", oldIndex, "to", index)
+  nextCell = m.rects[index]
 
-function configureListFloating(list)
-  'FIXME - this needs an overhaul for laying out
-  ? "configureListFloating"
-  cw = m.top.cellSize[0]
-  ch = m.top.cellSize[1]
-  csw = m.top.cellSpacing[0]
-  csh = m.top.cellSpacing[1]
-  numCols = 1920 / (cw + csw)
-  focusedTargetSets = []
+  if nextCell = invalid
+    logError("could not idenitfy next cell with index", index)
+    return invalid
+  end if
 
-  for i = 0 to numCols
-    focusedTargetSet = createObject("roSGNode", "TargetSet")
-    focusedTargetSets.push(focusedTargetSet)
-    rects = []
-    rects.push({ x: - cw * ((numCols - i) + 1), y: 0, width: cw, height: ch })
-    createHorizontalRects(rects, - cw * (numCols - i), cw, ch, csw, csh, numCols)
-    focusedTargetSet.targetRects = rects
-    focusedTargetSet.focusIndex = numCols + i
-    focusedTargetSet.color = "0x00202020AA"
+  targetX = getItemFocusXPosition(index)
+  'TODO count visible rows between oldIndex and newIndex
+  steps = abs(oldIndex - index)
+  if m.moveAnimation.state = "play"
+    m.moveAnimation.control = "pause"
+  end if
+  m.moveAnimationInterpolator.keyValue = [[m.cellHolder.translation[0], 20], [- targetX, 20]]
+  m.moveAnimation.duration = (steps * m.top.animSpeed) / fastAnimationSpeed
+
+
+    if m.top.viewState <> "show"
+      m.top.viewState = "show"
+    end if
+
+  if m.moveAnimation.state = "puse"
+    m.moveAnimation.control = "resume"
+  else
+    m.moveAnimation.control = "start"
+  end if
+
+end function
+
+function onAnimateToItemChange()
+  if m.content <> invalid
+    ' logInfo("onAnimateToItemChange", m.top.animateToItem)
+    animateToIndex(m.top.itemFocused, m.top.animateToItem, m.top.fastAnimationSpeed)
+  end if
+end function
+
+function getIndexAtX(xPos)
+  for i = 0 to m.rects.count() - 1
+    x = getItemFocusXPosition(i)
+    if abs(x) >= abs(xPos)
+      return i
+    end if
   end for
 
-  list.focusedTargetSet = focusedTargetSets
-
-  unfocusedTargetSet = createObject("roSGNode", "TargetSet")
-  list.unfocusedTargetSet = unfocusedtargetSet
-
-  rects = []
-  rects.push({ x: - cw * ((numCols / 2) + 1), y: 0, width: cw, height: ch })
-  createHorizontalRects(rects, - cw * 2, cw, ch, csw, csh, numCols)
-  unfocusedTargetSet.targetRects = rects
-  unfocusedTargetSet.focusIndex = numCols / 2 ' should not matter?
-  unfocusedTargetSet.color = "0x00202020AA"
-
-  list.targetSet = list.focusedTargetSet[0]
+  return -1
 end function
 
-
-function configureListZoom(list)
-  ? "configureListZoom"
-  focusedTargetSet = createObject("roSGNode", "TargetSet")
-
-  list.focusedTargetSet = focusedTargetSet
-
-  cw = m.top.cellSize[0]
-  ch = m.top.cellSize[1]
-  rects = []
-  sw = m.top.cellSpacing[0]
-  w = 0
-  'TODO calculate
-  ' for i = 0 to m.top.numCols
-  '   rects.push({ x: w, y: 0, width: cw, height: ch })
-  '   w += cw + sw
-  ' end for
-
-  rects = [
-    { x: -134, y: -64, width: 100, height: 128 },
-    { x: -134, y: -64, width: 100, height: 128 },
-    { x: -134, y: -64, width: 100, height: 128 },
-    { x: -14, y: -64, width: 100, height: 128 },
-    { x: 106, y: -90, width: 144, height: 180 },
-    { x: 270, y: -125, width: 200, height: 250 },
-    { x: 490, y: -188, width: 300, height: 376 }, ' focus
-    { x: 810, y: -125, width: 200, height: 250 },
-    { x: 1030, y: -90, width: 144, height: 180 },
-    { x: 1194, y: -64, width: 100, height: 128 },
-    { x: 1314, y: -64, width: 100, height: 128 },
-    { x: 1314, y: -64, width: 100, height: 128 },
-    { x: 1314, y: -64, width: 100, height: 128 }
-  ]
-  focusedTargetSet.rects = rects
-  focusedTargetSet.color = "0x00202020AA"
-
-  rects = []
-  sw = m.top.cellSpacing[0]
-  w = 0
-
-  'TODO calculate
-  ' for i = 0 to m.top.numCols
-  '   rects.push({ x: w, y: 0, width: cw, height: ch })
-  '   w += cw + sw
-  ' end for
-  rects = [
-    { x: -130, y: -64, width: 100, height: 128 },
-    { x: -10, y: -64, width: 100, height: 128 },
-    { x: 110, y: -64, width: 100, height: 128 },
-    { x: 230, y: -64, width: 100, height: 128 },
-    { x: 350, y: -64, width: 100, height: 128 },
-    { x: 470, y: -64, width: 100, height: 128 },
-    { x: 590, y: -64, width: 100, height: 128 }, ' focus
-    { x: 710, y: -64, width: 100, height: 128 },
-    { x: 830, y: -64, width: 100, height: 128 },
-    { x: 950, y: -64, width: 100, height: 128 },
-    { x: 1070, y: -64, width: 100, height: 128 },
-    { x: 1190, y: -64, width: 100, height: 128 },
-    { x: 1310, y: -64, width: 100, height: 128 }
-  ]
-
-  unfocusedTargetSet = createObject("roSGNode", "TargetSet")
-  list.unfocusedTargetSet = unfocusedTargetSet
-
-  unfocusedTargetSet.targetRects = rects
-  unfocusedTargetSet.color = "0x00202020AA"
-
-  list.targetSet = list.focusedTargetSet
-  m.top.defaultTargetSetFocusIndex = 6
+function getItemFocusXPosition(index) 
+  rect = m.rects[index] 
+  if rect <> invalid
+    return rect.x
+  end if
+  return 0
 end function
 
-function configureListCustom(list)
-end function
+function onAnimationFractionChange()
+  x = m.cellHolder.translation[0]
+  index = getIndexAtX(x)
+  ' logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction, "x", x, "index", index)
 
+  if m.moveAnimationInterpolator.fraction = 1
+    if index = -1
+      index = 0
+    end if
+    m.top.itemFocused = index
+    if m.top.viewState = "show"
+      m.top.viewState = "partial"
+    end if
+  else
+    ' if index <> -1 and index <> m.top.rowFocused
+    '   updateRowStates(m.currentDirection, index)
+    ' end if
+    m.top.itemFocused = index
 
-function configureListFocusWrap(list)
-  ? "configureListFocusWrap"
-  focusedTargetSet1 = createObject("roSGNode", "TargetSet")
-  focusedTargetSet2 = createObject("roSGNode", "TargetSet")
-  focusedTargetSet3 = createObject("roSGNode", "TargetSet")
-  focusedTargetSet4 = createObject("roSGNode", "TargetSet")
-  focusedTargetSet5 = createObject("roSGNode", "TargetSet")
-  list.focusedTargetSet = [focusedTargetSet1, focusedTargetSet2, focusedTargetSet3, focusedTargetSet4, focusedTargetSet5]
+  end if
 
-  focusedTargetSet1.targetRects = [
-    { x: -192, y: -64, width: 100, height: 128 },
-    { x: -192, y: -64, width: 100, height: 128 },
-    { x: -192, y: -90, width: 144, height: 180 },
-    { x: -192, y: -125, width: 200, height: 250 },
-    { x: 28, y: -188, width: 300, height: 376 }, ' focus
-    { x: 348, y: -125, width: 200, height: 250 },
-    { x: 568, y: -90, width: 144, height: 180 },
-    { x: 732, y: -64, width: 100, height: 128 },
-    { x: 852, y: -64, width: 100, height: 128 },
-    { x: 972, y: -64, width: 100, height: 128 },
-    { x: 1092, y: -64, width: 100, height: 128 },
-    { x: 1212, y: -64, width: 100, height: 128 },
-    { x: 1332, y: -64, width: 100, height: 128 }
-  ]
-  focusedTargetSet1.focusIndex = 4
-  focusedTargetSet1.color = "0x00202020AA"
-
-  focusedTargetSet2.targetRects = [
-    { x: -164, y: -64, width: 100, height: 128 },
-    { x: -164, y: -64, width: 100, height: 128 },
-    { x: -164, y: -64, width: 100, height: 128 },
-    { x: -164, y: -90, width: 144, height: 180 },
-    { x: 0, y: -125, width: 200, height: 250 },
-    { x: 220, y: -188, width: 300, height: 376 }, ' focus
-    { x: 540, y: -125, width: 200, height: 250 },
-    { x: 760, y: -90, width: 144, height: 180 },
-    { x: 924, y: -64, width: 100, height: 128 },
-    { x: 1044, y: -64, width: 100, height: 128 },
-    { x: 1164, y: -64, width: 100, height: 128 },
-    { x: 1284, y: -64, width: 100, height: 128 },
-    { x: 1404, y: -64, width: 100, height: 128 }
-  ]
-  focusedTargetSet2.focusIndex = 5
-  focusedTargetSet2.color = "0x00202020AA"
-
-  focusedTargetSet3.targetRects = [
-    { x: -134, y: -64, width: 100, height: 128 },
-    { x: -134, y: -64, width: 100, height: 128 },
-    { x: -134, y: -64, width: 100, height: 128 },
-    { x: -14, y: -64, width: 100, height: 128 },
-    { x: 106, y: -90, width: 144, height: 180 },
-    { x: 270, y: -125, width: 200, height: 250 },
-    { x: 490, y: -188, width: 300, height: 376 }, ' focus
-    { x: 810, y: -125, width: 200, height: 250 },
-    { x: 1030, y: -90, width: 144, height: 180 },
-    { x: 1194, y: -64, width: 100, height: 128 },
-    { x: 1314, y: -64, width: 100, height: 128 },
-    { x: 1314, y: -64, width: 100, height: 128 },
-    { x: 1314, y: -64, width: 100, height: 128 }
-  ]
-  focusedTargetSet3.focusIndex = 6
-  focusedTargetSet3.color = "0x00202020AA"
-
-  focusedTargetSet4.targetRects = [
-    { x: -204, y: -64, width: 100, height: 128 }
-    { x: -204, y: -64, width: 100, height: 128 },
-    { x: 16, y: -64, width: 100, height: 128 },
-    { x: 136, y: -64, width: 100, height: 128 },
-    { x: 256, y: -64, width: 100, height: 128 },
-    { x: 376, y: -90, width: 144, height: 180 },
-    { x: 540, y: -125, width: 200, height: 250 },
-    { x: 760, y: -188, width: 300, height: 376 }, ' focus
-    { x: 1080, y: -125, width: 200, height: 250 },
-    { x: 1300, y: -90, width: 144, height: 180 },
-    { x: 1464, y: -64, width: 100, height: 128 },
-    { x: 1584, y: -64, width: 100, height: 128 },
-    { x: 1704, y: -64, width: 100, height: 128 },
-  ]
-  focusedTargetSet4.focusIndex = 7
-  focusedTargetSet4.color = "0x00202020AA"
-
-  focusedTargetSet5.targetRects = [
-    { x: -152, y: -64, width: 100, height: 128 },
-    { x: -32, y: -64, width: 100, height: 128 }
-    { x: 88, y: -64, width: 100, height: 128 },
-    { x: 208, y: -64, width: 100, height: 128 },
-    { x: 328, y: -64, width: 100, height: 128 },
-    { x: 448, y: -64, width: 100, height: 128 },
-    { x: 568, y: -90, width: 144, height: 180 },
-    { x: 732, y: -125, width: 200, height: 250 },
-    { x: 952, y: -188, width: 300, height: 376 }, ' focus
-    { x: 1272, y: -125, width: 200, height: 250 },
-    { x: 1272, y: -90, width: 144, height: 180 },
-    { x: 1272, y: -64, width: 100, height: 128 },
-    { x: 1272, y: -64, width: 100, height: 128 },
-  ]
-  focusedTargetSet5.focusIndex = 8
-  focusedTargetSet5.color = "0x00202020AA"
-
-  unfocusedTargetSet = createObject("roSGNode", "TargetSet")
-  list.unfocusedTargetSet = unfocusedtargetSet
-
-  unfocusedTargetSet.targetRects = [
-    { x: -130, y: -64, width: 100, height: 128 },
-    { x: -10, y: -64, width: 100, height: 128 },
-    { x: 110, y: -64, width: 100, height: 128 },
-    { x: 230, y: -64, width: 100, height: 128 },
-    { x: 350, y: -64, width: 100, height: 128 },
-    { x: 470, y: -64, width: 100, height: 128 },
-    { x: 590, y: -64, width: 100, height: 128 }, ' focus
-    { x: 710, y: -64, width: 100, height: 128 },
-    { x: 830, y: -64, width: 100, height: 128 },
-    { x: 950, y: -64, width: 100, height: 128 },
-    { x: 1070, y: -64, width: 100, height: 128 },
-    { x: 1190, y: -64, width: 100, height: 128 },
-    { x: 1310, y: -64, width: 100, height: 128 }
-  ]
-  unfocusedTargetSet.focusIndex = 6 ' should not matter?
-  unfocusedTargetSet.color = "0x00202020AA"
-
-  list.targetSet = list.focusedTargetSet[0]
-  ' list.showTargetRects = true
-  m.top.defaultTargetSetFocusIndex = 6
-
-end function
-
-function addListListeners()
-  for each list in m.lists
-    list.observeField("itemFocused", "itemFocusedChanged")
-    list.observeField("itemUnfocused", "itemUnfocusedChanged")
-    list.observeField("itemSelected", "itemSelectedChanged")
-    list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
-  end for
 end function
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -376,7 +182,7 @@ end function
 
 function updateListVisibility(state)
   if m.content <> invalid
-    ' logMethod("updateListVisibility", m.top.index, state)
+    logMethod("updateListVisibility", m.top.index, state)
     states = {}
 
     if state = "hidden" or state = "partial"
@@ -387,10 +193,9 @@ function updateListVisibility(state)
       setListStateMap(states, 0, m.content.getChildCount(), "show")
     else if state = "partial"
       'TODO - calcculate this!
-      setListStateMap(states, m.list.itemFocused - 1, m.list.itemFocused + 4, "show")
+      setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "show")
     end if
 
-    ' ? "row updateListVisibility " ; formatJson(states)
     toggleCellStates(states)
   end if
 end function
@@ -400,29 +205,132 @@ function setListStateMap(states, startIndex, endIndex, state)
   for i = startIndex to endIndex
 
     if i >= 0 and i < m.content.getChildCount()
-      states[m.content.getChild(i).id] = state
+      states[str(i).trim()] = state
     end if
   end for
 end function
 
 function toggleCellStates(states)
-  m.cellTracker.callFunc("setViewStates", states)
+  'm.cellTracker.callFunc("setViewStates", states)
+  for each id in states
+    applyViewStateForCell(id, states[id])
+  end for
 end function
 
-'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-'++ key handling
-'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-function onCurrFocusItemIndexChange()
-  if m.top.viewState <> "show"
-    m.top.viewState = "show"
-
+function applyViewStateForCell(id, viewState)
+  index = id.toInt()
+  item = m.content.getChild(index)
+  if item <> invalid
+    if viewState = "show"
+      if m.cellsById[id] = invalid
+        cell = m.cellProvider@.getCell(item.cellType)
+        if cell <> invalid
+          cell.itemContent = item
+          cell.translation = [m.rects[index].x, m.rects[index].y]
+          m.cellHolder.appendChild(cell)
+          cell.index = m.top.index
+          m.cellsById[id] = cell
+        else 
+           ? ">>ERR no cell for " ; item.cellType
+        end if
+      end if
+    else
+      cell = m.cellsById[id]
+      if cell <> invalid
+        m.cellProvider@.releaseCell(cell) 
+        m.cellsById.delete(id)
+      end if
+    end if
   end if
 end function
 
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ lifecycle
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onCurrFocusItemIndexChange()
+end function
+
 function onIsFocusedChange()
-  if m.top.isFocused 
-    m.list.setFocus(true)
-  end if 
+end function
+
+function moveXFocus(direction)
+  nextIndex = m.top.itemFocused + direction
+
+  if nextIndex < 0
+    nextIndex = 0
+  else if nextIndex > m.rects.count() - 1
+    nextIndex = m.rects.count() - 1
+  end if
+  animateToIndex(m.top.itemFocused, nextIndex)
+  m.top.itemFocused = nextIndex
+
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ KeyPress
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onKeyPressLeft() as boolean
+  logMethod("onKeyPressLeft")
+  moveXFocus(-1)
+  return true
+end function
+
+function onKeyPressRight() as boolean
+  logMethod("onKeyPressRight")
+  moveXFocus(1)
+  return true
+end function
+
+
+function getLongPressIntervalForKey(key) as float
+  logMethod("getLongPressIntervalForKey", key)
+  if key = "left" or key = "right"
+    return 0.5
+  else
+    return 0
+  end if
+end function
+
+function onLongPressStart(key) as boolean
+  logMethod(">>>>onLongPressStart", key)
+
+  if key = "left" or key = "right"
+    logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    if key = "left"
+      targetIndex = 0 
+    else
+      targetIndex = m.content.getChildCount() - 1
+    end if
+    animateToIndex(m.top.itemFocused, targetIndex)
+    return true
+  end if
+
+  return false
+end function
+
+function onLongPressFinish(key) as boolean
+  if key = "left" or key = "right"
+    'fixed focus 
+    logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    index = getIndexAtX(m.cellHolder.translation[0])
+    if m.currentDirection = -1
+      nextIndex = index - 1
+    else
+      nextIndex = index
+      index -= m.currentDirection
+    end if
+
+    if nextIndex < 0
+      nextIndex = 0
+    else if index > m.rects.count() - 1
+      nextIndex = m.rects.count() - 1
+    end if
+
+    animateToIndex(index, nextIndex)
+    return true
+  end if
+
+  return false
 end function
