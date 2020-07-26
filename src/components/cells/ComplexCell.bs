@@ -6,8 +6,8 @@ function init()
   m.theLabel = m.top.findNode("theLabel")
   ' m.theLabel2 = m.top.findNode("theLabel2")
   m.theLabel3 = m.top.findNode("theLabel3")
-  m.focusColorInterp = m.top.findNode("focusColorInterp")
-  m.focusColorInterp.fieldToInterp = "theRect.color"
+  ' m.focusColorInterp = m.top.findNode("focusColorInterp")
+  ' m.focusColorInterp.fieldToInterp = "theRect.color"
 end function
 
 function itemContentChanged()
@@ -26,17 +26,17 @@ function currTargetChanged()
 end function
 
 function currRectChanged()
-  m.theRect.width = m.top.currRect.width
-  m.theRect.height = m.top.currRect.height - 100
+'   m.theRect.width = m.top.currRect.width
+'   m.theRect.height = m.top.currRect.height - 100
 end function
 
 function focusPercentChanged()
   ' print "focusPercent for item "; m.top.index; " changed to "; m.top.focusPercent
-  if (m.top.groupHasFocus)
-    m.focusColorInterp.fraction = m.top.focusPercent
-  else
-    m.focusColorInterp.fraction = 0
-  end if
+  ' if (m.top.groupHasFocus)
+  '   m.focusColorInterp.fraction = m.top.focusPercent
+  ' else
+  '   m.focusColorInterp.fraction = 0
+  ' end if
 end function
 
 function onKeyEvent(key as string, press as boolean) as boolean

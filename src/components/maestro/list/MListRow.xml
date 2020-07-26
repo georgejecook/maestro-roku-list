@@ -18,6 +18,12 @@
         onChange='onAnimateToItemChange'
         value='0' />
     <field
+        id='isOnScreen'
+        type='boolean'
+        onChange='onIsOnScreenChange'
+        alwaysNotify='false'
+        value='false' />
+    <field
         id='fastAnimationSpeed'
         type='float'
         value='1' />
@@ -90,7 +96,7 @@
   </interface>
 
   <children>
-    <Label id='header' text="header"/>
+    <Label id='header' text="header" color="#cccccc"/>
         <Group id = 'cellHolder' translation='[0,20]' />
 
     <Animation

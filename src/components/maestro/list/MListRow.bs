@@ -107,11 +107,11 @@ function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
   m.moveAnimation.duration = (steps * m.top.animSpeed) / fastAnimationSpeed
 
 
-    if m.top.viewState <> "show"
-      m.top.viewState = "show"
-    end if
+  if m.top.viewState <> "show"
+    m.top.viewState = "show"
+  end if
 
-  if m.moveAnimation.state = "puse"
+  if m.moveAnimation.state = "pause"
     m.moveAnimation.control = "resume"
   else
     m.moveAnimation.control = "start"
@@ -173,8 +173,9 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onViewStateChange()
-  ' logInfo("onViewStateChange", m.top.index, m.top.viewState)
+  logInfo("onViewStateChange", m.top.index, m.top.viewState)
   if m.top.viewState <> m.previousViewState
+  ? ">>>WTF1 "; m.previousViewState ; " " ; m.top.viewState
     m.previousViewState = m.top.viewState
     updateListVisibility(m.top.viewState)
   end if
@@ -182,7 +183,7 @@ end function
 
 function updateListVisibility(state)
   if m.content <> invalid
-    logMethod("updateListVisibility", m.top.index, state)
+    ' logMethod("updateListVisibility", m.top.index, state)
     states = {}
 
     if state = "hidden" or state = "partial"
@@ -217,21 +218,40 @@ function toggleCellStates(states)
   end for
 end function
 
+function onIsOnScreenChange()
+  ' logMethod("onIsOnScreenChange")
+  isOnScreen = m.top.isOnScreen
+  for each id in m.cellsById
+    cell = m.cellsById[id]
+    if isOnScreen
+      cell.itemContent = m.content.getChild(id.toInt())
+    end if
+    cell.visible = isOnScreen
+  end for
+end function
+
 function applyViewStateForCell(id, viewState)
   index = id.toInt()
+  isOnScreen = m.top.isOnScreen
+  ? "applyViewStateForCell "; id ; " vs " ; viewState ; " isonScreen" ; isOnScreen
   item = m.content.getChild(index)
   if item <> invalid
     if viewState = "show"
       if m.cellsById[id] = invalid
         cell = m.cellProvider@.getCell(item.cellType)
         if cell <> invalid
-          cell.itemContent = item
+          cell.visible = isOnScreen
+
+          if isOnScreen
+            cell.itemContent = item
+          end if
+
           cell.translation = [m.rects[index].x, m.rects[index].y]
           m.cellHolder.appendChild(cell)
           cell.index = m.top.index
           m.cellsById[id] = cell
         else 
-           ? ">>ERR no cell for " ; item.cellType
+          ? ">>ERR no cell for " ; item.cellType
         end if
       end if
     else

@@ -5,7 +5,7 @@ import "pkg:/components/maestro/view/mixin/FocusMixin.bs"
 function Init() as void
   CreateObject("roSGNode", "TrackerTask")
   m.top._global = m.global
-  m.top.rLog = initializeRlog(false, true)
+  m.top.rLog = initializeRlog(true, false)
   m.top.rLog.logLevel = 5
   registerLogger("MainScene")
   MIOC.init()

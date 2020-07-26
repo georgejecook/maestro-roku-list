@@ -35,15 +35,18 @@
   <children>
     <Rectangle
         id='theRect'
-        color='0x00002080'>
+        width="300"
+        height="300"
+        color='#8034eb'>
       <Label
           id='theLabel'
+          color="#000000"
           translation='[10, 10]' />
     </Rectangle>
-    <ColorFieldInterpolator
+    <!-- <ColorFieldInterpolator
         id='focusColorInterp'
         key='[0.0, 1.0]'
-        keyValue='[0x00002080, 0x000080FF]' />
+        keyValue='[0x00002080, 0x000080FF]' /> -->
   </children>
 
 </component>

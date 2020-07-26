@@ -6,7 +6,7 @@
     <field
         id='_prebakeCellOnes'
         type='integer'
-        value='100' />
+        value='150' />
     <field
         id='_prebakeCellTwos'
         type='integer'
@@ -14,15 +14,20 @@
     <field
         id='_prebakeImageCells'
         type='integer'
-        value='300' />
+        value='00' />
     <field
         id='_prebakeCellComplex'
         type='integer'
-        value='100' />
+        value='150' />
 
   </interface>
 
   <children>
+    <Rectangle
+        color='#b286f0'
+        width='1920'
+        height='1080'/>
+
     <NavController id='navController' />
 
     <Rectangle

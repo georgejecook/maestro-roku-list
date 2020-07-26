@@ -185,10 +185,12 @@ function onAnimationFractionChange()
     updateRowFocus(index)
   else
     ' logInfo(">>>", y, index, m.top.rowFocused)
-    if index <> -1 and index <> m.top.rowFocused and ((index mod 10) = 0 or index < 10 or index < m.content.getchildCount() -10)
+    if index <> -1 and index <> m.top.rowFocused and ((index mod 10) = 0 or index < 10 or index < m.content.getchildCount() - 10)
       updateRowStates(m.currentDirection, index)
     end if
-    m.top.rowFocused = index
+    nextIndex = getListAtY(y - 1400)
+    'TODO - actually run this propertly
+    m.visibleLists[nextIndex].isOnScreen = true
   end if
 
 end function
@@ -339,7 +341,7 @@ function updateRowFocus(index)
 end function
 
 function updateRowVisibilities(newIndex, oldIndex, numberOfRowsToShowBefore = 1, numberOfRowsToShowAfter = 3) as void
-  logMethod("updateRowVisibilities newIndex", newIndex, "old", oldIndex)
+  ' logMethod("updateRowVisibilities newIndex", newIndex, "old", oldIndex)
   states = {}
   if m.content = invalid or newIndex = oldIndex
     return 
@@ -351,7 +353,7 @@ function updateRowVisibilities(newIndex, oldIndex, numberOfRowsToShowBefore = 1,
   ' ? "updating states: " ; formatJson(states)
   for each rowId in states
     list = m.visibleLists[rowId.toInt()]
-    if list <> invalid
+    if list <> invalid and list.hasField("viewState")
       list.viewState = states[rowId]
     else
       ' ? "ERROR could not find visible list for "; rowId
