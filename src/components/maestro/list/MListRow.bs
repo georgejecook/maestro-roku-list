@@ -159,9 +159,10 @@ function onAnimationFractionChange()
       m.top.viewState = "partial"
     end if
   else
-    ' if index <> -1 and index <> m.top.rowFocused
-    '   updateRowStates(m.currentDirection, index)
-    ' end if
+    'updating horizontal list efficiency while scrolling..
+    if index <> -1 and index <> m.top.rowFocused
+      updateListVisibility("show")
+    end if
     m.top.itemFocused = index
 
   end if
@@ -174,8 +175,7 @@ end function
 
 function onViewStateChange()
   logInfo("onViewStateChange", m.top.index, m.top.viewState)
-  if m.top.viewState <> m.previousViewState
-  ? ">>>WTF1 "; m.previousViewState ; " " ; m.top.viewState
+  if m.top.viewState <> m.previousViewState 
     m.previousViewState = m.top.viewState
     updateListVisibility(m.top.viewState)
   end if
@@ -191,7 +191,8 @@ function updateListVisibility(state)
     end if
 
     if state = "show"
-      setListStateMap(states, 0, m.content.getChildCount(), "show")
+      ' setListStateMap(states, 0, m.content.getChildCount(), "show")
+      setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "show")
     else if state = "partial"
       'TODO - calcculate this!
       setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "show")

@@ -103,6 +103,7 @@ function makeList(rowContent)
   list.unfocusCount = m.top.unfocusCount
   list.viewState = "hidden"
   list.content = rowContent
+  list.isOnScreen = m.listIndex < 5
   m.listIndex++
 
   return list

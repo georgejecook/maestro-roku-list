@@ -6,32 +6,34 @@
   "configurations": [
   
     {
+      "name": "app",
       "type": "brightscript",
       "request": "launch",
-      "name": "Run",
-      "preLaunchTask": "app",
+      "consoleOutput": "normal",
       "internalConsoleOptions": "neverOpen",
+      "preLaunchTask": "app",
       "envFile": "${workspaceFolder}/.vscode/.env",
       "host": "${env:ROKU_DEV_TARGET}",
       "password": "${env:ROKU_DEVPASSWORD}",
-      "outDir": "${workspaceFolder}/out",
+      "retainStagingFolder": true,
+      "stopOnEntry": false,
       "rootDir": "${workspaceFolder}/build",
       "sourceDirs": [
-        "${workspaceFolder}/src"
+        "${workspaceFolder}/src",
       ],
-      "consoleOutput": "normal",
-      "stopOnEntry": false,
-      "retainDeploymentArchive": true,
-      "retainStagingFolder": true,
       "files": [
         "manifest",
         "source/**/*.*",
         "components/**/*.*",
         "images/**/*.*",
-        "!**/tests/**/*.*"
+        "font/**/*.*",
+        "!*.zip",
+        "!**/*.zip"
       ],
       "enableDebuggerAutoRecovery": true,
-      "stopDebuggerOnAppExit": true,
+      "stopDebuggerOnAppExit": false,
+      "enableVariablesPanel": false,
+      "injectRaleTrackerTask": false,
       "enableDebugProtocol": false
     },
     {
@@ -45,7 +47,6 @@
       "password": "${env:ROKU_DEVPASSWORD}",
       "outDir": "${workspaceFolder}/out",
       "rootDir": "${workspaceFolder}/build",
-      "debugRootDir": "${workspaceFolder}/src",
       "consoleOutput": "normal",
       "stopOnEntry": false,
       "retainDeploymentArchive": true,

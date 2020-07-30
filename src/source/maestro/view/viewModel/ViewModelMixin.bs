@@ -1,5 +1,5 @@
 import "../../lib/Utils.bs"
-import "pkg:/source/rLog/rLogMixin.brs"
+import "pkg:/source/rLog/rLogMixin.bs"
 import "../../observable/BaseObservable.bs"
 import "../../observable/ObservableMixin.bs"
 import "pkg:/components/maestro/view/mixin/FocusMixin.bs"

@@ -1,5 +1,5 @@
 import "../../observable/BaseObservable.bs"
-import "pkg:/source/rLog/rLogMixin.brs"
+import "pkg:/source/rLog/rLogMixin.bs"
 
 namespace MBVM
 

@@ -14,7 +14,7 @@
     <field
         id='_prebakeImageCells'
         type='integer'
-        value='00' />
+        value='100' />
     <field
         id='_prebakeCellComplex'
         type='integer'
