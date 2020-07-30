@@ -35,13 +35,18 @@
   <children>
     <Rectangle
         id='theRect'
-        color='0x00002080'>
+        width="300"
+        height="300"
+        color='#8034eb'>
       <Label
           id='theLabel'
+          color='#000000'
           translation='[10, 10]' />
+
       <Label
           id='theLabel2'
           text='OTHER'
+          color="#000000"
           translation='[10, 30]' />
     </Rectangle>
     <ColorFieldInterpolator

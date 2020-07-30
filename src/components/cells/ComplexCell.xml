@@ -35,7 +35,10 @@
   <children>
     <Rectangle
         id='theRect'
-        color='0x00002080'>
+        color='#8034eb'
+        width="300"
+        height="300"
+        >
     </Rectangle>
     <Poster
         id='poster'
@@ -56,7 +59,7 @@
         height='200'
         loadDisplayMode='scaleToFit' /> -->
     <Rectangle
-        opacity='0.8'
+        opacity='0.4'
         color='#000000'
         width='370'
         height='70' />
@@ -88,13 +91,13 @@
         wrap='true'
         maxLines='2'
         width='360'
-        color='#ffffff'
+        color='#000000'
         translation='[10, 300]' />
 
-    <ColorFieldInterpolator
+    <!-- <ColorFieldInterpolator
         id='focusColorInterp'
         key='[0.0, 1.0]'
-        keyValue='[0x00002080, 0x000080FF]' />
+        keyValue='[0x00002080, 0x000080FF]' /> -->
 
   </children>
 

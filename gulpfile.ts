@@ -2,18 +2,18 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import { series } from "gulp";
 import { RooibosProcessor, createProcessorConfig } from 'rooibos-cli';
-import { BurpConfig, BurpProcessor } from "burp-brightscript";
+import { BurpConfig, BurpProcessor, FileProcessor } from "burp-brightscript";
 import { inspect } from 'util';
 import { ProgramBuilder, BsConfig } from 'brighterscript';
 
 const exec = require('child_process').exec;
-const tmpBuildDir = '/tmp/buildTmp';
 const gulp = require('gulp');
 const gulpClean = require('gulp-clean');
 const outDir = './build';
 const rokuDeploy = require('roku-deploy');
 const util = require('util');
 const sleep = util.promisify(setTimeout);
+let burpFileProcessor: FileProcessor;
 
 let args = {
   host: process.env.ROKU_HOST || '192.168.16.3',
@@ -27,7 +27,7 @@ let args = {
 
 export function clean() {
   console.log('Doing a clean at ' + outDir);
-  return gulp.src(['out', outDir, tmpBuildDir], { allowEmpty: true }).pipe(gulpClean({ force: true }));
+  return gulp.src(['out', outDir], { allowEmpty: true }).pipe(gulpClean({ force: true }));
 }
 
 export function createDirectories() {
@@ -40,39 +40,49 @@ export async function deploy(cb) {
   await rokuDeploy.publish(args);
 }
 
-async function copyFiles() {
-  let oldPath = path.resolve(process.cwd());
-
-  try {
-    fs.mkdirSync(tmpBuildDir);
-    let sourcePaths = ['src'];
-    let sourcePathText = sourcePaths.map((p) => {
-      p = path.resolve(p);
-      p = p.endsWith('/') ? p : p + '/';
-      return p;
-    }).join(' ');
-
-    await exec(`rsync -az ${sourcePathText} ${tmpBuildDir}`);
-    console.log(`files copied to ${tmpBuildDir} dir is now ${process.cwd()}`);
-  } catch (err) {
-    console.error(err);
-  }
-  process.chdir(oldPath);
-}
 
 export async function compile(cb) {
   // copy all sources to tmp folder
   // so we can add the line numbers to them prior to transpiling
-  await copyFiles();
-  await sleep(100);
-  await applyBurpPreprocessing();
   let builder = new ProgramBuilder();
+  burpFileProcessor = createBurpProcessor();
+  builder.addFileResolver(projectFileResolver);
+
+
+  let configFiles: any[] = [
+    "manifest",
+    "ADBMobileConfig.json",
+    "source/**/*.*",
+    "components/**/*.*",
+    "images/**/*.*",
+    "font/**/*.*"
+  ];
+
+  if (process.env.buildType !== 'test') {
+    configFiles.push('!**/*Tests*.*');
+    configFiles.push('!**/tests');
+    configFiles.push('!**/tests/**/*.*');
+  }
+
   await builder.run({
-    stagingFolderPath: outDir,
+    stagingFolderPath: 'build',
     createPackage: false,
-    "rootDir": tmpBuildDir,
+    files: configFiles,
+    "rootDir": 'src',
     "autoImportComponentScript": true,
+    "diagnosticFilters": [
+      "source/rooibosFunctionMap.brs",
+      "**/RALETrackerTask.*",
+      "**/TestGlobalInitializer.*",
+      1107,
+      1001
+    ],
+    "showDiagnosticsInConsole": true
   });
+}
+
+function projectFileResolver(pathAbsolute: string): string | undefined | Thenable<string | undefined> {
+  return burpFileProcessor.processFileWithPath(pathAbsolute, pathAbsolute.toLowerCase().endsWith('.brs'));
 }
 
 async function prepareTests(cb) {
@@ -118,8 +128,7 @@ async function prepareTests(cb) {
 
   cb();
 }
-export async function applyBurpPreprocessing() {
-  const currentPath = process.cwd();
+export function createBurpProcessor(): FileProcessor {
   let replacements = null;
   if (process.env.buildType === 'prod') {
     replacements = [{
@@ -136,7 +145,7 @@ export async function applyBurpPreprocessing() {
     replacements = [
       {
         regex: '(^\\s*(m\\.)*(logInfo|logError|logVerbose|logDebug|logWarn|logMethod)\\((\\s*"))',
-        replacement: '$1#FullPath# '
+        replacement: '$1" + source_location, " '
       }
     ];
   }
@@ -148,18 +157,7 @@ export async function applyBurpPreprocessing() {
       replacement: '  if not m.currentResult.isFail then $1'
     });
   }
-  console.log('using replacements' + inspect(replacements));
-  let config: BurpConfig = {
-    sourcePath: tmpBuildDir,
-    filePattern: ['**/*.bs','**/*.brs'],
-    replacements: replacements
-  };
-
-  console.log('applying burp processing')
-  const processor = new BurpProcessor(config);
-  await processor.processFiles();
-  console.log(`Finished applying burp processing. Resetting path to ${currentPath}`);
-  process.chdir(currentPath);
+  return new FileProcessor({ replacements: replacements });
 }
 
 

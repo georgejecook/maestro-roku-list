@@ -74,11 +74,9 @@ function createData()
 
     if i = 10 or i = 14 or i = 19 or i = 22 or i = 23 or i = 28
       cellType = "RectComp"
-      ' else if m.contentId mod 7 = 0
-      ' cellType = "SimpleCell2"
       row.addFields({
         "cellType": cellType
-      })
+      })      
     end if
 
 
@@ -148,11 +146,11 @@ function makeItems(cellType, number)
     ' child.HDGRIDPOSTERURL = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
     child.title = "Item " + child.id.tostr()
 
-    ' if m.contentId mod 5 = 0
-    '   cellType = "SimpleCell"
-    ' else if m.contentId mod 7 = 0
-    '   cellType = "SimpleCell2"
-    ' end if
+    if m.contentId mod 5 = 0
+      cellType = "SimpleCell"
+    else if m.contentId mod 7 = 0
+      cellType = "ComplexCell"
+    end if
 
     child.addFields({
       "cellType": cellType

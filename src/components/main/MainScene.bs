@@ -1,4 +1,4 @@
-import "pkg:/source/rLog/rLogMixin.brs" 
+import "pkg:/source/rLog/rLogMixin.bs" 
 import "pkg:/source/maestro/ioc/IOCMixin.bs" 
 import "pkg:/components/maestro/view/mixin/FocusMixin.bs" 
 

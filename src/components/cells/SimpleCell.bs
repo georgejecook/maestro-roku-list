@@ -1,8 +1,8 @@
 function init()
   m.theRect = m.top.findNode("theRect")
   m.theLabel = m.top.findNode("theLabel")
-  m.focusColorInterp = m.top.findNode("focusColorInterp")
-  m.focusColorInterp.fieldToInterp = "theRect.color"
+  ' m.focusColorInterp = m.top.findNode("focusColorInterp")
+  ' m.focusColorInterp.fieldToInterp = "theRect.color"
 end function
 
 function itemContentChanged()
@@ -16,15 +16,15 @@ function currTargetChanged()
 end function
 
 function currRectChanged()
-  m.theRect.width = m.top.currRect.width
-  m.theRect.height = m.top.currRect.height - 200
+'   m.theRect.width = m.top.currRect.width
+'   m.theRect.height = m.top.currRect.height - 200
 end function
 
 function focusPercentChanged()
   ' print "focusPercent for item "; m.top.index; " changed to "; m.top.focusPercent
-  if (m.top.groupHasFocus)
-    m.focusColorInterp.fraction = m.top.focusPercent
-  else
-    m.focusColorInterp.fraction = 0
-  end if
+  ' if (m.top.groupHasFocus)
+  '   m.focusColorInterp.fraction = m.top.focusPercent
+  ' else
+  '   m.focusColorInterp.fraction = 0
+  ' end if
 end function
