@@ -5,7 +5,10 @@ build/*
 artifacts/*
 *.swp
 node_modules/*
+roku_modules/*
+**/roku_modules/*
 package-lock.json
 .history
 *.orig
 lcov*.info
+**/node_modules/*

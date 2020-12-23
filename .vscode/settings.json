@@ -7,5 +7,15 @@
     "activityBar.background": "#531634",
     "titleBar.activeBackground": "#751F49",
     "titleBar.activeForeground": "#FEFCFD"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/test-project": true,
+    "**/dist": true,
+    
   }
 }
