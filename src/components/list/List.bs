@@ -1,0 +1,190 @@
+import "pkg:/source/ListItemScroller.bs"
+import "pkg:/source/ListItemViewManager.bs"
+import "pkg:/source/ItemFocusManager.bs"
+import "pkg:/source/roku_modules/mc/Tasks.brs"
+import "pkg:/source/ListMixin.bs"
+
+function init()
+  log.registerLogger("List")
+  m.top.observeField("content", "onContentChange")
+  m.top.observeField("animateToRow", "onAnimateToRowChange")
+  m.top.observeField("focusedRowPercent", "onFocusedRowPercentChange")
+  m.top.observeField("nextFocusIndex", "onNextFocusIndexChange")
+  m.top.cellEvents = createEventsBroker("cells")
+  m.top.rowEvents = createEventsBroker("rows")
+  m.rowsGroup = m.top.findNode("rowsGroup") 
+  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
+  m.moveAnimation = m.top.findNode("moveAnimation")
+
+  m.top.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator") 
+  m.top.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
+  m.viewManager = new ListItemViewManager(m.top, m.rowsGroup)
+  m.focusManager = new ItemFocusManager(m.viewManager, m.top.focusMoveAnimation, m.top.focusMoveAnimationInterpolator, m.top.rowEvents)
+  m.itemScroller = new ListItemScroller(m.viewManager, m.moveAnimation, m.moveAnimationInterpolator)
+  m.itemScroller.focusManager = m.focusManager
+  m.focusManager.name = "LIST FM "
+  ' m.top.clippingRect = [0,0,1920,550]
+  m.focusIndicator = m.top.findNode("focusIndicator") 
+  m.cellProvider = m.global.cellProvider
+  m.cellTracker = m.global.cellTracker
+  m.content = invalid
+end function
+
+function createEventsBroker(id)
+  node = createObject("roSGNode", "Node")
+  node.id = id
+  node.addFields({ "listEvent": {}, "listEvents": [] })
+  return node
+end function
+
+function resetState()
+  m.viewManager.setContent(m.top.content)
+  m.itemScroller.reset()
+end function
+
+function onContentChange()
+  if m.content = invalid or not m.content.isSameNode(m.top.content)
+    m.content = m.top.content
+
+    resetState()
+  end if
+end function
+
+function onAnimateToRowChange()
+  if m.content <> invalid
+    ' animateToIndex(m.top.rowFocused, m.top.animateToRow, m.top.fastAnimationSpeed)
+    m.itemScroller.moveToIndex(m.top.animateToRow)
+  end if
+end function
+
+function getRowRenderer(index)
+  return m.viewManager.getRenderer(index)
+end function
+
+function getCellRenderer(rowIndex, cellIndex)
+  row = getRowRenderer(rowIndex)
+
+  if row <> invalid
+    return row@.getRenderer(cellIndex)
+  end if
+
+  return invalid
+end function
+
+function getCellScreenRect(rowIndex, cellIndex, rowScreenPos = invalid, cellScreenPos = invalid)
+  rowScreenRect = getRowScreenRect(rowIndex, rowScreenPos)
+
+  if rowScreenRect <> invalid
+    row = getRowRenderer(rowIndex)
+
+    if row <> invalid
+      cellScreenRect = row@.getScreenRect(cellIndex, screenPos)
+
+      if cellScreenRect <> invalid
+        cellScreenRect.screenPos += rowScreenRect.screenPos
+        cellScreenRect.translation[1] += rowScreenRect.screenPos
+        return cellScreenRect
+      end if
+    end if
+  end if
+
+  return invalid
+end function
+
+function getRowScreenRect(rowIndex, screenPos = invalid, direction = 0)
+  return m.viewManager.getScreenRect(rowIndex, screenPos, direction)
+end function
+
+function onNextFocusIndexChange()
+  m.sourceFocusRect = {
+    translation: m.focusIndicator.translation 
+    size: [m.focusIndicator.width, m.focusIndicator.height]
+  }
+  m.targetFocusRect = getCellScreenRect(m.top.nextFocusIndex[0], m.top.nextFocusIndex[1])
+  ? " onNextFocusIndexChange SOURCE " ; m.sourceFocusRect
+  ? " onNextFocusIndexChange TARGET " ; m.targetFocusRect
+end function
+
+function onFocusedRowPercentChange(evt) as void
+  fraction = evt.getData()
+  if m.sourceFocusRect = invalid or m.targetFocusRect = invalid
+    ? "NO FOCUS RECTS! Ensure m.top.nextFocusIndex was set!"
+    return
+  end if
+
+  translation = interpolate(m.sourceFocusRect.translation, m.targetFocusRect.translation, fraction)
+  size = interpolate(m.sourceFocusRect.size, m.targetFocusRect.size, fraction)
+  ? "translation " ; translation
+  ? "size " ; size
+  m.focusIndicator.translation = translation
+  m.focusIndicator.width = size[0]
+  m.focusIndicator.height = size[1]
+  ? "onFocusedRowPercentChange " ; evt.getData() ; " " ; translation[1]; " " ; m.targetFocusRect.translation[1]
+end function
+
+function interpolate(a, b, fraction)
+  if a <> invalid and b <> invalid
+    return [a[0] + (b[0] - a[0]) * fraction, a[1] + (b[1] - a[1]) * fraction]
+  else
+    return [0, 0]
+  end if
+end function
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ KeyPress
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onKeyPressUp() as boolean
+  m.logMethod("onKeyPressUp")
+  if (m.top.isScrolling)
+    m.itemScroller.move(-2)
+  else
+    m.itemScroller.move(-1)
+  end if
+  return true
+end function
+
+function onKeyPressDown() as boolean
+  m.logMethod("onKeyPressDown")
+  if (m.top.isScrolling)
+    m.itemScroller.move(2)
+  else
+    m.itemScroller.move(1)
+  end if
+  return true
+end function
+
+function getLongPressIntervalForKey(key) as float
+  m.logMethod("getLongPressIntervalForKey", key)
+  if key = "up" or key = "down"
+    return 0.2
+  else
+    return 0
+  end if
+end function
+
+function onLongPressStart(key) as boolean
+  m.logMethod(">>>>onLongPressStart", key)
+
+  if key = "up" or key = "down"
+    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    if key = "up"
+      m.itemScroller.moveToEnd(-1)
+    else
+      m.itemScroller.moveToEnd(1)
+    end if
+
+    return true
+  end if
+
+  return false
+end function
+
+function onLongPressFinish(key) as boolean
+  if key = "up" or key = "down"
+    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    m.itemScroller.finishAnimating()
+    return true
+  end if
+
+  return false
+end function

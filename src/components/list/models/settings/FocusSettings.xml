@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component
+    name='FocusSettings'
+    extends='Node'>
+    <interface>
+      <field id='animSpeed' type='float'/>
+      <field id='fastAnimSpeed' type='float'/>
+      <field id='animStyle' type='string'/>
+    </interface>
+</component>

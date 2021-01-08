@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component
+    name='RowSettings'
+    extends='Node'>
+  <interface>
+    <field
+        id='compName'
+        type='string' />
+    <field
+        id='headerSettings'
+        type='node' />
+    <field
+        id='focusSettings'
+        type='node' />
+    <field
+        id='cellSettings'
+        type='node' />
+    <field
+        id='contentOffset'
+        type='floatarray' />
+    <field
+        id='space'
+        type='integer' />
+    <field
+        id='screenPos'
+        type='integer' />
+    <field
+        id='height'
+        type='integer'
+        value='-1' />
+  </interface>
+</component>

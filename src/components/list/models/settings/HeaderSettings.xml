@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component
+    name='HeaderSettings'
+    extends='Node'>
+  <interface>
+    <field
+        id='compName'
+        type='string' />
+    <field
+        id='labelTranslation'
+        type='floatarray' />
+    <field
+        id='height'
+        type='integer' />
+    <field
+        id='font'
+        type='string' />
+    <field
+        id='fontSize'
+        type='integer' />
+  </interface>
+</component>

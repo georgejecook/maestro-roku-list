@@ -1,10 +1,13 @@
 function init()
   m.poster = m.top.findNode("poster")
-  ' m.theLabel = m.top.findNode("theLabel")
+  ' m.label = m.top.findNode("label")
+  m.top.observeField("itemContent", "itemContentChanged")
+  m.top.observeField("focusPercent", "focusPercentChanged")
+
 end function
 
 function itemContentChanged()
-  ' m.theLabel.text = "C" + m.top.itemContent.title
+  ' m.label.text = "C" + m.top.itemContent.title
   m.poster.uri = m.top.itemContent.HDGRIDPOSTERURL
 end function
 

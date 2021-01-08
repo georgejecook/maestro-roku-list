@@ -1,0 +1,375 @@
+import "pkg:/source/BaseClass.bs"
+
+class ItemViewManager extends BaseClass
+
+  public screenRect = { translation: [0, 0], size: [1920, 1080] }
+  public componentBufferMode = "none"
+
+  'owning views
+  public container = invalid
+  public owner = invalid
+  public delegate = invalid
+  public contentGroup = invalid
+
+  'content
+  public content = invalid
+  public components = []
+  public rects = []
+  public settings = invalid 
+
+  'tracking
+  public visibleItems = []
+  public visibleComponents = []
+  public hiddenComponents = []
+  public numberOfItems = 0
+  public axes = 0
+  public minPos = 0
+  public maxPos = 1080
+  public lookAheadDistance = 1000
+  public lookBehindDistance = 500
+  public lastRenderedIndexes = { startIndex: -1, endIndex: -1 }
+  public lastScrollIndex = 0
+  public lastScrollDirection = 0
+
+  function new(name, owner, container, axes, minPos, maxPos)
+    super(name)
+    m.container = container
+    m.contentGroup = container.getParent()
+    m.owner = owner
+    m.axes = axes
+    m.minPos = minPos
+    m.maxPos = maxPos
+    m.lastScrollDirection = 0
+    m.lastScrollIndex = 0
+
+    m.updateScreenRect()
+  end function
+
+  private function updateScreenRect()
+    m.screenRect = { translation: m.owner.translation, size: [m.owner.width, m.owner.height] }
+  end function
+
+  function setContent(content)
+    m.content = content
+    m.settings = ListMixin.getRowSettings(m.owner.content, m.content)
+
+    m.container.removeChildren(m.container.getChildren(-1, 0))
+    m._createRenderers(content)
+    m._updateLayout()
+
+    m.numberOfItems = m.visibleItems.count()
+  end function
+
+  function _createRenderers(items)
+    m.components = []
+    m.visibleComponents = []
+    m.visibleItems = []
+
+    m.createRenderers(items)
+  end function
+
+  function _updateLayout()
+    m.logInfo("_updateLayout")
+    m.updateScreenRect()
+
+    m.visibleComponents = []
+    m.visibleItems = []
+    m.rects = []
+
+    m.updateLayout()
+  end function
+
+  function onFocusIndexChange(direction, index)
+    m.updateRenderedComponents(direction, index)
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ util
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function convertChildTranslationToOwner(containerTranslation)
+    return [m.container.translation[0] + containerTranslation[0], m.container.translation[1] + containerTranslation[1]]
+  end function
+
+  function convertOwnerTranslationToChild(ownerTranslation)
+    return [m.container.translation[0] - ownerTranslation[0], m.container.translation[1] - ownerTranslation[1]]
+  end function
+
+  function getComoponentsInViewPort(startOffset)
+    compStates = {}
+
+    sStart = m.screenRect.translation[m.axes] + startOffset
+    sEnd = sStart + m.screenRect.size[m.axes]
+
+    for each comp in m.renderedComponents
+      cRect = m.rects[comp.index]
+      cStart = cRect.translation[m.axes]
+      cEnd = cStart + cRect.size[m.axes]
+      if (cStart >= sStart and cStart <= sEnd) or (cEnd >= sStart and cEnd <= sEnd)
+        compStates[comp.id] = true
+      else 
+        compStates[comp.id] = false
+      end if
+      ' m.logInfo(compStates[comp.id], "sStart", sStart, "sEnd", sENd, "cStart", cStart, "cEnd", cENd) 
+    end for
+
+    return compStates
+  end function
+
+  function setIsScrolling(isScrolling)
+    m.isScrolling = isScrolling
+    m.owner.isScrolling = isScrolling
+    for each comp in m.visibleComponents
+      if isScrolling
+        comp.listEvent = { name: "scrollStart" }
+      else
+        comp.listEvent = { name: "scrollStop" }
+      end if
+    end for
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ visibility state management
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function updateRenderedComponents(direction, index) as void
+    if not m.shouldUpdateRenderedIndexes(direction, index)
+      ' ? "not updating rendered indexes - shouldUpdateRenderedIndexes: false"
+      return
+    end if
+
+    renderedIndexes = m.getRenderedIndexes(direction, index)
+
+    if (m.lastRenderedIndexes <> invalid) and m.lastRenderedIndexes.startIndex = renderedIndexes.startIndex and m.lastRenderedIndexes.endIndex = renderedIndexes.endIndex
+      if m.renderedComponents.count() > 0
+        return
+      end if
+    end if
+
+    ' if m.row = invalid
+    '   ? " RI " ; renderedIndexes
+    '   ? " LRI " ; m.lastRenderedIndexes
+    ' end if
+    ' m.logInfo("renderedIndexes index", index, renderedIndexes)
+    renderedStateMap = m.createRenderedStateMap(direction, index, renderedIndexes)
+    m.renderedComponents = []
+    m.applyRenderStateMap(renderedStateMap)
+    m.lastRenderedIndexes = renderedIndexes
+  end function
+
+  function shouldUpdateRenderedIndexes(direction, index)
+    ' ? "???? I "; index ; " LI " ; m.lastScrollIndex ; " D " ; direction ; " LD " ; m.lastScrollDirection 
+    if direction <> m.lastScrollDirection or abs(index - m.lastScrollIndex) > 10 or index = 0
+      ' ? " LIST SHOULD UPDATE I "; index ; " LI " ; m.lastScrollIndex ; " D " ; direction ; " LD " ; m.lastScrollDirection 
+      m.lastScrollIndex = index
+      m.lastScrollDirection = direction
+      return true
+    end if
+    return false
+  end function
+
+  function getRenderedIndexes(direction, index)
+    indexPos = abs(m.getTargetTranslation(index, direction)[m.axes])
+
+    if direction < 0
+      beforePos = indexPos - m.lookAheadDistance
+      afterPos = indexPos + m.lookBehindDistance
+    else
+      afterPos = indexPos + m.lookAheadDistance
+      beforePos = indexPos - m.lookBehindDistance
+    end if
+
+    if beforePos < 0
+      beforePos = 0
+    end if
+
+    if afterPos < 0
+      afterPos = 0
+    end if
+
+    return {
+      startIndex: m.getIndexAtPosition(beforePos, direction)
+      endIndex: m.getIndexAtPosition(afterPos, direction)
+    }
+  end function
+
+  function createRenderedStateMap(direction, index, renderedIndexes)
+    ' m.logMethod("createRenderedStateMap", index, renderedIndexes)
+    renderedStateMap = {}
+
+    if m.numberOfItems = 0
+      return {}
+    end if
+
+    m.updateRenderStateMap(renderedStateMap, m.lastRenderedIndexes.startIndex, m.lastRenderedIndexes.endIndex, m.componentBufferMode)
+    m.updateRenderStateMap(renderedStateMap, renderedIndexes.startIndex, renderedIndexes.endIndex, "rendered")
+    return renderedStateMap
+  end function
+
+  function updateRenderStateMap(renderedStateMap, startIndex, endIndex, state)
+    if startIndex < 0
+      startIndex = 0
+    end if
+
+    ' ? " endindex " ; endIndex ; " m.numberOfItems "; m.numberOfItems
+    if endIndex > m.numberOfItems
+      endIndex = m.numberOfItems - 1
+    end if
+
+    for i = startIndex to endIndex 
+
+      rect = m.rects[i]
+      if rect <> invalid
+        ' ? "ROW "; i ; " rect idx "; rect.index ; " state " ; state
+        renderedStateMap[str(rect.index).trim()] = state
+      else
+        ? " NO RECT "; i
+      end if
+    end for
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ itemRect positions
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function getTargetTranslation(index, direction, screenPos = invalid)
+    itemRect = m.rects[index]
+
+    if itemRect = invalid
+      m.logWarn("no itemRect for index", index)
+      return [-1, -1]
+    end if
+
+    screenPos = m.getScreenPositionForItem(itemRect, direction, screenPos)
+    targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
+    ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
+
+    if m.axes = 0
+      return [- targetPos, m.container.translation[1]]
+    else
+      return [m.container.translation[0], - targetPos]
+    end if
+
+  end function
+
+  function getNextFlowScreenPosition(index, direction)
+    itemRect = m.rects[index]
+
+    if itemRect = invalid
+      m.logWarn("no itemRect for index", index)
+      return invalid
+    end if
+    
+    itemScreenPos = - itemRect.translation[m.axes] + m.container.translation[m.axes]
+
+    if itemScreenPos > m.minPos and itemScreenPos + itemRect.size.width < m.maxPos
+      'we can simply move the focus to this position
+      return itemScreenPos
+    end if
+
+    'if part or all of the view is off the viewport, then a scroll is required
+    return invalid
+  end function
+
+  function getScreenPositionForItem(itemRect, direction = 0, screenPos = invalid)
+    screenPos = m.minPos
+    if itemRect <> invalid
+      if screenPos <> invalid
+        ? " USING SCREEN POS" ; screenPos
+        screenPos = screenPos
+      else if itemRect.screenPos <> invalid
+        screenPos = itemRect.screenPos
+      else if m.direction = -1
+        screenPos = m.minPos
+      else if m.direction = 1
+        'TODO - calculate position that can fit on screen
+        screenPos = m.minPos ' fixed focus
+        ' return m.maxPos - itemRect.width
+      end if
+    end if
+    return screenPos + m.settings.contentOffset[m.axes]
+  end function
+
+  function getOffsetForScreenPosition(itemRect, screenPos)
+    if itemRect <> invalid
+      return itemRect.translation[m.axes] - screenPos
+    else
+      return m.minPos
+    end if
+  end function
+
+  function getIndexAtPosition(position, direction)
+    'TODO - this will get fiddly when we have wrapping
+
+    for i = 0 to m.numberOfItems
+      itemRect = m.rects[i]
+      screenPos = m.getScreenPositionForItem(itemRect, direction)
+      itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
+      ' ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
+      if itemPos > abs(position)
+        return i - 1
+      end if
+    end for
+
+    return -1
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ override
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function createRenderers(items)
+  end function
+
+  function updateLayout()
+  end function
+
+  function applyRenderStateMap(renderedStateMap)
+  end function
+
+  function getRenderer(index)
+    return invalid
+  end function
+
+  function getRect(index, useScreenCoords = false)
+    rect = m.rects[index]
+    if rect <> invalid
+      screenRect = {
+        size: [rect.size[0], rect.size[1]]
+        translation: [rect.translation[0], rect.translation[1]]
+        index: rect.index
+        screenPos: rect.screenPos
+      }
+      if useScreenCoords
+        screenRect.translation = m.convertChildTranslationToOwner(screenRect.translation)
+      end if
+    else
+      screenRect = {
+        translation: [0, 0]
+        size: [0, 0]
+        index: -1
+        screenpos: 0
+      }
+    end if
+    return screenRect
+  end function
+
+  function getScreenRect(index, screenPos = invalid, direction = 0)
+    rect = m.getRect(index)
+
+    if rect <> invalid
+      rect.screenPos = m.getScreenPositionForItem(rect, direction, screenPos)
+      rect.translation[m.axes] += rect.screenPos
+    end if
+    return rect
+  end function
+
+  function getFocusSettings()
+    return m.content.focusSettings
+  end function
+
+  function getItemSettings()
+    return m.content.settings
+  end function
+
+end class

@@ -1,0 +1,17 @@
+import "pkg:/source/ItemScroller.bs"
+
+class ListItemScroller extends ItemScroller
+  function new(group, moveAnimation, moveAnimationInterpolator)
+    super(group, 1, moveAnimation, moveAnimationInterpolator)
+  end function
+
+  override function setFocusOnRenderer(isMoving)
+    if not isMoving
+      m.logInfo("stopped scrolling on row", m.index)
+      row = m.viewManager.getRenderer(m.index)
+      if row <> invalid
+        row.setFocus(true)
+      end if
+    end if
+  end function
+end class

@@ -1,0 +1,162 @@
+namespace listMixin
+  function createListContent(rowContent = [], focusSettings = invalid, rowSettings = invalid)
+    content = createObject("roSGNode", "ListContent")
+    content.appendChildren(rowContent)
+
+    if rowSettings = invalid
+      rowSettings = ListMixin.createRowSettings()
+    end if
+
+    if focusSettings = invalid
+      focusSettings = ListMixin.createFocusSettings()
+    end if
+
+    content.update({
+      rowSettings: rowSettings
+      focusSettings: focusSettings
+    })
+
+    return content
+  end function
+
+  function createRowSettings(cellSettings = invalid, focusSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, headerSettings = invalid, compName = "HorizontalRow", height = -1)
+    settings = createObject("roSGNode", "RowSettings")
+
+    if cellSettings = invalid
+      cellSettings = ListMixin.createCellSettings()
+    end if
+
+    if headerSettings = invalid
+      headerSettings = ListMixin.createHeaderSettings()
+    end if
+
+    if focusSettings = invalid
+      focusSettings = ListMixin.createFocusSettings()
+    end if
+
+    settings.update({
+      rowCompName: compName
+      screenPos: screenPos
+      height: height
+      space: space
+      cellSettings: cellSettings
+      contentOffset: [0, 0]
+      headerSettings: headerSettings
+      focusSettings: focusSettings
+    })
+
+    return settings
+  end function
+
+  function createHeaderSettings(labelTranslation = [30, 20], height = 50, font = "font:MediumSystemBold", fontSize = 30)
+    settings = createObject("roSGNode", "HeaderSettings")
+
+    settings.update({
+      labelTranslation: labelTranslation
+      height: height
+      font: font
+      fontSize: fontSize
+    })
+
+    return settings
+  end function
+
+  function createCellSettings(compName = "Cell", size = [300, 500], space = 30, screenPos = 0)
+    settings = createObject("roSGNode", "CellSettings")
+
+    settings.update({
+      compName: compName
+      size: size
+      space: space
+      screenPos: screenPos
+    })
+
+    return settings
+  end function
+
+  ' function createGridRowSettings(compName = "SimpleTile", numCols = 3, spacing = [20, 20], cellSize = [300, 500], screenPos = 0, headerSettings = invalid)
+  '   'TODO
+  '   return {}
+  ' end function
+
+  ' function createGridRowContent(items, rowSettings)
+  '   rowContent = createObject("roSGNode", "roku_list_GridRowContent")
+  '   rows = []
+  '   for each item in items.getChildren(-1, 0)
+  '     row = createObject("roSGNode", "roku_list_RowContent")
+  '     row.group = rowContent
+  '   end for
+  '   rowContent.rowSettings = rowSettings
+  '   rowContent.appendChildren(rows)
+  '   return rowContent
+  ' end function
+
+  function createFocusSettings(animSpeed = 0.3, fastAnimSpeed = 0.1, animStyle = "fixed")
+    settings = createObject("roSGNode", "FocusSettings")
+    settings.update({
+      animSpeed: animSpeed
+      fastAnimSpeed: fastAnimSpeed
+      animStyle: animStyle
+    })
+    return settings
+
+  end function
+  ' 'usage
+  ' 'ON GET JSON DATA
+  ' json = m.serverGetDataHomeScreen()
+  ' content = createObjecT("roSGnode", "ContentNode")
+  ' content.appendChild(makeHeroRow(json.hero))
+  ' content.appendChild(makeFavesRow(json.faves))
+  ' moviesGridSettings = createGridRowSettings("Cell")
+  ' myGridRowContent = createGridRowContent(makeGridItems(json.showsGrid), moviesGridSettings)
+  ' for each show in json.shows
+  ' content.appendChild(makeShowRow(show))
+  ' end for
+
+  function setTileSettings(compName = "Cell", cellSize = [300, 500])
+  end function
+
+  function getRowSettings(listContent, rowContent = invalid)
+    if rowContent <> invalid and rowContent.settings <> invalid
+      return rowContent.settings
+    else if listContent <> invalid and listContent.rowSettings <> invalid
+      return listContent.rowSettings
+    else
+      'THIS SHOULD NOT BE POSSIBLE
+      m.logError("no listCotnent for list - this should not have been called!")
+      return invalid
+    end if
+  end function
+
+  function getCellSettings(listContent, rowContent = invalid, itemContent = invalid)
+    if itemContent <> invalid and itemContent.settings <> invalid
+      return item.settings
+    else if rowContent <> invalid and rowContent.settings <> invalid and rowContent.settings.cellSettings <> invalid
+      return rowContent.settings.cellSettings
+    else if listContent <> invalid and listContent.rowSettings <> invalid
+      return listContent.rowSettings.cellSettings
+    else 
+      m.logError("no listCotnent for list - this should not have been called!")
+      return invalid
+    end if
+  end function
+
+  function getFocusSettings(listContent, rowContent = invalid)
+    if rowContent <> invalid and rowContent.settings <> invalid and rowContent.settings.focusSettings <> invalid
+      ? "use row content FOCUS SETTINGS"
+      return rowContent.settings.focusSettings
+    else if listContent <> invalid and listContent.rowSettings <> invalid and listContent.rowSettings.focusSettings <> invalid
+      ? "use listContent ROW FOCUS SETTINGS"
+      return listContent.rowSettings.focusSettings
+      m.logError("no listCotnent for list - this should not have been called!")
+    else if listContent <> invalid and listContent.focusSettings <> invalid
+      ? "use listContent FOCUS SETTINGS"
+      return listContent.focusSettings
+      m.logError("no listCotnent for list - this should not have been called!")
+    end if
+    return invalid
+  end function
+
+  ' roku_list.setRowSettings(row, rowRenderer, offset, cellREnderr, cellSize)
+  ' roku_list.setTileSettings(content, cellRenderer, cellSize)
+end namespace 

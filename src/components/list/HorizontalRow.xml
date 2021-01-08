@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component
+    name='HorizontalRow'
+    extends='mv_BaseView'>
+
+  <interface>
+    <!-- content - must be RowContent subtype -->
+    <field
+        id='content'
+        type='node' />
+    <field
+        id='index'
+        type='integer' />
+    <field
+        id='owner'
+        type='node' />
+
+    <!-- screen and selection state -->
+    <field
+        id='listEvent'
+        type='assocarray' />
+
+    <field
+        id='renderState'
+        type='string'
+        alwaysNotify='false' />
+
+    <field
+        id='isRendered'
+        type='boolean'
+        alwaysNotify='false'
+        value='false' />
+
+    <field
+        id='isInViewport'
+        type='boolean'
+        alwaysNotify='false'
+        value='false' />
+
+    <field
+        id='animateToItem'
+        type='integer'
+        value='0' />
+
+    <field
+        id='isHidden'
+        type='boolean'
+        value='false' />
+
+    <field
+        id='focusedCellIndex'
+        type='integer' />
+
+    <field
+        id='focusedCellPercent'
+        type='float' />
+
+
+    <field
+        id='isScrolling'
+        type='boolean'
+        value='false' />
+
+
+    <!-- conver to size -->
+    <field
+        id='width'
+        type='integer' />
+
+    <field
+        id='height'
+        type='integer' />
+
+    <function name='getRenderer' />
+    <function name='getRect' />
+    <function name='getScreenRect' />
+
+  </interface>
+
+  <children>
+    <Rectangle
+        id='bgRect'
+        width='1920'
+        color='#000000'
+        opacity='0'
+        height='500' />
+    <Group
+        id='contentGroup'
+        translation='[0,0]'>
+      <Group
+          id='cellsGroup'
+          translation='[0,0]' />
+    </Group>
+
+    <Rectangle
+        width='1920'
+        color='#000000'
+        height='40' />
+    <Label
+        id='header'
+        text='header'
+        color='#ffffff' />
+
+    <Animation
+        id='moveAnimation'
+        duration='0.1'
+        repeat='false'
+        control='stop'
+        easeFunction='linear'>
+      <Vector2DFieldInterpolator
+          id='moveAnimationInterpolator'
+          key='[0.0, 1.0]'
+          keyValue='[ [0, 20], [0, 20] ]'
+          fieldToInterp='cellsGroup.translation' />
+    </Animation>
+    <!-- <ParallelAnimation   id = "testParallelAnimation" >
+    <Animation
+        id='moveItemsAnimation'
+        duration='0.1'
+        repeat='false'
+        control='stop'
+        easeFunction='linear'>
+      <Vector2DFieldInterpolator
+          id='moveItesmAnimationInterpolator'
+          key='[0.0, 1.0]'
+          keyValue='[ [0, 20], [0, 20] ]'
+          fieldToInterp='cellsGroup.translation' />
+    </Animation> 
+
+    </ParallelAnimation> -->
+
+  </children>
+
+</component>

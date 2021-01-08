@@ -1,0 +1,210 @@
+namespace tests
+
+  '@TestSuite ItemSCroller tests
+  class ItemScrollerTests extends Rooibos.BaseTestSuite
+
+    override function setUp()
+      log.initializeLogManager()
+    end function
+
+    override function beforeEach()
+
+      m.owner = Tests.Utils.createSimpleMockNode("owner")
+      m.owner.translation = [0, 0]
+      m.owner.width = 1920
+      m.owner.height = 1080
+
+      m.container = Tests.Utils.createSimpleMockNode("container")
+      m.container.translation = [0, 0]
+      m.container.width = 1920
+      m.container.height = 1080
+
+      m.animation = Tests.Utils.createSimpleMockNode("animation")
+      m.interpolator = Tests.Utils.createSimpleMockNode("interpolator")
+
+      m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
+      m.scroller = new ItemScroller(m.viewManager, 1, 0, 1080, m.animation, m.interpolator)
+      m.configureScroller(1, 20)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '@It tests getComponentsInViewPort
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    '@Test Simple
+    '@Params[0,     [0,1,2,3], [4,5,6,7,8,9,10] ]
+    '@Params[200,   [0,1,2,3,4], [5,6,7,8,9,10] ]
+    '@Params[250,   [0,1,2,3,4], [5,6,7,8,9,10] ]
+    '@Params[300,   [0,1,2,3,4], [5,6,7,8,9,10] ]
+    '@Params[301,   [1,2,3,4], [0,5,6,7,8,9,10] ]
+    '@Params[350,   [1,2,3,4], [0,5,6,7,8,9,10] ]
+    '@Params[400,   [1,2,3,4], [0,5,6,7,8,9,10] ]
+    '@Params[550,   [1,2,3,4,5], [0,6,7,8,9,10] ]
+    '@Params[600,   [1,2,3,4,5], [0,6,7,8,9,10] ]
+    '@Params[601,   [2,3,4,5], [0,1, 6,7,8,9,10] ]
+    '@Params[700,   [2,3,4,5], [0,1, 6,7,8,9,10] ]
+    '@Params[800,   [2,3,4,5, 6], [0,1, 7,8,9,10] ]
+    function getComponentsInViewPort_Scroll_left_to_right(offset, trueIds, falseIds)
+      m.scroller.updateRenderedComponents()
+      compStates = m.scroller.getComoponentsInViewPort(offset)
+
+      expected = {}
+      for each id in trueIds
+        expected[str(id).trim()] = true
+      end for
+      for each id in falseIds
+        expected[str(id).trim()] = false
+      end for
+      m.assertEqual(compStates, expected)
+    end function
+
+    '@Test first show
+    function setFocusIndex_first_show()
+      m.scroller.updateRenderedComponents()
+      m.scroller.setFocusIndex(0, false)
+      'TODO test me
+      comps = m.scroller.components
+      m.checkrenderedComps(comps, [0, 1, 2, 3], [4, 5, 6, 7, 8, 9, 10])
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '@It tests setFocusIndex
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+    '@Test Moving left to right
+    function setFocusIndex_moving_left_to_right()
+      comps = m.scroller.components
+      m.resetViewPortStates()
+      m.printStates(comps)
+      m.checkViewportEvent(comps, [], [], [], [])
+
+      m.scroller.moveToIndex(0, invalid, false)
+      m.scroller.direction = 1
+      m.container.translation = m.scroller.getTargetTranslation(1)
+      m.scroller.setFocusIndex(1, true)
+      m.printStates(comps)
+      m.checkViewportEvent(comps, [5], [1, 2, 3, 4], [0], [])
+
+      m.container.translation = m.scroller.getTargetTranslation(2)
+      m.scroller.setFocusIndex(2, true)
+      m.printStates(comps)
+      m.checkViewportEvent(comps, [6], [2, 3, 4, 5], [1], [0])
+
+      m.container.translation = m.scroller.getTargetTranslation(3)
+      m.scroller.setFocusIndex(3, true)
+      m.printStates(comps)
+      m.checkViewportEvent(comps, [7], [3, 4, 5, 6], [2], [0, 1])
+
+      m.container.translation = m.scroller.getTargetTranslation(4)
+      m.scroller.setFocusIndex(4, true)
+      m.printStates(comps)
+      m.checkViewportEvent(comps, [8], [4, 5, 6, 7], [3], [0, 1, 2])
+
+      m.container.translation = m.scroller.getTargetTranslation(5)
+      m.scroller.setFocusIndex(5, true)
+      m.printStates(comps)
+      m.checkViewportEvent(comps, [9], [5, 6, 7, 8], [4], [0, 1, 2, 3])
+
+    end function
+
+    '@Test Moving right to left
+    function setFocusIndex_moving_right_to_left()
+      comps = m.scroller.components
+      m.resetViewPortStates()
+      m.printStates(comps, -1)
+      m.checkViewportEvent(comps, [], [], [], [])
+
+      m.scroller.moveToIndex(10, invalid, false)
+      m.scroller.direction = -1
+      m.container.translation = m.scroller.getTargetTranslation(9)
+      m.scroller.setFocusIndex(9, true)
+      m.printStates(comps, -1)
+      m.checkViewportEvent(comps, [7], [11, 10, 9, 8], [12], [13])
+
+      m.container.translation = m.scroller.getTargetTranslation(8)
+      m.scroller.setFocusIndex(8, true)
+      m.printStates(comps, -1)
+      m.checkViewportEvent(comps, [6], [10, 9, 8, 7], [11], [12, 13])
+
+      m.container.translation = m.scroller.getTargetTranslation(7)
+      m.scroller.setFocusIndex(7, true)
+      m.printStates(comps, -1)
+      m.checkViewportEvent(comps, [5], [9, 8, 7, 6], [10], [11, 12, 13])
+
+      m.container.translation = m.scroller.getTargetTranslation(6)
+      m.scroller.setFocusIndex(6, true)
+      m.printStates(comps, -1)
+      m.checkViewportEvent(comps, [4], [8, 7, 6, 5], [9], [10, 11, 12, 13])
+
+      m.container.translation = m.scroller.getTargetTranslation(5)
+      m.scroller.setFocusIndex(5, true)
+      m.printStates(comps, -1)
+      m.checkViewportEvent(comps, [3], [7, 6, 5, 4], [8], [9, 10, 12, 12, 13])
+
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ utils
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    function printStates(comps, direction = 1)
+      if direction = 1
+        first = 0
+        last = 15
+      else
+        first = 15
+        last = 0
+      end if
+
+      for i = first to last step direction
+        comp = comps[i]
+        ? comp.id ; " " ; comp.listEvent.name ; " " ; comp.isInViewport
+      end for
+    end function
+
+    function resetViewPortStates()
+      for each comp in m.scroller.components
+        comp.listEvent = {}
+      end for
+    end function
+
+    function checkrenderedComps(comps, renderedIds, offScreenIds)
+      for each id in renderedIds
+        m.assertTrue(comps[id].isInViewport)
+      end for
+
+      for each id in offScreenIds
+        m.assertFalse(comps[id].isInViewport)
+      end for
+    end function
+
+    function checkViewportEvent(comps, willEnterIds = [], enterIds = [], willExitIds = [], exitIds = [])
+
+      for each id in enterIds
+        m.assertEqual(comps[id].listEvent.name, "didEnter")
+      end for
+
+      for each id in exitIds
+        m.assertEqual(comps[id].listEvent.name, "didExit")
+      end for
+
+      for each id in willEnterIds
+        m.assertEqual(comps[id].listEvent.name, "willEnter")
+      end for
+
+      for each id in willExitIds
+        m.assertEqual(comps[id].listEvent.name, "willExit")
+      end for
+
+    end function
+
+    private function configureScroller(axes, numItems = 20, itemSize = [300, 300], screenSize = [1920, 1080]) 
+      m.scroller.axes = axes
+
+      Tests.Utils.configureViewManager(m.viewManager, axes, numItems, itemSize, screenSize)
+
+      m.scroller.onViewManagerUpdate()
+    end function
+  end class
+end namespace

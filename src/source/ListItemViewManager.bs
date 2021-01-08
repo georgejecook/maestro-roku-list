@@ -1,0 +1,124 @@
+import "pkg:/source/ItemViewManager.bs"
+import "pkg:/source/ListMixin.bs"
+
+class ListItemViewManager extends ItemViewManager
+
+  function new(list, container, minPos = 0, maxPos = 1080)
+    super("ListItemViewManager", list, container, 1, minPos, maxPos)
+    m.delegate = list.rowEvents
+    m.lookAheadDistance = maxPos * 5
+    m.lookBehindDistance = maxPos * 2
+  end function
+
+  override function getRenderer(index)
+    return m.components[index]
+  end function
+
+  override function createRenderers(content)
+
+    'TODO remove/recycle views
+
+    y = 0
+    w = m.owner.width
+
+    if content <> invalid
+      index = 0
+      for each rowContent in content.getChildren(-1, 0)
+        settings = ListMixin.getRowSettings(m.content, rowContent)
+
+        if rowContent.rowCompName <> invalid and rowContent.rowCompName = "RectComp"
+          component = m.creatRectangle(rowContent, index, settings)
+        else
+          component = m.createHorizontalRow(rowContent, index, settings)
+        end if
+        component.index = index
+        component.renderState = "none"
+
+        m.components.push(component)
+        index++
+      end for
+    end if
+  end function
+
+  function createHorizontalRow(rowContent, index, settings)
+    component = m.container.createChild("HorizontalRow")
+    component.id = str(index).trim()
+    component.renderState = "none"
+    component.owner = m.owner
+    component.content = rowContent
+    component.isInViewport = index < 5
+
+    return component
+  end function
+
+  function creatRectangle(rowContent, index, settings)
+    component = m.container.createChild("Rectangle")
+    component.id = str(index).trim()
+    component.color = "#aaffaa"
+    component.addFields({ "content": rowContent 
+      "isFocusable": true
+      "isHidden": false
+      "isFocused": false
+    })
+    component.width = 1920
+    component.height = 300
+    component.owner = m.owner
+    component.content = rowContent
+
+    return component
+  end function
+
+  override function updateLayout()
+    y = 0
+    w = m.owner.width
+
+    for each component in m.components
+      settings = ListMixin.getRowSettings(m.content, component.content)
+      component.visible = component.content.isHidden <> true
+
+      if component.visible
+        component.translation = [0, y]
+
+        'TODO better handle the whole visibility
+
+        y += component.height + settings.space
+        ? " SCREEN POS "; settings.screenPos
+        m.rects.push({ 
+          translation: component.translation
+          size: [w, component.height] 
+          index: component.index
+          screenPos: settings.screenPos
+        })
+        m.visibleComponents.push(component)
+        m.visibleItems.push(component.content)
+      else
+        m.hiddenComponents.push(component)
+      end if
+
+    end for
+
+  end function
+
+  override function applyRenderStateMap(renderStateMap)
+    ' ? "updating renderStateMap: " ; formatJson(renderStateMap)
+    for each id in renderStateMap
+      component = m.components[id.toInt()]
+
+      if component <> invalid and component.renderState <> renderStateMap[id]
+        component.renderState = renderStateMap[id]
+        if component.renderState = "rendered"
+          m.renderedComponents.push(component)
+        end if
+        component.isRendered = component.renderState = "rendered"
+      else
+        ' ? "ERROR could not find visible component for "; id
+      end if
+    end for
+
+  end function
+
+  override function getFocusSettings()
+    return m.content.focusSettings
+  end function
+
+end class

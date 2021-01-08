@@ -1,0 +1,167 @@
+import "pkg:/source/ItemViewManager.bs"
+
+class RowItemViewManager extends ItemViewManager
+  public row = invalid
+  public cellsById = {}
+  public cellProvider
+  public cellTracker 
+  public isScrolling = false
+  public lastRowIsRendered = "none"
+
+  function new(list, row, container, cellProvider, cellTracker, minPos = 0, maxPos = 1920)
+    super("RowItemViewManager", list, container, 0, minPos, maxPos)
+    m.cellProvider = cellProvider
+    m.cellTracker = cellTracker
+    m.row = row
+    m.lookAheadDistance = maxPos * 1.5
+    m.lookBehindDistance = maxPos / 2
+
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ overridden
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  override function createRenderers(content)
+    'renderers are created as needed
+    m.cellsById = {}
+  end function
+
+  override function updateLayout()
+    translation = [0, 0]
+    index = 0
+    m.contentGroup.translation = m.settings.contentOffset
+
+    for each item in m.content.getChildren(-1, 0)
+      settings = ListMixin.getCellSettings(m.owner.content, m.content, item)
+      m.rects.push({ 
+        translation: translation, 
+        size: settings.size 
+        index: index
+        rowIndex: m.row.index
+      })
+      m.visibleItems.push(item)
+
+      'TODO - for now, no vis options for rows..
+      translation = [translation[0], translation[1]]
+      translation[m.axes] = translation[m.axes] + settings.size[m.axes] + settings.space
+      index++
+    end for
+  end function
+
+  override function shouldUpdateRenderedIndexes(direction, index)
+    return true
+  end function
+
+  override function applyRenderStateMap(renderStateMap)
+    ' m.logInfo("applyRenderStateMap", m.row.index, m.row.isRendered)
+    if m.row.isRendered
+      for each id in renderStateMap
+        m.applyrenderStateForCell(id, renderStateMap[id])
+      end for
+    else
+      for each id in renderStateMap
+        m.applyrenderStateForCell(id, "none")
+      end for
+    end if
+
+    m.lastRowIsRendered = m.row.isRendered
+  end function
+
+  function applyrenderStateForCell(id, renderState)
+    index = id.toInt()
+    isrendered = m.row.isrendered
+    item = m.content.getChild(index)
+
+    if item <> invalid
+      if renderState = "rendered"
+        if m.cellsById[id] = invalid
+          settings = ListMixin.getCellSettings(m.owner.content, m.content, item)
+          ' ? "GETTING CELL " ; id
+          cell = m.cellProvider@.getCell(settings.compName)
+
+          if cell <> invalid
+            'TODO - work out what to do around setting content etc here
+            cell.initialState = {
+              row: m.row
+              list: m.owner
+              size: m.rects[index].size
+            } 
+
+            cell.visible = true
+            ' cell.visible = isrendered
+
+            ' ? ">>>>>>>> " ; isrendered
+
+            ' if isrendered
+            cell.content = item
+            cell.listEvent = { "name": "didEnter" }
+            ' end if
+
+            cell.translation = m.rects[index].translation
+            cell.size = m.rects[index].size
+            m.container.appendChild(cell)
+            cell.index = index
+            m.cellsById[id] = cell
+          else 
+            ? ">>ERR no cell for " ; settings.compName
+          end if
+        end if
+      else
+        cell = m.cellsById[id]
+        if cell <> invalid
+          ' ? "RELEASING " ; id
+          m.cellProvider@.releaseCell(cell) 
+          m.cellsById.delete(id)
+        else
+          ' ? " COULD NOT FIND CELL TO RELEASE"
+        end if
+      end if
+    end if
+  end function
+
+  override function getRenderer(index)
+    return m.cellsById[str(index).trim()]
+  end function
+
+  override function setIsScrolling(isScrolling)
+    m.row.isScrolling = isScrolling
+    m.owner.isScrolling = isScrolling
+    m.isScrolling = isScrolling
+    for each id in m.cellsById
+      comp = m.cellsById[id]
+      if isScrolling
+        comp.listEvent = { name: "scrollStart" }
+      else
+        comp.listEvent = { name: "scrollStop" }
+      end if
+    end for
+  end function
+
+
+  override function getScreenRect(index, screenPos = invalid, direction = 0)
+    rect = super.getScreenRect(index, screenPos, direction)
+
+    if rect <> invalid
+      rect.translation[0] += m.settings.contentOffset[0]
+      rect.translation[1] += m.settings.contentOffset[1]
+    end if
+    return rect
+  end function
+
+  override function getNextFlowScreenPosition(index, direction, screenPos)
+    if m.isFlowSupported = true
+      itemRect = m.rects[index]
+      if itemRect <> invalid
+        screenPos = m.getScreenPositionForItem(itemRect, direction, screenPos)
+      end if
+      if direction = -1
+        return m.get
+      end if
+    end if
+
+    return invalid
+  end function
+
+
+end class

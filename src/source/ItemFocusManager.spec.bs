@@ -1,0 +1,95 @@
+namespace tests
+
+  '@TestSuite ItemFocusManager tests
+  class ItemFocusManagerTests extends Rooibos.BaseTestSuite
+
+    override function setUp()
+      log.initializeLogManager()
+    end function
+
+    override function beforeEach()
+      m.owner = Tests.Utils.createSimpleMockNode("owner")
+      m.owner.translation = [0, 0]
+      m.owner.width = 1920
+      m.owner.height = 1080
+
+      m.container = Tests.Utils.createSimpleMockNode("container")
+      m.container.translation = [0, 0]
+      m.container.width = 1920
+      m.container.height = 1080
+
+      m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
+
+      m.scrollerAnimation = Tests.Utils.createSimpleMockNode("animation")
+      m.scrollerInterpolator = Tests.Utils.createSimpleMockNode("interpolator")
+
+      m.scroller = new ItemScroller(m.viewManager, 1, 0, 1080, m.scrollerAnimation, m.scrollerInterpolator
+      )
+      m.configureScroller(1, 20)
+
+      m.animation = Tests.Utils.createSimpleMockNode("animation")
+      m.interpolator = Tests.Utils.createSimpleMockNode("interpolator")
+
+      m.focusManager = new ItemFocusManager(m.scroller, m.animation, m.interpolator)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '@It tests setFocusPosition
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    '@Test 
+    '@Params[0, 100, 1, 200, 0]
+    '@Params[3, 400, 5, 600, -1]
+    function setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
+      m.focusManager.setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
+
+      m.assertEqual(m.focusManager.index, index)
+      m.assertEqual(m.focusManager.indexPosition, indexPosition)
+      m.assertEqual(m.focusManager.nextIndex, nextIndex)
+      m.assertEqual(m.focusManager.nextIndexPosition, nextPosition)
+      m.assertEqual(m.focusManager.direction, direction)
+
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '@It tests onContainerPositionChange
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    '@Test 
+    '@Params[1, 0,0, 1, 100, 5, 0.05]
+    '@Params[1, 0,0, 1, 100, 50, 0.5]
+    '@Params[1, 0,0, 1, 100, 75, 0.75]
+    '@Params[1, 1,100, 2, 200, 105, 0.05]
+    '@Params[1, 1,100, 2, 200, 150, 0.5]
+    '@Params[1, 1,100, 2, 200, 175, 0.75]
+    '@Params[-1, 2,200, 1, 100, 195, 0.05]
+    '@Params[-1, 2,200, 1, 100, 150, 0.5]
+    '@Params[-1, 2,200, 1, 100, 125, 0.75]
+    '@Params[-1, 1 ,100, 0, 0, 95, 0.05]
+    '@Params[-1, 1 ,100, 0, 0, 50, 0.5]
+    '@Params[-1, 1 ,100, 0, 0, 25, 0.75]
+    '@Params[1, 1 ,100, 0, 0, 5, 0.95]
+    function onContainerPositionChange(direction, index, indexPosition, nextIndex, nextPosition, offset, expected)
+
+      m.focusManager.setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
+
+      m.expectOnce(m.focusManager, "onFocusUpdate", [expected * 1.0])
+
+      m.focusManager.onContainerPositionChange(offset)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ utils
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function configureScroller(axes, numItems = 20, itemSize = [300, 300], screenSize = [1920, 1080]) 
+      m.scroller.axes = axes
+
+      Tests.Utils.configureViewManager(m.viewManager, axes, numItems, itemSize, screenSize)
+
+      m.scroller.onViewManagerUpdate()
+    end function
+
+
+  end class
+end namespace

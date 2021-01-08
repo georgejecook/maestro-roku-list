@@ -1,0 +1,157 @@
+import "pkg:/source/BaseClass.bs"
+
+class ItemFocusManager extends BaseClass
+
+  public viewManager = invalid
+  public nextComponent = invalid
+  public component = invalid
+  public index = 0
+  public indexPosition = 0
+  public nextIndex = 0
+  public nextPosition = 0
+  public direction = 0
+  public didStart = false
+  public didFinish = false
+  public isRow = false
+
+  function new(viewManager, moveAnimation, moveAnimationInterpolator, ownerDelegate, rowIndex = -1)
+    super("ItemFocusManager")
+    m.name = "ItemFocusManager"
+    m.viewManager = viewManager
+    m.container = viewManager.container
+    m.delegate = viewManager.owner
+    m.moveAnimation = moveAnimation
+    m.rowIndex = rowIndex
+    m.moveAnimationInterpolator = moveAnimationInterpolator
+    m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
+    owner = viewManager.owner
+    m.delegates = [ownerDelegate]
+
+    if owner.delegate <> invalid
+      m.delegates.push(owner.delegate)
+    end if
+
+  end function
+
+  function setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
+    ' ? ">>>>>>>>>>>>>>>>>>>>>"
+    ' m.logInfo(index, indexPosition, nextIndex, nextPosition, direction)
+    ' ? ">>>>>>>>>>>>>>>>>>>>>"
+    m.index = index
+    m.indexPosition = indexPosition
+    m.nextIndex = nextIndex
+    m.nextPosition = nextPosition
+    m.direction = direction
+    m.component = m.viewManager.getRenderer(m.index)
+    m.nextComponent = m.viewManager.getRenderer(m.nextIndex)
+    m.didStart = false
+    m.didFinish = false
+    m.onFocusUpdate(0)
+  end function
+
+  function onFocusAnimationUpdate(fraction)
+    if m.didStart and not m.didFinish
+      m.onFocusUpdate(fraction)
+    end if
+  end function
+
+  function onContainerPositionChange(offset)
+    distance = abs(m.nextPosition - m.indexPosition)
+    currentPos = abs(m.indexPosition - offset)
+    ' ? "offset " ; offset ; " IP " ; m.indexPosition ; " D " ; distance ; " C " ; currentPos
+    if distance <> 0
+      fraction = (currentPos / distance)
+      if m.direction = -1
+        fraction = 1 - fraction
+      end if
+      ' ? m.name + " UPDATE: " ; fraction
+      m.onFocusUpdate(fraction)
+    else
+      ' ? "FIXME"
+    end if
+  end function
+
+  function onFocusUpdate(fraction) as void
+    if not m.didStart
+      name = "willLoseFocus"
+      nextName = "willGainFocus"
+      m.didStart = true
+      m.setOwnerNextFocusIndex()
+    else if fraction = 0
+      return
+    else if fraction = 1
+      if m.didFinish
+        return
+      end if
+      m.didFinish = true
+      name = "didLoseFocus"
+      nextName = "didGainFocus"
+      m.setOwnerIndexes()
+    else
+      name = "losingFocus"
+      nextName = "gainingFocus"
+    end if
+
+    if m.isRow 
+      m.viewManager.owner.focusedCellPercent = fraction
+    else
+      m.viewManager.owner.focusedRowPercent = fraction
+    end if
+
+    event = {
+      direction: m.direction
+      fraction: fraction
+      name: name
+      index: m.index
+    }
+    nextEvent = {
+      direction: m.direction
+      fraction: fraction
+      name: nextName
+      index: m.nextIndex
+    }
+
+    event.rowIndex = m.rowIndex
+    nextEvent.rowIndex = m.rowIndex
+
+    'let components know, so they can react
+    if m.component <> invalid
+      m.component.listEvent = event
+    end if
+
+    if m.nextComponent <> invalid
+      m.nextComponent.listEvent = nextEvent
+    end if
+
+    for each delegate in m.delegates
+      delegate.listEvent = event
+      delegate.listEvent = nextEvent
+    end for
+  end function
+
+  function setOwnerNextFocusIndex()
+    if m.isRow
+      m.viewManager.owner.nextFocusIndex = [m.viewManager.row.index, m.nextIndex]
+    else
+      comp = m.viewManager.getRenderer(m.nextIndex)
+      if comp <> invalid
+        m.viewManager.owner.nextFocusIndex = [comp.index, comp.focusedCellIndex]
+      end if
+    end if
+
+  end function
+
+  function setOwnerIndexes()
+    if m.isRow
+      m.viewManager.owner.focusedCellIndex = m.nextIndex
+    else
+      m.viewManager.owner.focusedRowIndex = m.nextIndex
+      comp = m.viewManager.getRenderer(m.nextIndex)
+      if comp <> invalid
+        m.viewManager.owner.focusedCellIndex = comp.focusedCellIndex
+      end if
+    end if
+
+  end function
+
+end class

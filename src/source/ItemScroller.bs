@@ -1,0 +1,342 @@
+import "pkg:/source/BaseClass.bs"
+
+class ItemScroller extends BaseClass
+
+public rects = []
+public items = []
+public components = []
+public viewManager = invalid
+public focusManager = invalid
+public renderedComponents = []
+public renderedCompMap = []
+public index = 0
+public indexPosition = 0
+public focusedIndex = 0
+public nextIndex = 0
+public nextPosition = 0
+public targetIndex = 0
+public container = invalid
+public direction = 0
+public axes = 0 'x = 0, y =1
+public screenPos = 0 
+public isFloatingFocus = false
+public isWrapped = false
+
+function new(viewManager, axes, moveAnimation, moveAnimationInterpolator)
+  super("ItemScroller")
+  m.viewManager = viewManager
+  m.container = m.viewManager.container
+  m.axes = axes
+  m.moveAnimation = moveAnimation
+  m.moveAnimationInterpolator = moveAnimationInterpolator
+  m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
+  
+end function
+
+public function onViewManagerUpdate()
+  m.components = m.viewManager.visibleComponents ' content items 
+  
+  m.delegates = []
+  
+  if m.viewManager.delegate <> invalid
+    m.delegates.push(m.viewManager.delegate)
+  end if
+  m.settings = m.getFocusSettings()
+end function
+
+function getFocusSettings()
+  return m.viewManager.content.focusSettings
+end function
+
+public function reset()
+  m.onViewManagerUpdate()
+  m.moveToIndex(0, invalid, false)
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ collection movement
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function moveToEnd(direction, screenPos = invalid, animated = true, fast = false)
+  if direction = -1
+    index = 0
+  else
+    index = m.viewManager.numberOfItems - 1
+  end if
+  m.moveToIndex(index, screenPos, animated, fast)
+end function
+
+function move(offset, screenPos = invalid, animated = true, fast = false)
+  index = m.index + offset
+  
+  if offset > 0
+    direction = 1
+  else 
+    direction = -1
+  end if
+  
+  index = m.getValidTargetIndex(index, direction)
+  
+  m.logInfo("move", m.index, offset, index, screenPos, animated, fast)
+  
+  if index <> -1
+    m.moveToIndex(index, screenPos, animated, fast)
+  end if
+end function
+
+function getValidTargetIndex(index, direction)
+  if index < 0
+    return 0
+  end if
+  
+  if index > m.viewManager.numberOfItems - 1
+    return m.getValidTargetIndex(m.viewManager.numberOfItems - 1, - 1)
+  end if
+  'TODO - check if the item is focusable.. 
+  'this logic below is broken
+  ' item = m.viewManager.visibleItems[index]
+  ' while item <> invalid and (item.isFocusable = true or item.isFocusable = invalid)  and index < m.viewManager.numberOfItems - 1 and index > -1
+  '   index += direction
+  '   item = m.viewManager.visibleItems[index]
+  ' end while
+  
+  return index
+end function
+
+function moveToIndex(index, screenPos = invalid, animated = true, fast = false)
+  m.logInfo("moveToIndex", index, screenPos, animated)
+  
+  if index < m.index
+    direction = -1
+  else
+    direction = 1
+  end if
+  
+  targetTranslation = m.viewManager.getTargetTranslation(index, direction, screenPos)
+  
+  if targetTranslation = invalid
+    m.logError("cannot move! translation invalid for index", index)
+    return false
+  end if
+  
+  m.direction = direction
+  
+  if m.isFloatingFocus
+    nextFlowPosition = m.viewManager.getNextFlowScreenPosition()
+    if nextFlowPosition <> invalid
+      m.moveFocusToIndex(index, nextFlowPosition, animated)
+    endif
+  end if
+  
+  itemRect = m.viewManager.rects[index]
+  if screenPos = invalid
+    screenPos = m.screenPos
+  end if
+  
+  m.screenPos = m.viewManager.getScreenPositionForItem(itemRect, m.direction, screenPos)
+  m.targetIndex = index
+  
+  
+  m.setNextIndex(m.index + m.direction)
+  if fast
+    m.animSpeed = m.settings.fastAnimSpeed
+  else 
+    m.animSpeed = m.settings.animSpeed
+  end if
+  
+  ? "m.settings " ; m.settings.animSpeed
+  
+  m.logInfo("moving to ", targetTranslation[m.axes], animated)
+  if animated
+    m.toggleScrolling(true)
+    m.setFocusIndex(m.index, true, screenPos)
+    m.viewManager.updateRenderedComponents(m.direction, m.index)
+    
+    'TODO count visible rows between oldIndex and newIndex
+    steps = abs(m.index - index)
+    if steps = 0
+      steps = 1
+    end if
+    if m.moveAnimation.state = "play"
+      m.moveAnimation.control = "pause"
+    end if
+    m.moveAnimationInterpolator.keyValue = [m.container.translation, targetTranslation]
+    m.moveAnimation.duration = steps * m.animSpeed
+    
+    if m.moveAnimation.state = "pause"
+      m.moveAnimation.control = "resume"
+    else
+      m.moveAnimation.control = "start"
+    end if
+  else
+    m.container.translation = targetTranslation
+    'TODO -check if jump is bigger than a certain amount
+    ' m.viewManager.updateRenderedComponents(m.direction, m.index)
+    m.setFocusIndex(index, false)
+  end if
+end function
+
+
+function finishAnimating()
+  ' ? "stop ci " ; m.index ; " ni " ; m.nextIndex
+  if m.direction = -1
+    nextIndex = m.nextIndex + 1
+  else
+    nextIndex = m.nextIndex
+  end if
+  m.moveToIndex(nextIndex, invalid, true, true)
+end function
+
+function setNextIndex(index, screenPos = invalid)
+  if index < 0
+    index = 0
+  end if
+  m.nextIndex = index
+  nextRect = m.viewManager.rects[m.nextIndex]
+  screenPos = m.viewManager.getScreenPositionForItem(nextRect, m.direction, screenPos)
+  nextTranslation = m.viewManager.getTargetTranslation(index, m.index, screenPos)
+  
+  if nextTranslation <> invalid
+    m.nextPosition = nextTranslation[m.axes]
+  else
+    m.nextPosition = m.indexPosition
+  end if
+end function
+
+function stopAnimating()
+  m.moveAnimation.control = "stop"
+  ? "STOP ANIMAGING TOG SCROLL FALSE"
+  m.toggleScrolling(false)
+end function
+
+function toggleScrolling(active)
+  m.viewManager.setIsScrolling(active)
+end function
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ animation callbacks
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onAnimationFractionChange(fraction)
+  ' m.logInfo("onAnimationFractionChange", fraction)
+  position = m.container.translation[m.axes]
+  index = m.viewManager.getIndexAtPosition(position, m.direction)
+  
+  if fraction = 1
+    m.focusManager.onFocusAnimationUpdate(1) 
+    ? "FRACTIN 1 TOG SCROLL FALSE"
+    m.toggleScrolling(false)
+    
+    if index <> m.index
+      m.setFocusIndex(index, false)
+    end if
+    m.targetIndex = -1
+  else
+    m.focusManager.onContainerPositionChange(position) 
+    if index <> m.index 
+      m.focusManager.onFocusAnimationUpdate(1) 
+      m.setFocusIndex(index, true)
+    end if
+  end if
+  
+end function
+
+' /**
+'  * @member setFocusIndex
+'  * @memberof module:ItemScroller
+'  * @instance
+'  * @function
+'  * @description Responsible for all state updates, and hooks pertaning to focus position.
+'  *       NOTE : does NOT update position - you should be in position when calling this. for speed does not recalculate index: you should know the index when you call me!
+'  * @param {integer} index - the index you KNOW you are on when your move is finished (finished could mean from one index to nextindex, while animating; doesn' have to be targetIndex)
+'  * @param {boolean} isMoving - if true, then deltas are calculated for next position, and observers fired if their screen status will change
+'  */
+function setFocusIndex(index, isMoving, screenPos = invalid)
+  'This MUST be called infrequently
+  if index = -1
+    m.index = 0
+    m.setNextIndex(0, screenPos)
+  else
+    m.index = index
+    m.setNextIndex(m.index + m.direction)
+  end if
+  
+  'TODO -note - we need to know what screenPos WAS in a floating scenario!!
+  m.indexPosition = m.viewManager.getTargetTranslation(m.index, m.direction, screenPos)[m.axes]
+  
+  m.viewManager.updateRenderedComponents(m.direction, m.index)
+  
+  m.notifyViewportEvents(true)
+  
+  m.focusManager.setFocusPosition(m.index, m.indexPosition, m.nextIndex, m.nextPosition, m.direction)
+  m.setFocusOnRenderer(isMoving)
+end function
+
+function setFocusOnRenderer(isMoving)
+end function
+
+function notifyViewportEvents(isMoving)
+  'maintain a collection of controls that are in bounds right now:
+  m.renderedCompMap = m.viewManager.getComoponentsInViewPort( - m.container.translation[m.axes])
+  
+  'we assign events to each component AND send them to the owner, so it can choose what to do
+  events = []
+  
+  for each id in m.renderedCompMap
+    comp = m.components[id.toInt()]
+    if comp <> invalid
+      if m.renderedCompMap[id] = true and comp.isInViewport = false
+        'ensure clients always get willEnter before didEnter
+        if comp.listEvent = invalid or comp.listEvent.name <> "willEnter" 
+          event = { name: "willEnter", direction: m.direction, index: comp.index }
+          comp.listEvent = event
+          events.push(event)
+        end if
+        event = { name: "didEnter", direction: m.direction, index: comp.index }
+        comp.listEvent = event
+        events.push(event)
+        comp.isInViewport = true
+        ' comp.visible = true
+      else if m.renderedCompMap[id] = false and comp.isInViewport = true
+        'ensure clients always get willExit before didExit
+        if comp.listEvent = invalid or comp.listEvent.name <> "willExit" 
+          event = { name: "willExit", direction: m.direction, index: comp.index }
+          comp.listEvent = event
+          events.push(event)
+        end if
+        event = { name: "didExit", direction: m.direction, index: comp.index }
+        comp.listEvent = event
+        events.push(event)
+        comp.isInViewport = false
+        ' comp.visible = false
+      end if
+    end if 
+  end for
+  
+  'notify what WILL come into view
+  if isMoving and m.nextIndex <> m.index
+    nextTranslation = m.viewManager.getTargetTranslation(m.nextIndex, m.direction, m.screenPos)
+    nextrenderedCompMap = m.viewManager.getComoponentsInViewPort(nextTranslation[m.axes])
+    ' m.logInfo("nextrenderedCompMap", nextrenderedCompMap)
+    for each id in nextrenderedCompMap
+      comp = m.components[id.toInt()]
+      if comp <> invalid
+        ' m.logInfo(id, comp.isInViewport, nextrenderedCompMap[id])
+        if nextrenderedCompMap[id] = true and comp.isInViewport = false
+          event = { name: "willEnter", direction: m.direction, index: comp.index }
+          comp.listEvent = event
+          events.push(event)
+        else if nextrenderedCompMap[id] = false and comp.isInViewport = true
+          event = { name: "willExit", direction: m.direction, index: comp.index }
+          comp.listEvent = event
+          events.push(event)
+        end if
+      end if 
+    end for
+  end if
+  
+  for each delegate in m.delegates
+    delegate.listEvents = events
+  end for
+end function
+
+end class

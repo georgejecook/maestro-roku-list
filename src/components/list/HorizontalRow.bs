@@ -1,0 +1,204 @@
+import "pkg:/source/ListMixin.bs"
+import "pkg:/source/ListItemDelegateMixin.bs"
+import "pkg:/source/RowItemScroller.bs"
+import "pkg:/source/RowItemViewManager.bs"
+import "pkg:/source/ItemFocusManager.bs"
+
+function init()
+  log.registerLogger("Row")
+  m.isAnimatorsCreated = false
+  m.top.observeField("content", "onContentChange")
+  m.top.observeField("isScrolling", "onIsScrollingChange")
+  m.top.observeField("isRendered", "onIsRenderedChange")
+  m.top.observeField("animateToItem", "onAnimateToItemChange")
+  m.cellsGroup = m.top.findNode("cellsGroup")
+  m.contentGroup = m.top.findNode("contentGroup")
+  m.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator") 
+  m.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
+  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
+  m.moveAnimation = m.top.findNode("moveAnimation")
+  m.header = m.top.findNode("header")
+  m.bgRect = m.top.findNode("bgRect")
+  m.cellProvider = m.global.cellProvider
+  m.cellTracker = m.global.cellTracker
+  ListItemDelegateMixin.setDelegate()
+  m.top.observeField("listEvent", "onListEvent")
+end function
+
+function createManagers()
+  m.logInfo("createManagers")
+  isAnimatorsCreated = true
+  m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
+  m.focusManager = new ItemFocusManager(m.viewManager, m.focusMoveAnimation, m.focusMoveAnimationInterpolator, m.top.owner.cellEvents, m.top.index)
+  m.focusManager.name = "ROW FM "
+  m.focusManager.isRow = true
+  m.itemScroller = new RowItemScroller(m.viewManager, m.moveAnimation, m.moveAnimationInterpolator)
+  m.itemScroller.focusManager = m.focusManager
+end function
+
+function onContentChange(evt)
+  ' m.logInfo("onContentChange", evt.getField())
+  if m.content = invalid or not m.content.isSameNode(m.top.content)
+    m.content = m.top.content
+    m.header.text = "ROW " + m.top.content.title
+    calculateHeight()
+    createManagers()
+    m.viewManager.setContent(m.top.content)
+    m.itemScroller.reset()
+  end if
+end function
+
+function calculateHeight()
+  settings = ListMixin.getRowSettings(m.top.owner.content, m.content)
+  if settings.height <> -1
+    m.top.height = settings.height
+  else
+    m.top.height = settings.cellSettings.size[1] + settings.contentOffset[1]
+  end if
+end function
+
+function onIsRenderedChange()
+  ' ? "onIsRenderedChange " ; m.top.isRendered
+  if m.viewManager <> invalid
+    m.viewManager.updateRenderedComponents(m.itemScroller.direction, m.itemScroller.index)
+  end if
+end function
+
+function onIsScrollingChange()
+  if m.viewManager <> invalid
+    m.viewManager.setIsScrolling(m.top.isScrolling)
+  end if
+end function
+
+function onListEvent(evt)
+  event = evt.getData()
+
+  if event.name = "willEnter" or event.name = "didEnter"
+    for each component in m.cellsGroup.getChildren(-1, 0)
+      component.listEvent = event
+    end for
+  end if
+end function
+
+function onAnimateToItemChange()
+  if m.content <> invalid
+    m.itemScroller.moveToIndex(m.top.animateToItem)
+  end if
+end function
+
+function getRenderer(index)
+  return m.viewManager.getRenderer(index)
+end function
+
+function getRect(index, useScreenCoords = false)
+  return m.viewManager.getRect(index, useScreenCoords)
+end function
+
+function getScreenRect(index, screenPos = invalid, direction = 0)
+  return m.viewManager.getScreenRect(index, screenPos, direction)
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ KeyPress
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onKeyPressLeft() as boolean
+  m.logMethod("onKeyPressLeft")
+  m.itemScroller.move(-1, 500)
+  return true
+end function
+
+function onKeyPressRight() as boolean
+  m.logMethod("onKeyPressRight")
+  m.itemScroller.move(1, 500)
+  return true
+end function
+
+function getLongPressIntervalForKey(key) as float
+  m.logMethod("getLongPressIntervalForKey", key)
+  if key = "left" or key = "right"
+    return 0.2
+  else
+    return 0
+  end if
+end function
+
+function onLongPressStart(key) as boolean
+  m.logMethod(">>>>onLongPressStart", key)
+
+  if key = "left" or key = "right"
+    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    if key = "left"
+      m.itemScroller.moveToEnd(-1)
+    else
+      m.itemScroller.moveToEnd(1)
+    end if
+
+    return true
+  end if
+
+  return false
+end function
+
+function onLongPressFinish(key) as boolean
+  if key = "left" or key = "right"
+    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    m.itemScroller.finishAnimating()
+    return true
+  end if
+
+  return false
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ delegate
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+' function onWillEnter(index, direction)
+'   ' ? "onWillEnter " ; index ; " " ; direction
+'   ' m.top.opacity = 1
+'   ' if direction = 1
+'   ' else
+'   '   m.top.opacity = 0
+'   ' end if
+' end function
+
+' function onWillExit(index, direction)
+'   ? "onWillExit " ; index ; " " ; direction
+' end function
+
+' function onDidEnter(index, direction)
+'   ? "onDidEnter " ; index ; " " ; direction
+' end function
+
+' function onDidExit(index, direction)
+'   ? "onDidExit " ; index ; " " ; direction
+' end function
+
+' function onWillGainFocus(index, direction)
+'   ? "onWillGainFocus " ; index ; " " ; direction
+' end function
+
+' function onWillLoseFocus(index, direction)
+'   ? "onWillLoseFocus " ; index ; " " ; direction
+' end function
+
+function onDidGainFocus(index, direction)
+  '   ? "onDidGainFocus " ; index ; " " ; direction
+  '   ' m.top.opacity = 1
+  m.bgRect.opacity = 1
+end function
+
+function onDidLoseFocus(index, direction)
+  '   ? "onDidLoseFocus " ; index ; " " ; direction
+  '   ' m.top.opacity = 0
+  m.bgRect.opacity = 0
+end function
+
+function onGainingFocus(index, direction, fraction)
+  m.bgRect.opacity = fraction
+end function
+
+function onLosingFocus(index, direction, fraction)
+  m.bgRect.opacity = 1 - fraction
+end function

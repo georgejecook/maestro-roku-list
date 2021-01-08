@@ -1,0 +1,114 @@
+namespace tests
+
+  '@TestSuite ItemViewManager tests
+  class ItemViewManagerTests extends Rooibos.BaseTestSuite
+
+    override function setUp()
+      log.initializeLogManager()
+    end function
+
+    override function beforeEach()
+      m.owner = Tests.Utils.createSimpleMockNode("owner")
+      m.owner.translation = [0, 0]
+      m.owner.width = 1920
+      m.owner.height = 1080
+
+      m.container = Tests.Utils.createSimpleMockNode("container")
+      m.container.translation = [0, 0]
+      m.container.width = 1920
+      m.container.height = 1080
+
+      m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
+      Tests.Utils.configureViewManager(m.viewManager, 0)
+
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '@It tests translation conversions
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    '@Test some group calcuations to sanity check after getting weird results
+    function sanityTests()
+      owner = m.scene.createChild("Group")
+      container = owner.createChild("Group")
+      child = container.createChild("Rectangle")
+      owner.translation = [0, 0]
+
+      container.translation = [0, 0]
+      child.translation = [300, 0]
+      ? "P" ; child.ancestorBoundingRect(owner).x ; " C " ; child.BoundingRect().x
+      container.translation = [300, 0]
+      ? "P" ; child.ancestorBoundingRect(owner).x ; " C " ; child.BoundingRect().x
+
+      container.translation = [-300, 0]
+      ? "P" ; child.ancestorBoundingRect(owner).x ; " C " ; child.BoundingRect().x
+
+      container.translation = [1000, 0]
+      ? "P" ; child.ancestorBoundingRect(owner).x ; " C " ; child.BoundingRect().x
+
+      container.translation = [-1000, 0]
+      ? "P" ; child.ancestorBoundingRect(owner).x ; " C " ; child.BoundingRect().x
+
+      child.translation = [1000, 0]
+      ? "P" ; child.ancestorBoundingRect(owner).x ; " C " ; child.BoundingRect().x
+
+    end function
+
+    '@Test 
+    '@Params[0, 0, 0]
+    '@Params[0, 100, 100]
+    '@Params[0, 300, 300]
+    '@Params[0, 500, 500]
+    '@Params[0, 3000, 3000]
+    '@Params[-100, 100, 0]
+    '@Params[-300, 300, 0]
+    '@Params[-500, 500, 0]
+    '@Params[-3000, 3000, 0]
+    '@Params[-50, 100, 50]
+    '@Params[-100, 300, 200]
+    '@Params[-200, 500, 300]
+    '@Params[-3000, 3000, 0]
+    '@Params[100, 100, 200]
+    '@Params[300, 300, 600]
+    '@Params[500, 500, 1000]
+    '@Params[3000, 3000, 6000]
+    function convertChildTranslationToOwner(containerOffset, itemOffset, expected)
+      m.viewManager.owner = m.scene.createChild("Group")
+      m.viewManager.container = m.viewManager.owner.createChild("Group")
+
+      m.viewManager.container.translation = [containerOffset, 0]
+
+      m.assertEqual(int(m.viewManager.convertChildTranslationToOwner([itemOffset, 0])[0]), expected)
+
+    end function
+
+    '@Test 
+    '@Params[0, 0, 0]
+    '@Params[0, 100, -100]
+    '@Params[0, 300, -300]
+    '@Params[0, 500, -500]
+    '@Params[0, 3000, -3000]
+    '@Params[-100, 0, -100]
+    '@Params[-100, 100, -200]
+    '@Params[-300, 300, -600]
+    '@Params[-500, 500, -1000]
+    '@Params[-3000, 3000, -6000]
+    '@Params[-50, 100, -150]
+    '@Params[-100, 300, -400]
+    '@Params[-200, 500, -700]
+    '@Params[-3000, 3000, -6000]
+    '@Params[100, 100, 0]
+    '@Params[300, 300, 0]
+    '@Params[500, 500, 0]
+    '@Params[3000, 3000, 0]
+    function convertOwnerTranslationToChild(containerOffset, screenOffset, expected)
+      m.viewManager.owner = m.scene.createChild("Group")
+      m.viewManager.container = m.viewManager.owner.createChild("Group")
+
+      m.viewManager.container.translation = [containerOffset, 0]
+
+      m.assertEqual(int(m.viewManager.convertOwnerTranslationToChild([screenOffset, 0])[0]), expected)
+
+    end function
+  end class
+end namespace

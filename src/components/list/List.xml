@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component
+    name='List'
+    extends='mv_BaseView'>
+  <interface>
+    <field
+        id='content'
+        type='node'
+        value='invalid' />
+
+    <field
+        id='isScrolling'
+        type='boolean' />
+
+    <field
+        id='focusMoveAnimationInterpolator'
+        type='node' />
+    <field
+        id='focusMoveAnimation'
+        type='node' />
+
+    <field
+        id='width'
+        type='float'
+        value='1920' />
+    <field
+        id='height'
+        type='float'
+        value='1080' />
+    <!-- indicates what to set a row to when it's considered hidden (hidden|partial) -->
+    <field
+        id='rowHidingMode'
+        value='hidden'
+        type='string' />
+    <field
+        id='animateToRow'
+        type='integer'
+        value='0' />
+    <field
+        id='focusedRowIndex'
+        type='integer' />
+    <field
+        id='focusedCellIndex'
+        type='integer' />
+    <field
+        id='focusedRowPercent'
+        type='float' />
+
+    <field
+        id='focusedCellPercent'
+        type='float' />
+
+    <field
+        id='nextFocusIndex'
+        type='array' />
+
+    <!-- screen and selection state -->
+    <field
+        id='cellEvents'
+        type='node' />
+    <field
+        id='rowEvents'
+        type='node' />
+    <!-- <field
+        id='viewPortEvents'
+        type='array' /> -->
+
+    <field
+        id='rowFocused'
+        type='integer' />
+    <field
+        id='itemFocused'
+        type='integer' />
+    <field
+        id='itemUnfocused'
+        type='integer' />
+    <field
+        id='itemSelected'
+        type='integer' />
+    <field
+        id='currFocusItemIndex'
+        type='integer' />
+    <field
+        id='_focusedRenderer'
+        type='node' />
+    <field
+        id='isHidden'
+        type='boolean'
+        onChange='isHiddenChange' />
+    <function name='getBoundsForIndex' />
+    <function name='getFocusedBounds' />
+
+    <function name='getRowScreenRect' />
+    <function name='getCellRenderer' />
+    <function name='getCellScreenRect' />
+
+  </interface>
+  <children>
+    <Timer
+        id='focusTimer'
+        duration='0.01'
+        control='start'
+        repeat='true' />
+    <Group id='contentGroup'>
+      <Group id='rowsGroup' />
+    </Group>
+    <Rectangle id='focusPoint' />
+    <Rectangle
+        id='focusIndicator'
+        color='#ff0000'
+        visible='true'
+        opacity='0.5' />
+
+    <Animation
+        id='moveAnimation'
+        duration='0.1'
+        repeat='false'
+        control='stop'
+        easeFunction='linear'>
+      <Vector2DFieldInterpolator
+          id='moveAnimationInterpolator'
+          key='[0.0, 1.0]'
+          keyValue='[ [0, 60], [0, 606] ]'
+          fieldToInterp='rowsGroup.translation' />
+    </Animation>
+    <Animation
+        id='focusPointMoveAnimation'
+        duration='0.1'
+        repeat='false'
+        control='stop'
+        easeFunction='linear'>
+      <Vector2DFieldInterpolator
+          id='focusPointAnimationInterpolator'
+          key='[0.0, 1.0]'
+          keyValue='[ [0, 60], [0, 606] ]'
+          fieldToInterp='focusPoint.translation' />
+    </Animation>
+  </children>
+
+</component>
