@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "dependencies": {
-    "brighterscript": "^0.28.1",
+    "brighterscript": "file:../../vsc/brighterscript",
     "log": "file:../../roku-log/roku-log",
     "mc": "file:../maestro-roku-core",
     "mioc": "file:../maestro-roku-ioc",

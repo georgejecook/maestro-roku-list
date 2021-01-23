@@ -1,6 +1,5 @@
 namespace tests
 
-  @ignore
   @suite("ItemViewManager tests")
   class ItemViewManagerTests extends tests.BaseTestSuite
 
@@ -10,6 +9,7 @@ namespace tests
 
     override function beforeEach()
       m.owner = new tests.utils.MockNode("owner")
+      m.owner.content = listMixin.createListContent()
       m.owner.translation = [0, 0]
       m.owner.width = 1920
       m.owner.height = 1080
@@ -20,6 +20,9 @@ namespace tests
       m.container.height = 1080
 
       m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
+      m.viewManager.lookAheadDistance = 2700
+      m.viewManager.lookBehindDistance = 0
+
       tests.utils.configureViewManager(m.viewManager, 0)
 
     end function
@@ -56,23 +59,23 @@ namespace tests
     end function
 
     @it("convertChildTranslationToOwner")
-    @Params(0, 0, 0)
-    @Params(0, 100, 100)
-    @Params(0, 300, 300)
-    @Params(0, 500, 500)
-    @Params(0, 3000, 3000)
-    @Params(-100, 100, 0)
-    @Params(-300, 300, 0)
-    @Params(-500, 500, 0)
-    @Params(-3000, 3000, 0)
-    @Params(-50, 100, 50)
-    @Params(-100, 300, 200)
-    @Params(-200, 500, 300)
-    @Params(-3000, 3000, 0)
-    @Params(100, 100, 200)
-    @Params(300, 300, 600)
-    @Params(500, 500, 1000)
-    @Params(3000, 3000, 6000)
+    @params(0, 0, 0)
+    @params(0, 100, 100)
+    @params(0, 300, 300)
+    @params(0, 500, 500)
+    @params(0, 3000, 3000)
+    @params(-100, 100, 0)
+    @params(-300, 300, 0)
+    @params(-500, 500, 0)
+    @params(-3000, 3000, 0)
+    @params(-50, 100, 50)
+    @params(-100, 300, 200)
+    @params(-200, 500, 300)
+    @params(-3000, 3000, 0)
+    @params(100, 100, 200)
+    @params(300, 300, 600)
+    @params(500, 500, 1000)
+    @params(3000, 3000, 6000)
     function convertChildTranslationToOwner(containerOffset, itemOffset, expected)
       m.viewManager.owner = m.scene.createChild("Group")
       m.viewManager.container = m.viewManager.owner.createChild("Group")
@@ -117,30 +120,32 @@ namespace tests
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     @it("Simple")
-    @Params(0, [0, 1, 2, 3], [4, 5, 6, 7, 8, 9, 10])
-    @Params(200, [0, 1, 2, 3, 4], [5, 6, 7, 8, 9, 10])
-    @Params(250, [0, 1, 2, 3, 4], [5, 6, 7, 8, 9, 10])
-    @Params(300, [0, 1, 2, 3, 4], [5, 6, 7, 8, 9, 10])
-    @Params(301, [1, 2, 3, 4], [0, 5, 6, 7, 8, 9, 10])
-    @Params(350, [1, 2, 3, 4], [0, 5, 6, 7, 8, 9, 10])
-    @Params(400, [1, 2, 3, 4], [0, 5, 6, 7, 8, 9, 10])
-    @Params(550, [1, 2, 3, 4, 5], [0, 6, 7, 8, 9, 10])
-    @Params(600, [1, 2, 3, 4, 5], [0, 6, 7, 8, 9, 10])
-    @Params(601, [2, 3, 4, 5], [0, 1, 6, 7, 8, 9, 10])
-    @Params(700, [2, 3, 4, 5], [0, 1, 6, 7, 8, 9, 10])
-    @Params(800, [2, 3, 4, 5, 6], [0, 1, 7, 8, 9, 10])
+    @params(0, [0, 1, 2, 3], [4, 5, 6, 7, 8, 9])
+    @params(200, [0, 1, 2, 3, 4], [5, 6, 7, 8, 9])
+    @params(250, [0, 1, 2, 3, 4], [5, 6, 7, 8, 9])
+    @params(300, [0, 1, 2, 3, 4], [5, 6, 7, 8, 9])
+    @params(301, [1, 2, 3, 4], [0, 5, 6, 7, 8, 9])
+    @params(350, [1, 2, 3, 4], [0, 5, 6, 7, 8, 9])
+    @params(400, [1, 2, 3, 4], [0, 5, 6, 7, 8, 9])
+    @params(550, [1, 2, 3, 4, 5], [0, 6, 7, 8, 9])
+    @params(600, [1, 2, 3, 4, 5], [0, 6, 7, 8, 9])
+    @params(601, [2, 3, 4, 5], [0, 1, 6, 7, 8, 9])
+    @params(700, [2, 3, 4, 5], [0, 1, 6, 7, 8, 9])
+    @params(800, [2, 3, 4, 5, 6], [0, 1, 7, 8, 9])
     function getComponentsInViewPort_Scroll_left_to_right(offset, trueIds, falseIds)
-      m.scroller.updateRenderedComponents(1, 0)
-      compStates = m.scroller.getComoponentsInViewPort(offset)
+      m.viewManager.updateRenderedComponents(1, 0)
+      compStates = m.viewManager.getComoponentsInViewPort(offset)
 
       expected = {}
       for each id in trueIds
-        expected[str(id).trim()] = true
+        strId = str(id).trim()
+        m.assertTrue(compStates[strId], "id '" + strId + "' should be true")
       end for
       for each id in falseIds
-        expected[str(id).trim()] = false
+        strId = str(id).trim()
+        m.assertFalse(compStates[strId], "id '" + strId + "' should be false")
       end for
-      m.assertEqual(compStates, expected)
+
     end function
   end class
 end namespace

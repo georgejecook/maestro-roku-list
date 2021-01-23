@@ -13,7 +13,7 @@
   ],
   "rooibos": {
     "isRecordingCodeCoverage": false,
-    "testsFilePattern": null
+    "showOnlyFailures": true
   },
   "rokuLog": {
     "strip": false,
