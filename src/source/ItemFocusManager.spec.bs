@@ -1,6 +1,5 @@
 namespace tests
 
-  @ignore
   @suite("ItemFocusManager tests")
   class ItemFocusManagerTests extends tests.BaseTestSuite
 
@@ -29,7 +28,7 @@ namespace tests
 
       m.scrollerAnimation = new tests.utils.MockNode("animation")
       m.scrollerInterpolator = new tests.utils.MockNode("interpolator")
-      m.focusManager = { "id" : "focusManager" }
+      m.focusManager = { "id": "focusManager" }
 
       m.scroller = new ItemScroller(m.viewManager, 1, m.scrollerAnimation, m.scrollerInterpolator, m.focusManager)
       m.configureScroller(1, 20)
@@ -37,7 +36,7 @@ namespace tests
       m.animation = new tests.utils.MockNode("animation")
       m.interpolator = new tests.utils.MockNode("interpolator")
 
-      m.focusManager = new ItemFocusManager(m.viewManagevr, m.animation, m.interpolator, invalid)
+      m.focusManager = new ItemFocusManager(m.viewManager, m.animation, m.interpolator, invalid)
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -25,7 +25,7 @@ class ItemFocusManager extends BaseClass
     m.moveAnimationInterpolator = moveAnimationInterpolator
     m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
     owner = viewManager.owner
-    m.delegates = [ownerDelegate]
+    m.delegates = []
 
     if owner.delegate <> invalid
       m.delegates.push(owner.delegate)

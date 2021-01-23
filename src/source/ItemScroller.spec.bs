@@ -49,36 +49,35 @@ namespace tests
       m.container.translation = m.viewManager.getTargetTranslation(1, 1)
       m.viewManager.updateRenderedComponents(1, 0)
       m.scroller.setFocusIndex(1, true)
-      ' m.printStates(comps)
+      m.printStates(0, comps)
       ' m.checkViewportEvent(comps, [], [0, 1, 2], [3, 4], [])
 
       m.container.translation = m.viewManager.getTargetTranslation(2, 1)
       m.viewManager.updateRenderedComponents(1, 1)
       m.scroller.setFocusIndex(2, true)
-      ' m.printStates(comps)
+      m.printStates(1, comps)
       ' m.checkViewportEvent(comps, [6], [2, 3, 4, 5], [1], [0])
 
       m.container.translation = m.viewManager.getTargetTranslation(3, 1)
       m.viewManager.updateRenderedComponents(1, 2)
       m.scroller.setFocusIndex(3, true)
-      ' m.printStates(comps)
+      m.printStates(2, comps)
       ' m.checkViewportEvent(comps, [7], [3, 4, 5, 6], [2], [0, 1])
 
       m.container.translation = m.viewManager.getTargetTranslation(4, 1)
       m.viewManager.updateRenderedComponents(1, 3)
       m.scroller.setFocusIndex(4, true)
-      ' m.printStates(comps)
+      m.printStates(3, comps)
       ' m.checkViewportEvent(comps, [8], [4, 5, 6, 7], [3], [0, 1, 2])
 
       m.container.translation = m.viewManager.getTargetTranslation(5, 1)
       m.viewManager.updateRenderedComponents(1, 4)
       m.scroller.setFocusIndex(5, true)
-      ' m.printStates(comps)
+      m.printStates(4, comps)
       ' m.checkViewportEvent(comps, [9], [5, 6, 7, 8], [4], [0, 1, 2, 3])
 
     end function
 
-    @only
     @it("Moving left to right offset by 50 pixels")
     function setFocusIndex_moving_left_to_right_offset_50()
       comps = m.scroller.components
@@ -120,42 +119,46 @@ namespace tests
 
     end function
 
-    ' @only
     @it("Moving right to left")
     function setFocusIndex_moving_right_to_left()
       comps = m.scroller.components
       m.stub(m.focusManager, "setFocusPosition")
       m.resetViewPortStates()
       m.printStates(0, comps, -1)
-      m.checkViewportEvent(comps, [], [], [], [])
+      ' m.checkViewportEvent(comps, [], [], [], [])
 
       'do an initial move.
       m.scroller.moveToIndex(10, invalid, false)
       m.scroller.direction = -1
-      ' m.container.translation = m.viewManager.getTargetTranslation(9, 1)
+      m.container.translation = m.viewManager.getTargetTranslation(9, 1)
+      m.viewManager.updateRenderedComponents(10, 0)
       m.scroller.setFocusIndex(9, true)
       m.printStates(1, comps, -1)
-      m.checkViewportEvent(comps, [7], [11, 10, 9, 8], [12], [13])
+      ' m.checkViewportEvent(comps, [7], [11, 10, 9, 8], [12], [13])
 
-      ' m.container.translation = m.viewManager.getTargetTranslation(8, 1)
-      ' m.scroller.setFocusIndex(8, true)
-      ' m.printStates(2, comps, -1)
+      m.container.translation = m.viewManager.getTargetTranslation(8, 1)
+      m.viewManager.updateRenderedComponents(9, 0)
+      m.scroller.setFocusIndex(8, true)
+      m.printStates(2, comps, -1)
       ' m.checkViewportEvent(comps, [6], [10, 9, 8, 7], [11], [12, 13])
 
-      ' m.container.translation = m.viewManager.getTargetTranslation(7, 1)
-      ' m.scroller.setFocusIndex(7, true)
-      ' m.printStates(3, comps, -1)
+      m.container.translation = m.viewManager.getTargetTranslation(7, 1)
+      m.viewManager.updateRenderedComponents(8, 0)
+      m.scroller.setFocusIndex(7, true)
+      m.printStates(3, comps, -1)
       ' m.checkViewportEvent(comps, [5], [9, 8, 7, 6], [10], [11, 12, 13])
 
-      ' m.container.translation = m.viewManager.getTargetTranslation(6, 1)
-      ' m.scroller.setFocusIndex(6, true)
-      ' m.printStates(4,comps, -1)
-      ' m.checkViewportE vent(comps, [4], [8, 7, 6, 5], [9], [10, 11, 12, 13])
+      m.container.translation = m.viewManager.getTargetTranslation(6, 1)
+      m.viewManager.updateRenderedComponents(7, 0)
+      m.scroller.setFocusIndex(6, true)
+      m.printStates(4, comps, -1)
+      ' m.checkViewportEvent(comps, [4], [8, 7, 6, 5], [9], [10, 11, 12, 13])
 
-      ' m.container.translation = m.viewManager.getTargetTranslation(5, 1)
-      ' m.scroller.setFocusIndex(5, true)
-      ' m.printStates(5,comps, -1)
-      ' m.checkViewportE vent(comps, [3], [7, 6, 5, 4], [8], [9, 10, 12, 12, 13])
+      m.container.translation = m.viewManager.getTargetTranslation(5, 1)
+      m.viewManager.updateRenderedComponents(6, 0)
+      m.scroller.setFocusIndex(5, true)
+      m.printStates(5, comps, -1)
+      ' m.checkViewportEvent(comps, [3], [7, 6, 5, 4], [8], [9, 10, 12, 12, 13])
 
     end function
 
@@ -184,7 +187,8 @@ namespace tests
 
       for i = first to last step direction
         comp = comps[i]
-        m.logInfo(index, comp.id, "evt", comp.listEvent.name, "ivp", comp.isInViewport, "vs", comp._vs)
+        ' m.logInfo(index, comp.id, "evt", comp.listEvent.name, "ivp", comp.isInViewport, "vs", comp._vs)
+         ? index; " " ; comp.id; " " ; "evt"; " " ; comp.listEvent.name; " " ; "ivp"; " " ; comp.isInViewport; " " ; "vs"; " " ; comp._vs
       end for
     end function
 

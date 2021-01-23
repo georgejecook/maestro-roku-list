@@ -61,6 +61,11 @@
         type='boolean'
         value='false' />
 
+    <field
+        id='_vs'
+        type='string'
+        value='none' />
+
 
     <!-- conver to size -->
     <field

@@ -307,11 +307,12 @@ class ItemScroller extends BaseClass
       end if
     end for
 
-    for each comp in m.viewManager.renderedComponents
+    for each comp in m.viewManager.visibleComponents
+    ' for each comp in m.viewManager.renderedComponents
       if comp <> invalid
         id = comp.id
 
-        ' m.logInfo(" id", id, " is in vp", comp.isInViewPort, "RCMap", m.RCMap.id)
+        ' m.logInfo(" id", id, " is in vp", comp.isInViewPort, "RCMap", m.RCMap[id], "vs", comp._vs)
         if m.RCMap[id] = true and comp.isInViewport <> true
           'ensure clients always get willEnter before didEnter
           m.setCompViewPortStatus(comp, "willEnter", "none", events)

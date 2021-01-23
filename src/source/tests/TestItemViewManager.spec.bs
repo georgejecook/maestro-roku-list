@@ -12,6 +12,7 @@ namespace tests
       m.itemSize = itemSize
       m.space = space
       m.lookAheadDistance = 1500
+      m.lookBehindDistance = 1500
     end function
 
     override function getRenderer(index)
@@ -35,6 +36,7 @@ namespace tests
             content: item
             isrendered: false
             renderState: "none"
+            _vs: "none"
             isInViewport: false
             visible: item.isHidden <> true
           })
