@@ -1,4 +1,5 @@
 import "pkg:/source/BaseClass.bs"
+import "pkg:/source/ListMixin.bs"
 
 class ItemViewManager extends BaseClass
 
@@ -15,7 +16,7 @@ class ItemViewManager extends BaseClass
   public content = invalid
   public components = []
   public rects = []
-  public settings = invalid 
+  public settings = invalid
 
   'tracking
   public visibleItems = []
@@ -30,6 +31,7 @@ class ItemViewManager extends BaseClass
   public lastRenderedIndexes = { startIndex: -1, endIndex: -1 }
   public lastScrollIndex = 0
   public lastScrollDirection = 0
+  public renderedComponents = []
 
   function new(name, owner, container, axes, minPos, maxPos)
     super(name)
@@ -51,7 +53,7 @@ class ItemViewManager extends BaseClass
 
   function setContent(content)
     m.content = content
-    m.settings = ListMixin.getRowSettings(m.owner.content, m.content)
+    m.settings = listMixin.getRowSettings(m.owner.content, m.content)
 
     m.container.removeChildren(m.container.getChildren(-1, 0))
     m._createRenderers(content)
@@ -60,12 +62,12 @@ class ItemViewManager extends BaseClass
     m.numberOfItems = m.visibleItems.count()
   end function
 
-  function _createRenderers(items)
+  function _createRenderers(content)
     m.components = []
     m.visibleComponents = []
     m.visibleItems = []
 
-    m.createRenderers(items)
+    m.createRenderers(content)
   end function
 
   function _updateLayout()
@@ -101,16 +103,17 @@ class ItemViewManager extends BaseClass
     sStart = m.screenRect.translation[m.axes] + startOffset
     sEnd = sStart + m.screenRect.size[m.axes]
 
+    ' for each comp in m.visibleComponents
     for each comp in m.renderedComponents
       cRect = m.rects[comp.index]
       cStart = cRect.translation[m.axes]
       cEnd = cStart + cRect.size[m.axes]
       if (cStart >= sStart and cStart <= sEnd) or (cEnd >= sStart and cEnd <= sEnd)
         compStates[comp.id] = true
-      else 
+      else
         compStates[comp.id] = false
       end if
-      ' m.logInfo(compStates[comp.id], "sStart", sStart, "sEnd", sENd, "cStart", cStart, "cEnd", cENd) 
+      ' m.logInfo(compStates[comp.id], "sStart", sStart, "sEnd", sENd, "cStart", cStart, "cEnd", cENd)
     end for
 
     return compStates
@@ -141,7 +144,9 @@ class ItemViewManager extends BaseClass
     renderedIndexes = m.getRenderedIndexes(direction, index)
 
     if (m.lastRenderedIndexes <> invalid) and m.lastRenderedIndexes.startIndex = renderedIndexes.startIndex and m.lastRenderedIndexes.endIndex = renderedIndexes.endIndex
+      ' this is the same set of comps as last time
       if m.renderedComponents.count() > 0
+        ' and we have seemingly done our inital render; so we can bail.
         return
       end if
     end if
@@ -158,9 +163,9 @@ class ItemViewManager extends BaseClass
   end function
 
   function shouldUpdateRenderedIndexes(direction, index)
-    ' ? "???? I "; index ; " LI " ; m.lastScrollIndex ; " D " ; direction ; " LD " ; m.lastScrollDirection 
+    ' ? "???? I "; index ; " LI " ; m.lastScrollIndex ; " D " ; direction ; " LD " ; m.lastScrollDirection
     if direction <> m.lastScrollDirection or abs(index - m.lastScrollIndex) > 10 or index = 0
-      ' ? " LIST SHOULD UPDATE I "; index ; " LI " ; m.lastScrollIndex ; " D " ; direction ; " LD " ; m.lastScrollDirection 
+      ' ? " LIST SHOULD UPDATE I "; index ; " LI " ; m.lastScrollIndex ; " D " ; direction ; " LD " ; m.lastScrollDirection
       m.lastScrollIndex = index
       m.lastScrollDirection = direction
       return true
@@ -216,7 +221,7 @@ class ItemViewManager extends BaseClass
       endIndex = m.numberOfItems - 1
     end if
 
-    for i = startIndex to endIndex 
+    for i = startIndex to endIndex
 
       rect = m.rects[i]
       if rect <> invalid
@@ -242,7 +247,7 @@ class ItemViewManager extends BaseClass
 
     screenPos = m.getScreenPositionForItem(itemRect, direction, screenPos)
     targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
-    ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
+    ' ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
 
     if m.axes = 0
       return [- targetPos, m.container.translation[1]]
@@ -259,7 +264,7 @@ class ItemViewManager extends BaseClass
       m.logWarn("no itemRect for index", index)
       return invalid
     end if
-    
+
     itemScreenPos = - itemRect.translation[m.axes] + m.container.translation[m.axes]
 
     if itemScreenPos > m.minPos and itemScreenPos + itemRect.size.width < m.maxPos
@@ -275,7 +280,7 @@ class ItemViewManager extends BaseClass
     screenPos = m.minPos
     if itemRect <> invalid
       if screenPos <> invalid
-        ? " USING SCREEN POS" ; screenPos
+        ' ? " USING SCREEN POS" ; screenPos
         screenPos = screenPos
       else if itemRect.screenPos <> invalid
         screenPos = itemRect.screenPos
@@ -315,21 +320,8 @@ class ItemViewManager extends BaseClass
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  '++ override
+  '++ general item api
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  function createRenderers(items)
-  end function
-
-  function updateLayout()
-  end function
-
-  function applyRenderStateMap(renderedStateMap)
-  end function
-
-  function getRenderer(index)
-    return invalid
-  end function
 
   function getRect(index, useScreenCoords = false)
     rect = m.rects[index]
@@ -371,5 +363,27 @@ class ItemViewManager extends BaseClass
   function getItemSettings()
     return m.content.settings
   end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ abstract methods
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function createRenderers(items)
+    m.logError("You must override this method")
+  end function
+
+  function updateLayout()
+    m.logError("You must override this method")
+  end function
+
+  function applyRenderStateMap(renderedStateMap)
+    m.logError("You must override this method")
+  end function
+
+  function getRenderer(index)
+    m.logError("You must override this method")
+    return invalid
+  end function
+
 
 end class

@@ -5,7 +5,6 @@ import "pkg:/source/RowItemViewManager.bs"
 import "pkg:/source/ItemFocusManager.bs"
 
 function init()
-  log.registerLogger("Row")
   m.isAnimatorsCreated = false
   m.top.observeField("content", "onContentChange")
   m.top.observeField("isScrolling", "onIsScrollingChange")
@@ -13,9 +12,9 @@ function init()
   m.top.observeField("animateToItem", "onAnimateToItemChange")
   m.cellsGroup = m.top.findNode("cellsGroup")
   m.contentGroup = m.top.findNode("contentGroup")
-  m.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator") 
+  m.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator")
   m.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
-  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
+  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator")
   m.moveAnimation = m.top.findNode("moveAnimation")
   m.header = m.top.findNode("header")
   m.bgRect = m.top.findNode("bgRect")
@@ -32,24 +31,23 @@ function createManagers()
   m.focusManager = new ItemFocusManager(m.viewManager, m.focusMoveAnimation, m.focusMoveAnimationInterpolator, m.top.owner.cellEvents, m.top.index)
   m.focusManager.name = "ROW FM "
   m.focusManager.isRow = true
-  m.itemScroller = new RowItemScroller(m.viewManager, m.moveAnimation, m.moveAnimationInterpolator)
-  m.itemScroller.focusManager = m.focusManager
+  m.itemScroller = new RowItemScroller(m.viewManager, m.moveAnimation, m.moveAnimationInterpolator, m.focusManager)
 end function
 
 function onContentChange(evt)
   ' m.logInfo("onContentChange", evt.getField())
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     m.content = m.top.content
-    m.header.text = "ROW " + m.top.content.title
+    m.header.text = "ROW " + m.content.title
     calculateHeight()
     createManagers()
-    m.viewManager.setContent(m.top.content)
+    m.viewManager.setContent(m.content)
     m.itemScroller.reset()
   end if
 end function
 
 function calculateHeight()
-  settings = ListMixin.getRowSettings(m.top.owner.content, m.content)
+  settings = listMixin.getRowSettings(m.top.owner.content, m.content)
   if settings.height <> -1
     m.top.height = settings.height
   else

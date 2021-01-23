@@ -92,7 +92,7 @@ class ItemFocusManager extends BaseClass
       nextName = "gainingFocus"
     end if
 
-    if m.isRow 
+    if m.isRow
       m.viewManager.owner.focusedCellPercent = fraction
     else
       m.viewManager.owner.focusedRowPercent = fraction

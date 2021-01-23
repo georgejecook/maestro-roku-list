@@ -1,29 +1,10 @@
 {
-  "rootDir": "src",
+  "extends": "bsconfig.json",
   "files": [
     "manifest",
     "source/**/*.*",
     "components/**/*.*",
     "images/**/*.*"
-  ],
-  "autoImportComponentScript": true,
-  "createPackage": false,
-  "stagingFolderPath": "build",
-  "diagnosticFilters": [
-    {
-      "src": "**/roku_modules/**/*.*",
-      "codes": [
-        1107,
-        1009,
-        1001
-      ]
-    },
-    {
-      "src": "**/WhiteList.xml",
-      "codes": [
-        1067
-      ]
-    }
   ],
   "plugins": [
     "/home/george/hope/open-source/roku-log/roku-log-bsc-plugin/dist/plugin.js",
@@ -37,6 +18,5 @@
   "rokuLog": {
     "strip": false,
     "insertPkgPath": true
-  },
-  "sourceMap": true
+  }
 }

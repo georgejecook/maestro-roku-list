@@ -1,21 +1,60 @@
 {
-  "jira-plugin.workingProject": "",
-  "workbench.colorCustomizations": {
-    "statusBar.background": "#551A8B",
-    "statusBar.debuggingBackground": "#551A8B",
-    "panelTitle.activeBorder": "#ff0000",
-    "activityBar.background": "#531634",
-    "titleBar.activeBackground": "#751F49",
-    "titleBar.activeForeground": "#FEFCFD"
-  },
+  "cSpell.ignorePaths": [
+    "**/package-lock.json",
+    "**/node_modules/**",
+    "**/vscode-extension/**",
+    "**/.git/objects/**",
+    ".vscode",
+    "dist",
+    "build",
+  ],
   "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/test-project": true,
+    "build": true,
+    ".history": true,
+    "node_modules": true,
+    "out": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "/tmp/**": true,
     "**/dist": true,
-    
-  }
+    "**/build": true,
+    "**/out": true,
+    "**/test-project": true
+  },
+  "search.exclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.meteor/local": true,
+    "**/build/**": true,
+    "build/**": true,
+    "**/.history/**": true,
+    ".history/**": true,
+    ".history/**/*": true,
+    "out/**": true,
+    "**/out/**": true,
+    "/tmp/**": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/out": true,
+    "**/test-project": true
+  },
+  "files.useExperimentalFileWatcher": true,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.meteor/local": true,
+    "**/build/**": true,
+    "**/.history/**": true,
+    ".history/**": true,
+    "**/out/**": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/out": true,
+    "**/test-project": true
+  },
+
 }

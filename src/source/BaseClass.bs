@@ -4,6 +4,7 @@ import "pkg:/source/roku_modules/mc/Tasks.brs"
 class BaseClass
   function new(name)
     log.registerLogger(name, m)
+    m.__classname = name
     m.observeNodeField = mc_Tasks_observeNodeField
 
   end function

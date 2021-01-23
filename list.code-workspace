@@ -1,12 +1,12 @@
 {
 	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "test-project"
-		}
-	],
+    {
+      "path": "."
+    },
+    {
+      "path": "../../rooibos/bsc-plugin"
+    }
+  ],
   "remoteAuthority": "wsl+Ubuntu-20.04",
   "settings": {
     "workbench.colorCustomizations": {

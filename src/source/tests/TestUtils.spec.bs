@@ -1,0 +1,63 @@
+namespace tests.utils
+  function configureViewManager(viewManager, axes, numItems = 20, itemSize = [300, 300], screenSize = [1920, 1080])
+    owner = viewManager.owner
+    container = viewManager.container
+
+    owner.translation = [0, 0]
+    owner.width = screenSize[0]
+    owner.height = screenSize[1]
+
+    container.translation = [0, 0]
+    container.width = screenSize[0]
+    container.height = screenSize[0]
+
+    children = []
+
+    for i = 0 to numItems
+      children.push({
+        id: str(i).trim()
+      })
+    end for
+    content = new tests.utils.MockNode("listContent", children)
+    content.focusSettings = listMixin.createFocusSettings()
+    content.rowSettings = listMixin.createRowSettings()
+
+    viewManager.itemSize = itemSize
+    viewManager.setContent(content)
+  end function
+
+  class MockNode
+    public id
+    public children
+    public parent
+
+    function new(id, children = [], parent = invalid)
+      m.id = id
+      m.children = children
+      m.parent = parent
+    end function
+
+    function addFields(fields)
+      m.append(fields)
+    end function
+
+    function observeField(field, func)
+    end function
+
+    function getChildren(first, num)
+      return m.children
+    end function
+
+    function getParent()
+      return m.parent
+    end function
+
+    function removeChildren(children)
+    end function
+
+    function createChild(compName)
+    end function
+
+  end class
+
+end namespace

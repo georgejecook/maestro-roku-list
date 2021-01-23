@@ -1,8 +1,8 @@
 import "pkg:/source/ItemScroller.bs"
 
 class RowItemScroller extends ItemScroller
-  function new(viewManager, moveAnimation, moveAnimationInterpolator)
-    super(viewManager, 0, moveAnimation, moveAnimationInterpolator)
+  function new(viewManager, moveAnimation, moveAnimationInterpolator, focusManager)
+    super(viewManager, 0, moveAnimation, moveAnimationInterpolator, focusManager)
     m.screenPos = 500
   end function
 
@@ -13,7 +13,7 @@ class RowItemScroller extends ItemScroller
   end function
 
   override function getFocusSettings()
-    return ListMixin.getFocusSettings(m.viewManager.owner.content, m.viewManager.content)
+    return listMixin.getFocusSettings(m.viewManager.owner.content, m.viewManager.content)
   end function
 
 end class

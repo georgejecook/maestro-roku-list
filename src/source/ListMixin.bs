@@ -4,11 +4,11 @@ namespace listMixin
     content.appendChildren(rowContent)
 
     if rowSettings = invalid
-      rowSettings = ListMixin.createRowSettings()
+      rowSettings = listMixin.createRowSettings()
     end if
 
     if focusSettings = invalid
-      focusSettings = ListMixin.createFocusSettings()
+      focusSettings = listMixin.createFocusSettings()
     end if
 
     content.update({
@@ -23,15 +23,15 @@ namespace listMixin
     settings = createObject("roSGNode", "RowSettings")
 
     if cellSettings = invalid
-      cellSettings = ListMixin.createCellSettings()
+      cellSettings = listMixin.createCellSettings()
     end if
 
     if headerSettings = invalid
-      headerSettings = ListMixin.createHeaderSettings()
+      headerSettings = listMixin.createHeaderSettings()
     end if
 
     if focusSettings = invalid
-      focusSettings = ListMixin.createFocusSettings()
+      focusSettings = listMixin.createFocusSettings()
     end if
 
     settings.update({
@@ -123,7 +123,7 @@ namespace listMixin
       return listContent.rowSettings
     else
       'THIS SHOULD NOT BE POSSIBLE
-      m.logError("no listCotnent for list - this should not have been called!")
+      m.logError("no settings for list - this should not have been called!")
       return invalid
     end if
   end function
@@ -135,7 +135,7 @@ namespace listMixin
       return rowContent.settings.cellSettings
     else if listContent <> invalid and listContent.rowSettings <> invalid
       return listContent.rowSettings.cellSettings
-    else 
+    else
       m.logError("no listCotnent for list - this should not have been called!")
       return invalid
     end if
@@ -159,4 +159,4 @@ namespace listMixin
 
   ' roku_list.setRowSettings(row, rowRenderer, offset, cellREnderr, cellSize)
   ' roku_list.setTileSettings(content, cellRenderer, cellSize)
-end namespace 
+end namespace

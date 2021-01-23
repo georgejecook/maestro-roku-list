@@ -1,11 +1,7 @@
 namespace tests
 
-  '@TestSuite ListDelegateMixin tests
-  class ListDelegateMixinTests extends Rooibos.BaseTestSuite
-
-    override function setUp()
-      log.initializeLogManager()
-    end function
+  @suite("ListDelegateMixin tests")
+  class ListDelegateMixinTests extends tests.BaseTestSuite
 
 
   end class

@@ -14,14 +14,14 @@
         "app",
         "--silent"
       ]
-    }
+    },
     {
       "type": "shell",
       "label": "test",
       "command": "npm",
       "args": [
         "run",
-        "test",
+        "build-test",
         "--silent"
       ]
     },

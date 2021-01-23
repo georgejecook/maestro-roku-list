@@ -30,7 +30,6 @@
     <function name='getCell' />
     <function name='getCellForContentId' />
     <function name='bindCellToContent' />
-    <function name='unbindCellFromContent' />
     <function name='setViewStates' />
     <function name='getStateForContentId' />
   </interface>

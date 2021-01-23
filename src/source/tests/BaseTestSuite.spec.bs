@@ -1,0 +1,13 @@
+namespace tests
+  class BaseTestSuite extends rooibos.BaseTestSuite
+    override function setUp()
+      tests.setUpMScope()
+      log.registerLogger(m.name, m)
+    end function
+  end class
+
+  function setUpMScope()
+    log.initializeLogManager()
+    log.registerLogger("rooibosScope")
+  end function
+end namespace

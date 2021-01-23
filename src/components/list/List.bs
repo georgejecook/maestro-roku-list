@@ -5,18 +5,17 @@ import "pkg:/source/roku_modules/mc/Tasks.brs"
 import "pkg:/source/ListMixin.bs"
 
 function init()
-  log.registerLogger("List")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("animateToRow", "onAnimateToRowChange")
   m.top.observeField("focusedRowPercent", "onFocusedRowPercentChange")
   m.top.observeField("nextFocusIndex", "onNextFocusIndexChange")
   m.top.cellEvents = createEventsBroker("cells")
   m.top.rowEvents = createEventsBroker("rows")
-  m.rowsGroup = m.top.findNode("rowsGroup") 
-  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
+  m.rowsGroup = m.top.findNode("rowsGroup")
+  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator")
   m.moveAnimation = m.top.findNode("moveAnimation")
 
-  m.top.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator") 
+  m.top.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator")
   m.top.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
   m.viewManager = new ListItemViewManager(m.top, m.rowsGroup)
   m.focusManager = new ItemFocusManager(m.viewManager, m.top.focusMoveAnimation, m.top.focusMoveAnimationInterpolator, m.top.rowEvents)
@@ -24,7 +23,7 @@ function init()
   m.itemScroller.focusManager = m.focusManager
   m.focusManager.name = "LIST FM "
   ' m.top.clippingRect = [0,0,1920,550]
-  m.focusIndicator = m.top.findNode("focusIndicator") 
+  m.focusIndicator = m.top.findNode("focusIndicator")
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
   m.content = invalid
@@ -97,7 +96,7 @@ end function
 
 function onNextFocusIndexChange()
   m.sourceFocusRect = {
-    translation: m.focusIndicator.translation 
+    translation: m.focusIndicator.translation
     size: [m.focusIndicator.width, m.focusIndicator.height]
   }
   m.targetFocusRect = getCellScreenRect(m.top.nextFocusIndex[0], m.top.nextFocusIndex[1])

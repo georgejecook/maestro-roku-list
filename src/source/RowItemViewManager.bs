@@ -4,7 +4,7 @@ class RowItemViewManager extends ItemViewManager
   public row = invalid
   public cellsById = {}
   public cellProvider
-  public cellTracker 
+  public cellTracker
   public isScrolling = false
   public lastRowIsRendered = "none"
 
@@ -33,10 +33,10 @@ class RowItemViewManager extends ItemViewManager
     m.contentGroup.translation = m.settings.contentOffset
 
     for each item in m.content.getChildren(-1, 0)
-      settings = ListMixin.getCellSettings(m.owner.content, m.content, item)
-      m.rects.push({ 
-        translation: translation, 
-        size: settings.size 
+      settings = listMixin.getCellSettings(m.owner.content, m.content, item)
+      m.rects.push({
+        translation: translation,
+        size: settings.size
         index: index
         rowIndex: m.row.index
       })
@@ -55,6 +55,7 @@ class RowItemViewManager extends ItemViewManager
 
   override function applyRenderStateMap(renderStateMap)
     ' m.logInfo("applyRenderStateMap", m.row.index, m.row.isRendered)
+    m.renderedComponents = []
     if m.row.isRendered
       for each id in renderStateMap
         m.applyrenderStateForCell(id, renderStateMap[id])
@@ -76,7 +77,7 @@ class RowItemViewManager extends ItemViewManager
     if item <> invalid
       if renderState = "rendered"
         if m.cellsById[id] = invalid
-          settings = ListMixin.getCellSettings(m.owner.content, m.content, item)
+          settings = listMixin.getCellSettings(m.owner.content, m.content, item)
           ' ? "GETTING CELL " ; id
           cell = m.cellProvider@.getCell(settings.compName)
 
@@ -86,7 +87,7 @@ class RowItemViewManager extends ItemViewManager
               row: m.row
               list: m.owner
               size: m.rects[index].size
-            } 
+            }
 
             cell.visible = true
             ' cell.visible = isrendered
@@ -103,7 +104,8 @@ class RowItemViewManager extends ItemViewManager
             m.container.appendChild(cell)
             cell.index = index
             m.cellsById[id] = cell
-          else 
+            m.renderedComponents.push(cell)
+          else
             ? ">>ERR no cell for " ; settings.compName
           end if
         end if
@@ -111,7 +113,7 @@ class RowItemViewManager extends ItemViewManager
         cell = m.cellsById[id]
         if cell <> invalid
           ' ? "RELEASING " ; id
-          m.cellProvider@.releaseCell(cell) 
+          m.cellProvider@.releaseCell(cell)
           m.cellsById.delete(id)
         else
           ' ? " COULD NOT FIND CELL TO RELEASE"

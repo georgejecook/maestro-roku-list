@@ -87,8 +87,6 @@
         id='isHidden'
         type='boolean'
         onChange='isHiddenChange' />
-    <function name='getBoundsForIndex' />
-    <function name='getFocusedBounds' />
 
     <function name='getRowScreenRect' />
     <function name='getCellRenderer' />

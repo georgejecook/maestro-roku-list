@@ -4,7 +4,6 @@
     name='Cell'
     extends='Group'>
 
-  <!-- Note that target and rect are both set during the interpolation -->
   <interface>
     <field
         id='index'

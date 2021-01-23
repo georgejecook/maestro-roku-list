@@ -7,6 +7,7 @@
     "doc": "docs"
   },
   "dependencies": {
+    "brighterscript": "^0.28.1",
     "log": "file:../../roku-log/roku-log",
     "mc": "file:../maestro-roku-core",
     "mioc": "file:../maestro-roku-ioc",
@@ -18,7 +19,6 @@
     "!roku_modules"
   ],
   "devDependencies": {
-    "brighterscript": "^0.23.1",
     "chalk": "^4.1.0",
     "fs-extra": "^9.0.1",
     "ropm": "^0.5.0"
@@ -48,14 +48,10 @@
   },
   "ropm": {
     "rootDir": "src",
-    "packageRootDir": "dist",
-    "prefixMatching": "expanded"
+    "packageRootDir": "dist"
   },
   "scripts": {
-    "install-local": "node scripts/install-local.js",
-    "install-pull-local": "node scripts/install-local.js --pull",
-    "uninstall-local": "node scripts/uninstall-local.js",
-    "build": "npx bsc",
-    "test": "cd tests && ropm install && bsc"
+    "build": "node scripts/run.js",
+    "build-test": "node scripts/run-test.js"
   }
 }
