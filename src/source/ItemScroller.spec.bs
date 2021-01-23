@@ -36,7 +36,7 @@ namespace tests
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     @it("Moving left to right")
-    function setFocusIndex_moving_left_to_right()
+    function test()
       comps = m.scroller.components
       m.resetViewPortStates()
       ' m.printStates(comps)
@@ -79,7 +79,7 @@ namespace tests
     end function
 
     @it("Moving left to right offset by 50 pixels")
-    function setFocusIndex_moving_left_to_right_offset_50()
+    function test()
       comps = m.scroller.components
       m.resetViewPortStates()
       m.checkViewportEvent(comps, [], [], [], [])
@@ -120,7 +120,7 @@ namespace tests
     end function
 
     @it("Moving right to left")
-    function setFocusIndex_moving_right_to_left()
+    function test()
       comps = m.scroller.components
       m.stub(m.focusManager, "setFocusPosition")
       m.resetViewPortStates()
@@ -163,7 +163,7 @@ namespace tests
     end function
 
     @it("first show")
-    function setFocusIndex_first_show()
+    function test()
       m.stub(m.focusManager, "setFocusPosition")
       m.viewManager.updateRenderedComponents(1, 0)
       m.scroller.setFocusIndex(0, false)

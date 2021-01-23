@@ -19,14 +19,17 @@ class ItemFocusManager extends BaseClass
     m.name = "ItemFocusManager"
     m.viewManager = viewManager
     m.container = viewManager.container
-    m.delegate = viewManager.owner
     m.moveAnimation = moveAnimation
     m.rowIndex = rowIndex
     m.moveAnimationInterpolator = moveAnimationInterpolator
     m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
+    m.delegates = [viewManager.owner]
+    if ownerDelegate <> invalid
+      m.delegates.push(ownerDelegate)
+    else
+      m.logError("There was no delegate passed to this focus manager - events wont be handled")
+    end if
     owner = viewManager.owner
-    m.delegates = []
-
     if owner.delegate <> invalid
       m.delegates.push(owner.delegate)
     end if
@@ -98,6 +101,10 @@ class ItemFocusManager extends BaseClass
       m.viewManager.owner.focusedRowPercent = fraction
     end if
 
+    m.sendEvents(name, nextName, fraction)
+  end function
+
+  function sendEvents(name, nextName, fraction)
     event = {
       direction: m.direction
       fraction: fraction

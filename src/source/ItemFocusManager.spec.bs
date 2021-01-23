@@ -12,6 +12,8 @@ namespace tests
     public scroller
     public animation
     public interpolator
+    public delegate
+    public ownerDelegate
 
     override function beforeEach()
       m.owner = new tests.utils.MockNode("owner")
@@ -35,9 +37,45 @@ namespace tests
 
       m.animation = new tests.utils.MockNode("animation")
       m.interpolator = new tests.utils.MockNode("interpolator")
+      m.delegate = { "id": "delegate" }
+      m.ownerDelegate = { "id": "ownerDelegate" }
 
-      m.focusManager = new ItemFocusManager(m.viewManager, m.animation, m.interpolator, invalid)
+      m.focusManager = new ItemFocusManager(m.viewManager, m.animation, m.interpolator, m.ownerDelegate)
     end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("tests constructor")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("sets values")
+    function test()
+      m.assertEqual(m.focusManager.delegates[0].id, "owner")
+      m.assertEqual(m.focusManager.delegates[1].id, "ownerDelegate")
+      m.assertArrayCount(m.focusManager.delegates, 2)
+    end function
+
+    @it("does not need owner delegate")
+    function test()
+      m.focusManager = new ItemFocusManager(m.viewManager, m.animation, m.interpolator, invalid)
+      m.assertEqual(m.focusManager.delegates[0].id, "owner")
+      m.assertArrayCount(m.focusManager.delegates, 1)
+
+    end function
+
+    @it("sets rowIndex")
+    @params(0)
+    @params(1)
+    @params(2)
+    @params(3)
+    function test(index)
+      m.focusManager = new ItemFocusManager(m.viewManager, m.animation, m.interpolator, invalid, index)
+      m.assertEqual(m.focusManager.delegates[0].id, "owner")
+      m.assertArrayCount(m.focusManager.delegates, 1)
+      m.assertEqual(m.focusManager.rowIndex, index)
+
+    end function
+
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     @describe("tests setFocusPosition")
@@ -46,7 +84,7 @@ namespace tests
     @it("tests various values")
     @params(0, 100, 1, 200, 0)
     @params(3, 400, 5, 600, -1)
-    function setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
+    function test(index, indexPosition, nextIndex, nextPosition, direction)
       m.focusManager.setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
 
       m.assertEqual(m.focusManager.index, index)
@@ -75,7 +113,7 @@ namespace tests
     @params(-1, 1, 100, 0, 0, 50, 0.5)
     @params(-1, 1, 100, 0, 0, 25, 0.25)
     @params(1, 1, 100, 0, 0, 5, 0.95)
-    function onContainerPositionChange(direction, index, indexPosition, nextIndex, nextPosition, offset, expected)
+    function test(direction, index, indexPosition, nextIndex, nextPosition, offset, expected)
 
       m.focusManager.setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
 
@@ -84,6 +122,65 @@ namespace tests
       m.focusManager.onContainerPositionChange(offset)
     end function
 
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("tests onFocusUpdate")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("initializes when not started")
+    function test()
+      m.expectOnce(m.focusManager, "setOwnerNextFocusIndex", [])
+      m.expectOnce(m.focusManager, "sendEvents", ["willLoseFocus", "willGainFocus", 0])
+
+      m.focusManager.onFocusUpdate(0)
+
+      m.assertTrue(m.focusManager.didStart)
+
+    end function
+
+    @it("does nothing on 0 fraction when started")
+    function test()
+      m.focusManager.didStart = true
+      m.expectNone(m.focusManager, "setOwnerNextFocusIndex")
+      m.expectNone(m.focusManager, "sendEvents")
+
+      m.focusManager.onFocusUpdate(0)
+
+    end function
+
+    @it("does nothing on 1 fraction when finished")
+    function test()
+      m.focusManager.didStart = true
+      m.focusManager.didFinish = true
+      m.expectNone(m.focusManager, "setOwnerNextFocusIndex")
+      m.expectNone(m.focusManager, "sendEvents")
+
+      m.focusManager.onFocusUpdate(0)
+
+    end function
+
+    @it("fraction 1 - not finished")
+    function test()
+      m.expectOnce(m.focusManager, "sendEvents", ["didLoseFocus", "didGainFocus", 1])
+      m.expectOnce(m.focusManager, "setOwnerIndexes", [])
+      m.focusManager.didStart = true
+      m.focusManager.onFocusUpdate(1)
+
+      m.assertTrue(m.focusManager.didStart)
+
+    end function
+
+    @it("various fractions")
+    @params(0.2)
+    @params(0.5)
+    @params(0.8)
+    function test(fraction)
+      m.expectOnce(m.focusManager, "sendEvents", ["losingFocus", "gainingFocus", fraction])
+      m.focusManager.didStart = true
+
+      m.focusManager.onFocusUpdate(fraction)
+      m.assertFalse(m.focusManager.didFinish)
+
+    end function
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ utils
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
