@@ -7,7 +7,6 @@
     "doc": "docs"
   },
   "dependencies": {
-    "brighterscript": "file:../../vsc/brighterscript",
     "log": "file:../../roku-log/roku-log",
     "mc": "file:../maestro-roku-core",
     "mioc": "file:../maestro-roku-ioc",
@@ -19,6 +18,7 @@
     "!roku_modules"
   ],
   "devDependencies": {
+    "brighterscript": "file:../../vsc/brighterscript",
     "chalk": "^4.1.0",
     "fs-extra": "^9.0.1",
     "ropm": "^0.5.0"

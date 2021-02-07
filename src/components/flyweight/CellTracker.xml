@@ -7,10 +7,9 @@
     <field
         id='_debugM'
         type='boolean'
-        onChange='onDebugMChange'
         alwaysNotify='true' />
     <field
-        id='_m'
+        id='__m'
         type='assocarray' />
     <field
         id='trackingId'

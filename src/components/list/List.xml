@@ -85,8 +85,7 @@
         type='node' />
     <field
         id='isHidden'
-        type='boolean'
-        onChange='isHiddenChange' />
+        type='boolean' />
 
     <function name='getRowScreenRect' />
     <function name='getCellRenderer' />

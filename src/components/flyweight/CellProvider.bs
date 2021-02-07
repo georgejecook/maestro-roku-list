@@ -1,8 +1,9 @@
 import "pkg:/source/roku_modules/mc/Utils.brs"
-import "pkg:/source/roku_modules/log/LogMixin.brs" 
+import "pkg:/source/roku_modules/log/LogMixin.brs"
 
 function init()
   log.registerLogger("CellProvider")
+  m.top.observeField("_m", "onDebugMChange")
   reset()
 end function
 
@@ -26,7 +27,7 @@ function getTrackers(cellType)
       freeCellsById: {}
       numberOfCellsInPool: 0
     }
-    m.cellTypes[cellType] = trackers 
+    m.cellTypes[cellType] = trackers
   end if
   return trackers
 end function

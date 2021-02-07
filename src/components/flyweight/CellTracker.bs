@@ -2,11 +2,13 @@ import "pkg:/source/roku_modules/log/LogMixin.brs"
 
 function init()
   log.registerLogger("CellTracker")
+  m.top.observeField("_debugM", "onDebugMChange")
+
   reset()
 end function
 
 function onDebugMChange()
-  m.top._m = m
+  m.top.__m = m
 end function
 
 function reset(args = invalid)
@@ -20,13 +22,13 @@ end function
 function getTrackers(scope = "all")
   trackers = m.trackers[scope]
   if trackers = invalid
-    trackers = { 
+    trackers = {
       contentIdsByCellId: {}
       viewStatesByContentId: {}
       cellIdsByContentId: {}
       cellsById: {}
     }
-    m.trackers[scope] = trackers 
+    m.trackers[scope] = trackers
   end if
   return trackers
 end function

@@ -9,6 +9,8 @@ function init()
   m.top.observeField("animateToRow", "onAnimateToRowChange")
   m.top.observeField("focusedRowPercent", "onFocusedRowPercentChange")
   m.top.observeField("nextFocusIndex", "onNextFocusIndexChange")
+  m.top.observeField("isHidden", "isHiddenChange")
+
   m.top.cellEvents = createEventsBroker("cells")
   m.top.rowEvents = createEventsBroker("rows")
   m.rowsGroup = m.top.findNode("rowsGroup")
