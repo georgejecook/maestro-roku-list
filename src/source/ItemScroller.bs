@@ -1,12 +1,14 @@
-import "pkg:/source/BaseClass.bs"
+import "pkg:/source/roku_modules/mc/BaseClass.brs"
+import "pkg:/source/roku_modules/mv/Animation.brs"
 
-class ItemScroller extends BaseClass
+class ItemScroller extends mc.BaseClass
 
   public rects = []
   public items = []
   public components = []
-  public viewManager = invalid
-  public focusManager = invalid
+  public viewManager
+  public focusManager ' this MUST be set before doing anything
+  public moveAnimation
   'rendered component maps
   public RCMap = {}
   public lastRCMap = {}
@@ -23,17 +25,16 @@ class ItemScroller extends BaseClass
   public screenPos = 0
   public isFloatingFocus = false
   public isWrapped = false
+  public delegates
 
-  function new(viewManager, axes, moveAnimation, moveAnimationInterpolator, focusManager)
+  private animSpeed
+  private settings
+  function new(viewManager, axes)
     super("ItemScroller")
     m.viewManager = viewManager
     m.container = m.viewManager.container
     m.axes = axes
-    m.moveAnimation = moveAnimation
-    m.moveAnimationInterpolator = moveAnimationInterpolator
-    m.focusManager = focusManager
-    m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
-
+    m.moveAnimation = mv.animations.utils.moveTo(m.container, 1, m.container.translation, false)
   end function
 
   public function onViewManagerUpdate()
@@ -80,7 +81,7 @@ class ItemScroller extends BaseClass
 
     index = m.getValidTargetIndex(index, direction)
 
-    m.logInfo("move", m.index, offset, index, screenPos, animated, fast)
+    m.log.info("move", m.index, offset, index, screenPos, animated, fast)
 
     if index <> -1
       m.moveToIndex(index, screenPos, animated, fast)
@@ -107,7 +108,7 @@ class ItemScroller extends BaseClass
   end function
 
   function moveToIndex(index, screenPos = invalid, animated = true, fast = false)
-    m.logInfo("moveToIndex", index, screenPos, animated)
+    m.log.info("moveToIndex", index, screenPos, animated)
 
     if index < m.index
       direction = -1
@@ -118,14 +119,14 @@ class ItemScroller extends BaseClass
     targetTranslation = m.viewManager.getTargetTranslation(index, direction, screenPos)
 
     if targetTranslation = invalid
-      m.logError("cannot move! translation invalid for index", index)
+      m.log.error("cannot move! translation invalid for index", index)
       return false
     end if
 
     m.direction = direction
 
     if m.isFloatingFocus
-      m.logError("floating focus is not supported yet")
+      m.log.error("floating focus is not supported yet")
       'not yet supported
       ' nextFlowPosition = m.viewManager.getNextFlowScreenPosition()
       ' if nextFlowPosition <> invalid
@@ -143,7 +144,7 @@ class ItemScroller extends BaseClass
 
     m.setNextIndex(m.index + m.direction)
 
-    m.logInfo("moving to ", targetTranslation[m.axes], animated)
+    m.log.info("moving to ", targetTranslation[m.axes], animated)
     if animated
 
       if fast
@@ -158,22 +159,11 @@ class ItemScroller extends BaseClass
       m.setFocusIndex(m.index, true, screenPos)
       m.viewManager.updateRenderedComponents(m.direction, m.index)
 
-      'TODO count visible rows between oldIndex and newIndex
-      steps = abs(m.index - index)
-      if steps = 0
-        steps = 1
-      end if
       if m.moveAnimation.state = "play"
         m.moveAnimation.control = "pause"
       end if
-      m.moveAnimationInterpolator.keyValue = [m.container.translation, targetTranslation]
-      m.moveAnimation.duration = steps * m.animSpeed
+      m.moveAnimation.animateToWithSpeed(targetTranslation, m.animSpeed)
 
-      if m.moveAnimation.state = "pause"
-        m.moveAnimation.control = "resume"
-      else
-        m.moveAnimation.control = "start"
-      end if
     else
       m.container.translation = targetTranslation
       'TODO -check if jump is bigger than a certain amount
@@ -223,7 +213,7 @@ class ItemScroller extends BaseClass
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   function onAnimationFractionChange(fraction)
-    ' m.logInfo("onAnimationFractionChange", fraction)
+    ' m.log.info("onAnimationFractionChange", fraction)
     position = m.container.translation[m.axes]
     index = m.viewManager.getIndexAtPosition(position, m.direction)
 
@@ -308,11 +298,11 @@ class ItemScroller extends BaseClass
     end for
 
     for each comp in m.viewManager.visibleComponents
-    ' for each comp in m.viewManager.renderedComponents
+      ' for each comp in m.viewManager.renderedComponents
       if comp <> invalid
         id = comp.id
 
-        ' m.logInfo(" id", id, " is in vp", comp.isInViewPort, "RCMap", m.RCMap[id], "vs", comp._vs)
+        ' m.log.info(" id", id, " is in vp", comp.isInViewPort, "RCMap", m.RCMap[id], "vs", comp._vs)
         if m.RCMap[id] = true and comp.isInViewport <> true
           'ensure clients always get willEnter before didEnter
           m.setCompViewPortStatus(comp, "willEnter", "none", events)
@@ -330,9 +320,9 @@ class ItemScroller extends BaseClass
       end if
     end for
 
-    ' m.logInfo("events")
+    ' m.log.info("events")
     ' for each event in events
-    '   m.logInfo("event", event)
+    '   m.log.info("event", event)
     ' end for
     m.lastRCMap = m.RCMap
     for each delegate in m.delegates

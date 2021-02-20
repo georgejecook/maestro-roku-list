@@ -106,34 +106,6 @@
         text='header'
         color='#ffffff' />
 
-    <Animation
-        id='moveAnimation'
-        duration='0.1'
-        repeat='false'
-        control='stop'
-        easeFunction='linear'>
-      <Vector2DFieldInterpolator
-          id='moveAnimationInterpolator'
-          key='[0.0, 1.0]'
-          keyValue='[ [0, 20], [0, 20] ]'
-          fieldToInterp='cellsGroup.translation' />
-    </Animation>
-    <!-- <ParallelAnimation   id = "testParallelAnimation" >
-    <Animation
-        id='moveItemsAnimation'
-        duration='0.1'
-        repeat='false'
-        control='stop'
-        easeFunction='linear'>
-      <Vector2DFieldInterpolator
-          id='moveItesmAnimationInterpolator'
-          key='[0.0, 1.0]'
-          keyValue='[ [0, 20], [0, 20] ]'
-          fieldToInterp='cellsGroup.translation' />
-    </Animation> 
-
-    </ParallelAnimation> -->
-
   </children>
 
 </component>

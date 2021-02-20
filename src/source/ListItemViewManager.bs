@@ -3,6 +3,11 @@ import "pkg:/source/ListMixin.bs"
 
 class ListItemViewManager extends ItemViewManager
 
+  public comps
+  public visibleComps
+  public hiddenComps
+  public renderedComps
+  
   function new(list, container, minPos = 0, maxPos = 1080)
     super("ListItemViewManager", list, container, 1, minPos, maxPos)
     m.delegate = list.rowEvents
@@ -11,7 +16,7 @@ class ListItemViewManager extends ItemViewManager
   end function
 
   override function getRenderer(index)
-    return m.components[index]
+    return m.comps[index]
   end function
 
   override function createRenderers(content)
@@ -27,17 +32,17 @@ class ListItemViewManager extends ItemViewManager
         settings = listMixin.getRowSettings(m.content, rowContent)
 
         if rowContent.rowCompName
-          component = m.createCustomRow(rowContent, index, settings)
+          comp = m.createCustomRow(rowContent, index, settings)
         else
-          component = m.createHorizontalRow(rowContent, index, settings)
+          comp = m.createHorizontalRow(rowContent, index, settings)
         end if
-        if component <> invalid
-          component.index = index
-          component.renderState = "none"
+        if comp <> invalid
+          comp.index = index
+          comp.renderState = "none"
 
-          m.components.push(component)
+          m.comps.push(comp)
         else
-          m.logError("could not create row for index ")
+          m.log.error("could not create row for index ")
         end if
         index++
       end for
@@ -45,63 +50,63 @@ class ListItemViewManager extends ItemViewManager
   end function
 
   function createHorizontalRow(rowContent, index, settings)
-    component = m.container.createChild("HorizontalRow")
-    component.id = str(index).trim()
-    component.renderState = "none"
-    component.owner = m.owner
-    component.content = rowContent
+    comp = m.container.createChild("HorizontalRow")
+    comp.id = str(index).trim()
+    comp.renderState = "none"
+    comp.owner = m.owner
+    comp.content = rowContent
     'TODO - measure the heights.
-    component.isInViewport = index < 5
+    comp.isInViewport = index < 5
 
-    return component
+    return comp
   end function
 
   function createCustomRow(rowContent, index, settings)
-    component = m.container.createChild(rowContent.compName)
-    if component <> invalid
-      component.id = str(index).trim()
-      component.color = "#aaffaa"
-      component.addFields({ "content": rowContent
+    comp = m.container.createChild(rowContent.compName)
+    if comp <> invalid
+      comp.id = str(index).trim()
+      comp.color = "#aaffaa"
+      comp.addFields({ "content": rowContent
         "isFocusable": true
         "isHidden": false
         "isFocused": false
       })
-      component.width = 1920
-      component.height = 300
-      component.owner = m.owner
-      component.content = rowContent
+      comp.width = 1920
+      comp.height = 300
+      comp.owner = m.owner
+      comp.content = rowContent
     else
-      m.logError("could not create custom row", rowContent.compName)
+      m.log.error("could not create custom row", rowContent.compName)
     end if
 
-    return component
+    return comp
   end function
 
   override function updateLayout()
     y = 0
     w = m.owner.width
 
-    for each component in m.components
-      settings = listMixin.getRowSettings(m.content, component.content)
-      component.visible = component.content.isHidden <> true
+    for each comp in m.comps
+      settings = listMixin.getRowSettings(m.content, comp.content)
+      comp.visible = comp.content.isHidden <> true
 
-      if component.visible
-        component.translation = [0, y]
+      if comp.visible
+        comp.translation = [0, y]
 
         'TODO better handle the whole visibility
 
-        y += component.height + settings.space
+        y += comp.height + settings.space
         ' ? " SCREEN POS "; settings.screenPos
         m.rects.push({
-          translation: component.translation
-          size: [w, component.height]
-          index: component.index
+          translation: comp.translation
+          size: [w, comp.height]
+          index: comp.index
           screenPos: settings.screenPos
         })
-        m.visibleComponents.push(component)
-        m.visibleItems.push(component.content)
+        m.visiblecomps.push(comp)
+        m.visibleItems.push(comp.content)
       else
-        m.hiddenComponents.push(component)
+        m.hiddencomps.push(comp)
       end if
 
     end for
@@ -111,16 +116,16 @@ class ListItemViewManager extends ItemViewManager
   override function applyRenderStateMap(renderStateMap)
     ' ? "updating renderStateMap: " ; formatJson(renderStateMap)
     for each id in renderStateMap
-      component = m.components[id.toInt()]
+      comp = m.comps[id.toInt()]
 
-      if component <> invalid and component.renderState <> renderStateMap[id]
-        component.renderState = renderStateMap[id]
-        if component.renderState = "rendered"
-          m.renderedComponents.push(component)
+      if comp <> invalid and comp.renderState <> renderStateMap[id]
+        comp.renderState = renderStateMap[id]
+        if comp.renderState = "rendered"
+          m.renderedcomps.push(comp)
         end if
-        component.isRendered = component.renderState = "rendered"
+        comp.isRendered = comp.renderState = "rendered"
       else
-        ' ? "ERROR could not find visible component for "; id
+        ' ? "ERROR could not find visible comp for "; id
       end if
     end for
 

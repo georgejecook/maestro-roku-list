@@ -1,57 +1,62 @@
 {
-  "name": "maestro-roku-ioc-sample",
-  "version": "0.1.0",
-  "description": "Fast, flexible list example, extracted from maestro framework",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
-  "dependencies": {
-    "log": "file:../../roku-log/roku-log",
-    "mc": "file:../maestro-roku-core",
-    "mioc": "file:../maestro-roku-ioc",
-    "mv": "file:../maestro-roku-view",
-    "mx": "file:../maestro-roku-mvvm"
-  },
-  "files": [
-    "dist/**/!(manifest)*",
-    "!roku_modules"
-  ],
-  "devDependencies": {
-    "brighterscript": "file:../../vsc/brighterscript",
-    "chalk": "^4.1.0",
-    "fs-extra": "^9.0.1",
-    "ropm": "^0.5.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/georgejecook/roku-ioc.git"
-  },
-  "keywords": [
-    "ropm",
-    "brightscript",
-    "mvvm",
-    "framework",
-    "fun"
-  ],
-  "author": "George Cook",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/georgejecook/roku-ioc/issues"
-  },
-  "ts-node": {
-    "transpileOnly": true,
-    "compileOptions": {
-      "incremental": true,
-      "allowJs": false
+    "name": "maestro-roku-ioc-sample",
+    "version": "0.1.0",
+    "description": "Fast, flexible list example, extracted from maestro framework",
+    "main": "index.js",
+    "directories": {
+        "doc": "docs"
+    },
+    "dependencies": {
+        "log": "/home/george/hope/open-source/maestro/roku-log",
+        "mc": "/home/george/hope/open-source/maestro/maestro-roku-core",
+        "mioc": "/home/george/hope/open-source/maestro/maestro-roku-ioc",
+        "mv": "/home/george/hope/open-source/maestro/maestro-roku-view"
+    },
+    "files": [
+        "dist/**/!(manifest)*",
+        "!roku_modules"
+    ],
+    "devDependencies": {
+        "brighterscript": "file:../../vsc/brighterscript",
+        "fs-extra": "^7.0.1",
+        "maestro-roku-bsc-plugin": "file:../maestro-roku-bsc-plugin",
+        "rimraf": "^3.0.2",
+        "rooibos-roku": "file:../../rooibos/bsc-plugin",
+        "yargs": "^16.2.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/georgejecook/roku-ioc.git"
+    },
+    "keywords": [
+        "ropm",
+        "brightscript",
+        "mvvm",
+        "framework",
+        "fun"
+    ],
+    "author": "George Cook",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/georgejecook/roku-ioc/issues"
+    },
+    "ts-node": {
+        "transpileOnly": true,
+        "compileOptions": {
+            "incremental": true,
+            "allowJs": false
+        }
+    },
+    "ropm": {
+        "rootDir": "src",
+        "packageRootDir": "dist"
+    },
+    "scripts": {
+        "local": "ts-node scripts/install-maestro-local.js",
+        "remote": "ts-node scripts/install-maestro-remote.js",
+        "build": "node scripts/run.js && ts-node scripts/move-generated-files.js",
+        "build-remote": "npm run remote && npm run build",
+        "build-local": "npm run local && npm run build",
+        "build-test": "node scripts/run-test.js"
     }
-  },
-  "ropm": {
-    "rootDir": "src",
-    "packageRootDir": "dist"
-  },
-  "scripts": {
-    "build": "node scripts/run.js",
-    "build-test": "node scripts/run-test.js"
-  }
 }

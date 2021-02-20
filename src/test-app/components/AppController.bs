@@ -1,0 +1,53 @@
+import "pkg:/source/roku_modules/mioc/MIOC.brs"
+import "pkg:/source/roku_modules/mc/Tasks.brs"
+import "pkg:/source/roku_modules/mx/BaseObservable.brs"
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ Initialization
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function Init()
+  mv.initializeFocusManager(m.global)
+  initFlyweight()
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ flyweight
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function initFlyweight()
+  m.cellProvider = createObject("roSGNode", "CellProvider")
+  m.global.addFields({ "cellProvider": m.cellProvider })
+
+  m.cellTracker = createObject("roSGNode", "CellTracker")
+  m.global.addFields({ "cellTracker": m.cellTracker })
+  m.top.addFields({ "_global": m.global })
+
+  m.infoLabel = m.top.findNode("infoLabel")
+
+end function
+
+function prebakeCells()
+  m.cellProvider@.addPreBakedCells(200, "Cell")
+end function
+
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ callbacks
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onInfoChange()
+  m.infoLabel.text = " Light cells (" + str(m.cellTracker.numberOfCellsInUse) + "/" + str(m.cellTracker.numberOfCells) + ") - Real cells (" + str(m.cellProvider.numberOfCellsInUse) + "/" + str(m.cellProvider.numberOfCells) + ")"
+end function
+
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ lifecycle
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onFirstShow()
+  m.log.info("onFirstShow")
+  screen = m.top.findNode("contentGroup").createChild("ListScreen")
+  mv.initializeView(screen)
+  mv.setFocus(screen)
+end function

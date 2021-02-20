@@ -1,19 +1,26 @@
 {
-  "extends": "bsconfig.json",
+  "stagingFolderPath": "build",
   "files": [
     "manifest",
     "source/**/*.*",
-    "components/**/*.*",
-    "images/**/*.*"
+    "components/**/*.*"
   ],
+  "extends": "bsconfig.json",
   "plugins": [
-    "/home/george/hope/open-source/roku-log/roku-log-bsc-plugin/dist/plugin.js",
-    "/home/george/hope/open-source/rooibos/bsc-plugin/dist/plugin.js",
-    "/home/george/hope/open-source/maestro/maestro-roku-bsc-plugin/dist/plugin.js"
+    "maestro-roku-bsc-plugin",
+    "rooibos-roku"
   ],
   "rooibos": {
     "isRecordingCodeCoverage": false,
-    "showOnlyFailures": true
+    "testsFilePattern": null,
+    "tags": [
+      "!integration",
+      "!deprecated",
+      "!fixme"
+    ],
+    "showOnlyFailures": true,
+    "catchCrashes": true,
+    "lineWidth": 70
   },
   "rokuLog": {
     "strip": false,

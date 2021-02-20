@@ -1,7 +1,7 @@
 import "pkg:/source/roku_modules/log/LogMixin.brs"
 
 function init()
-  log.registerLogger("CellTracker")
+  m.log = new log.Logger("CellTracker")
   m.top.observeField("_debugM", "onDebugMChange")
 
   reset()
@@ -12,7 +12,7 @@ function onDebugMChange()
 end function
 
 function reset(args = invalid)
-  m.logInfo("resetting cell trackers")
+  m.log.info("resetting cell trackers")
   m.trackers = {}
   m.top.numberOfCells = 0
   m.top.numberOfCellsInUse = 0
@@ -64,7 +64,7 @@ function bindCellToContent(cell, content, scope = "all")
     existingId = trackers.contentIdsByCellId[cell.trackingId]
     if existingId <> invalid
       if content <> invalid and existingId = content.id
-        m.logDebug("bound to same thing; ignoring")
+        m.log.debug("bound to same thing; ignoring")
         'we are bound to the same thing
         return invalid
       else

@@ -8,13 +8,13 @@ namespace tests
     public viewManager
 
     override function beforeEach()
-      m.owner = new tests.utils.MockNode("owner")
+      m.owner = new rooibos.utils.MockNode("owner")
       m.owner.content = listMixin.createListContent()
       m.owner.translation = [0, 0]
       m.owner.width = 1920
       m.owner.height = 1080
 
-      m.container = new tests.utils.MockNode("container")
+      m.container = new rooibos.utils.MockNode("container")
       m.container.translation = [0, 0]
       m.container.width = 1920
       m.container.height = 1080

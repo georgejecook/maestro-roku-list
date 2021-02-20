@@ -12,10 +12,6 @@ function init()
   m.top.observeField("animateToItem", "onAnimateToItemChange")
   m.cellsGroup = m.top.findNode("cellsGroup")
   m.contentGroup = m.top.findNode("contentGroup")
-  m.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator")
-  m.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
-  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator")
-  m.moveAnimation = m.top.findNode("moveAnimation")
   m.header = m.top.findNode("header")
   m.bgRect = m.top.findNode("bgRect")
   m.cellProvider = m.global.cellProvider
@@ -25,17 +21,17 @@ function init()
 end function
 
 function createManagers()
-  m.logInfo("createManagers")
+  m.log.info("createManagers")
   isAnimatorsCreated = true
   m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
-  m.focusManager = new ItemFocusManager(m.viewManager, m.focusMoveAnimation, m.focusMoveAnimationInterpolator, m.top.owner.cellEvents, m.top.index)
+  m.focusManager = new ItemFocusManager(m.viewManager, m.top.owner.cellEvents, m.top.index)
   m.focusManager.name = "ROW FM "
   m.focusManager.isRow = true
-  m.itemScroller = new RowItemScroller(m.viewManager, m.moveAnimation, m.moveAnimationInterpolator, m.focusManager)
+  m.itemScroller = new RowItemScroller(m.viewManager, m.focusManager)
 end function
 
 function onContentChange(evt)
-  ' m.logInfo("onContentChange", evt.getField())
+  ' m.log.info("onContentChange", evt.getField())
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     m.content = m.top.content
     m.header.text = "ROW " + m.content.title
@@ -101,19 +97,19 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onKeyPressLeft() as boolean
-  m.logMethod("onKeyPressLeft")
+  m.log.method("onKeyPressLeft")
   m.itemScroller.move(-1, 500)
   return true
 end function
 
 function onKeyPressRight() as boolean
-  m.logMethod("onKeyPressRight")
+  m.log.method("onKeyPressRight")
   m.itemScroller.move(1, 500)
   return true
 end function
 
 function getLongPressIntervalForKey(key) as float
-  m.logMethod("getLongPressIntervalForKey", key)
+  m.log.method("getLongPressIntervalForKey", key)
   if key = "left" or key = "right"
     return 0.2
   else
@@ -122,10 +118,10 @@ function getLongPressIntervalForKey(key) as float
 end function
 
 function onLongPressStart(key) as boolean
-  m.logMethod(">>>>onLongPressStart", key)
+  m.log.method(">>>>onLongPressStart", key)
 
   if key = "left" or key = "right"
-    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
     if key = "left"
       m.itemScroller.moveToEnd(-1)
     else
@@ -140,7 +136,7 @@ end function
 
 function onLongPressFinish(key) as boolean
   if key = "left" or key = "right"
-    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
     m.itemScroller.finishAnimating()
     return true
   end if

@@ -2,7 +2,7 @@ import "pkg:/source/roku_modules/mc/Utils.brs"
 import "pkg:/source/roku_modules/log/LogMixin.brs"
 
 function init()
-  log.registerLogger("CellProvider")
+  m.log = new log.Logger("CellProvider")
   m.top.observeField("_m", "onDebugMChange")
   reset()
 end function
@@ -13,7 +13,7 @@ function onDebugMChange()
 end function
 
 function reset(args = invalid)
-  m.logInfo("reset")
+  m.log.info("reset")
   m.cellTypes = {}
   m.top.numberOfCells = 0
   m.top.numberOfCellsInUse = 0
@@ -54,7 +54,7 @@ end function
 
 function addPreBakedCells(number, cellType = invalid)
   cellType = getRopmSafeCellType(cellType)
-  m.logInfo("adding ", number, cellType, "cells")
+  m.log.info("adding ", number, cellType, "cells")
   trackers = getTrackers(cellType)
 
   for i = 0 to number
@@ -66,7 +66,7 @@ function addPreBakedCells(number, cellType = invalid)
       trackers.allCells.push(cell)
       m.top.numberOfCells++
     else
-      m.logError("error creating cell with type", cellType)
+      m.log.error("error creating cell with type", cellType)
     end if
   end for
   ' ? "finished making cells"
@@ -79,10 +79,10 @@ function getCell(cellType = invalid)
   trackers = getTrackers(cellType)
 
   if trackers.freeCellsById.count() = 0
-    m.logWarn("ran out of cells getting type :", cellType)
+    m.log.warn("ran out of cells getting type :", cellType)
 
     if m.top.isCreateMoreEnabled
-      m.logWarn("creating", m.top.numerOfCellsToCreateWhenDry, "more", cellType, "cells")
+      m.log.warn("creating", m.top.numerOfCellsToCreateWhenDry, "more", cellType, "cells")
       for i = 0 to m.top.numerOfCellsToCreateWhenDry
         createCell(cellType)
       end for

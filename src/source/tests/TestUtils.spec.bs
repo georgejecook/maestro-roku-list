@@ -18,46 +18,12 @@ namespace tests.utils
         id: str(i).trim()
       })
     end for
-    content = new tests.utils.MockNode("listContent", children)
+    content = new rooibos.utils.MockNode("listContent", children)
     content.focusSettings = listMixin.createFocusSettings()
     content.rowSettings = listMixin.createRowSettings()
 
     viewManager.itemSize = itemSize
     viewManager.setContent(content)
   end function
-
-  class MockNode
-    public id
-    public children
-    public parent
-
-    function new(id, children = [], parent = invalid)
-      m.id = id
-      m.children = children
-      m.parent = parent
-    end function
-
-    function addFields(fields)
-      m.append(fields)
-    end function
-
-    function observeField(field, func)
-    end function
-
-    function getChildren(first, num)
-      return m.children
-    end function
-
-    function getParent()
-      return m.parent
-    end function
-
-    function removeChildren(children)
-    end function
-
-    function createChild(compName)
-    end function
-
-  end class
 
 end namespace

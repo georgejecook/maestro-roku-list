@@ -135,7 +135,7 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onKeyPressUp() as boolean
-  m.logMethod("onKeyPressUp")
+  m.log.method("onKeyPressUp")
   if (m.top.isScrolling)
     m.itemScroller.move(-2)
   else
@@ -145,7 +145,7 @@ function onKeyPressUp() as boolean
 end function
 
 function onKeyPressDown() as boolean
-  m.logMethod("onKeyPressDown")
+  m.log.method("onKeyPressDown")
   if (m.top.isScrolling)
     m.itemScroller.move(2)
   else
@@ -155,7 +155,7 @@ function onKeyPressDown() as boolean
 end function
 
 function getLongPressIntervalForKey(key) as float
-  m.logMethod("getLongPressIntervalForKey", key)
+  m.log.method("getLongPressIntervalForKey", key)
   if key = "up" or key = "down"
     return 0.2
   else
@@ -164,10 +164,10 @@ function getLongPressIntervalForKey(key) as float
 end function
 
 function onLongPressStart(key) as boolean
-  m.logMethod(">>>>onLongPressStart", key)
+  m.log.method(">>>>onLongPressStart", key)
 
   if key = "up" or key = "down"
-    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
     if key = "up"
       m.itemScroller.moveToEnd(-1)
     else
@@ -182,7 +182,7 @@ end function
 
 function onLongPressFinish(key) as boolean
   if key = "up" or key = "down"
-    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
     m.itemScroller.finishAnimating()
     return true
   end if

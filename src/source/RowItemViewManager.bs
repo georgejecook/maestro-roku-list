@@ -5,8 +5,8 @@ class RowItemViewManager extends ItemViewManager
   public cellsById = {}
   public cellProvider
   public cellTracker
-  public isScrolling = false
   public lastRowIsRendered = "none"
+  public isFlowSupported = false
 
   function new(list, row, container, cellProvider, cellTracker, minPos = 0, maxPos = 1920)
     super("RowItemViewManager", list, container, 0, minPos, maxPos)
@@ -54,7 +54,7 @@ class RowItemViewManager extends ItemViewManager
   end function
 
   override function applyRenderStateMap(renderStateMap)
-    ' m.logInfo("applyRenderStateMap", m.row.index, m.row.isRendered)
+    ' m.log.info("applyRenderStateMap", m.row.index, m.row.isRendered)
     m.renderedComponents = []
     if m.row.isRendered
       for each id in renderStateMap
@@ -158,7 +158,8 @@ class RowItemViewManager extends ItemViewManager
         screenPos = m.getScreenPositionForItem(itemRect, direction, screenPos)
       end if
       if direction = -1
-        return m.get
+        'TODO
+        return invalid
       end if
     end if
 

@@ -8,7 +8,7 @@ class RowItemScroller extends ItemScroller
 
   override function setFocusOnRenderer(isMoving)
     if not isMoving
-      m.logInfo("stopped scrolling on item", m.index)
+      m.log.info("stopped scrolling on item", m.index)
     end if
   end function
 

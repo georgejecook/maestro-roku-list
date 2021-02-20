@@ -1,5 +1,6 @@
 namespace tests
 
+  @nocatch
   @suite("ItemFocusManager tests")
   class ItemFocusManagerTests extends tests.BaseTestSuite
 
@@ -16,31 +17,25 @@ namespace tests
     public ownerDelegate
 
     override function beforeEach()
-      m.owner = new tests.utils.MockNode("owner")
+      m.owner = new rooibos.utils.MockNode("owner")
       m.owner.translation = [0, 0]
       m.owner.width = 1920
       m.owner.height = 1080
 
-      m.container = new tests.utils.MockNode("container")
+      m.container = new rooibos.utils.MockNode("container")
       m.container.translation = [0, 0]
       m.container.width = 1920
       m.container.height = 1080
 
       m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
 
-      m.scrollerAnimation = new tests.utils.MockNode("animation")
-      m.scrollerInterpolator = new tests.utils.MockNode("interpolator")
-      m.focusManager = { "id": "focusManager" }
-
-      m.scroller = new ItemScroller(m.viewManager, 1, m.scrollerAnimation, m.scrollerInterpolator, m.focusManager)
+      m.scroller = new ItemScroller(m.viewManager, 1)
       m.configureScroller(1, 20)
 
-      m.animation = new tests.utils.MockNode("animation")
-      m.interpolator = new tests.utils.MockNode("interpolator")
       m.delegate = { "id": "delegate" }
       m.ownerDelegate = { "id": "ownerDelegate" }
 
-      m.focusManager = new ItemFocusManager(m.viewManager, m.animation, m.interpolator, m.ownerDelegate)
+      m.focusManager = new ItemFocusManager(m.viewManager, m.scroller, m.interpolator, m.ownerDelegate)
     end function
 
 
@@ -49,15 +44,15 @@ namespace tests
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     @it("sets values")
-    function test()
+    function _()
+      m.assertArrayCount(m.focusManager.delegates, 2)
       m.assertEqual(m.focusManager.delegates[0].id, "owner")
       m.assertEqual(m.focusManager.delegates[1].id, "ownerDelegate")
-      m.assertArrayCount(m.focusManager.delegates, 2)
     end function
 
     @it("does not need owner delegate")
-    function test()
-      m.focusManager = new ItemFocusManager(m.viewManager, m.animation, m.interpolator, invalid)
+    function _()
+      m.focusManager = new ItemFocusManager(m.viewManager, m.scroller, invalid)
       m.assertEqual(m.focusManager.delegates[0].id, "owner")
       m.assertArrayCount(m.focusManager.delegates, 1)
 
@@ -68,8 +63,8 @@ namespace tests
     @params(1)
     @params(2)
     @params(3)
-    function test(index)
-      m.focusManager = new ItemFocusManager(m.viewManager, m.animation, m.interpolator, invalid, index)
+    function _(index)
+      m.focusManager = new ItemFocusManager(m.viewManager, m.scroller, invalid,  index)
       m.assertEqual(m.focusManager.delegates[0].id, "owner")
       m.assertArrayCount(m.focusManager.delegates, 1)
       m.assertEqual(m.focusManager.rowIndex, index)
@@ -84,7 +79,7 @@ namespace tests
     @it("tests various values")
     @params(0, 100, 1, 200, 0)
     @params(3, 400, 5, 600, -1)
-    function test(index, indexPosition, nextIndex, nextPosition, direction)
+    function _(index, indexPosition, nextIndex, nextPosition, direction)
       m.focusManager.setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
 
       m.assertEqual(m.focusManager.index, index)
@@ -113,7 +108,7 @@ namespace tests
     @params(-1, 1, 100, 0, 0, 50, 0.5)
     @params(-1, 1, 100, 0, 0, 25, 0.25)
     @params(1, 1, 100, 0, 0, 5, 0.95)
-    function test(direction, index, indexPosition, nextIndex, nextPosition, offset, expected)
+    function _(direction, index, indexPosition, nextIndex, nextPosition, offset, expected)
 
       m.focusManager.setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
 
@@ -127,7 +122,7 @@ namespace tests
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     @it("initializes when not started")
-    function test()
+    function _()
       m.expectOnce(m.focusManager, "setOwnerNextFocusIndex", [])
       m.expectOnce(m.focusManager, "sendEvents", ["willLoseFocus", "willGainFocus", 0])
 
@@ -138,7 +133,7 @@ namespace tests
     end function
 
     @it("does nothing on 0 fraction when started")
-    function test()
+    function _()
       m.focusManager.didStart = true
       m.expectNone(m.focusManager, "setOwnerNextFocusIndex")
       m.expectNone(m.focusManager, "sendEvents")
@@ -148,7 +143,7 @@ namespace tests
     end function
 
     @it("does nothing on 1 fraction when finished")
-    function test()
+    function _()
       m.focusManager.didStart = true
       m.focusManager.didFinish = true
       m.expectNone(m.focusManager, "setOwnerNextFocusIndex")
@@ -159,7 +154,7 @@ namespace tests
     end function
 
     @it("fraction 1 - not finished")
-    function test()
+    function _()
       m.expectOnce(m.focusManager, "sendEvents", ["didLoseFocus", "didGainFocus", 1])
       m.expectOnce(m.focusManager, "setOwnerIndexes", [])
       m.focusManager.didStart = true
@@ -173,7 +168,7 @@ namespace tests
     @params(0.2)
     @params(0.5)
     @params(0.8)
-    function test(fraction)
+    function _(fraction)
       m.expectOnce(m.focusManager, "sendEvents", ["losingFocus", "gainingFocus", fraction])
       m.focusManager.didStart = true
 

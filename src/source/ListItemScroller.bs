@@ -7,7 +7,7 @@ class ListItemScroller extends ItemScroller
 
   override function setFocusOnRenderer(isMoving)
     if not isMoving
-      m.logInfo("stopped scrolling on row", m.index)
+      m.log.info("stopped scrolling on row", m.index)
       row = m.viewManager.getRenderer(m.index)
       if row <> invalid
         row.setFocus(true)

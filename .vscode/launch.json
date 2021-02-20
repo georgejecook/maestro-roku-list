@@ -4,38 +4,6 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-
-    {
-      "name": "app",
-      "type": "brightscript",
-      "request": "launch",
-      "consoleOutput": "normal",
-      "internalConsoleOptions": "neverOpen",
-      "preLaunchTask": "app",
-      "envFile": "${workspaceFolder}/.vscode/.env",
-      "host": "${env:ROKU_DEV_TARGET}",
-      "password": "${env:ROKU_DEVPASSWORD}",
-      "retainStagingFolder": true,
-      "stopOnEntry": false,
-      "rootDir": "${workspaceFolder}/build",
-      "sourceDirs": [
-        "${workspaceFolder}/src",
-      ],
-      "files": [
-        "manifest",
-        "source/**/*.*",
-        "components/**/*.*",
-        "images/**/*.*",
-        "font/**/*.*",
-        "!*.zip",
-        "!**/*.zip"
-      ],
-      "enableDebuggerAutoRecovery": true,
-      "stopDebuggerOnAppExit": false,
-      "enableVariablesPanel": false,
-      "injectRaleTrackerTask": false,
-      "enableDebugProtocol": false
-    },
     {
       "type": "brightscript",
       "request": "launch",

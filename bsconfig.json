@@ -3,36 +3,39 @@
   "files": [
     "manifest",
     "source/**/*.*",
-    "components/**/*.*",
-    "images/**/*.*"
+    "components/**/*.*"
   ],
   "autoImportComponentScript": true,
   "createPackage": false,
   "stagingFolderPath": "build",
   "diagnosticFilters": [
     {
-      "src": "**/roku_modules/**/*.*",
-      "codes": [
-        1107,
-        1009,
-        1001
-      ]
+      "src": "**/roku_modules/**/*.*"
     },
     {
       "src": "**/WhiteList.xml",
       "codes": [
         1067
       ]
-    }
+    },
+    1120
   ],
+  "emitDefinitions": true,
   "plugins": [
-    "/home/george/hope/open-source/roku-log/roku-log-bsc-plugin/dist/plugin.js",
-    "/home/george/hope/open-source/rooibos/bsc-plugin/dist/plugin.js",
-    "/home/george/hope/open-source/maestro/maestro-roku-bsc-plugin/dist/plugin.js"
+    "maestro-roku-bsc-plugin",
+    "rooibos-roku"
   ],
   "rooibos": {
     "isRecordingCodeCoverage": false,
-    "testsFilePattern": null
+    "testsFilePattern": null,
+    "tags": [
+      "!integration",
+      "!deprecated",
+      "!fixme"
+    ],
+    "showOnlyFailures": true,
+    "catchCrashes": true,
+    "lineWidth": 70
   },
   "rokuLog": {
     "strip": false,

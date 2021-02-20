@@ -123,7 +123,7 @@ namespace listMixin
       return listContent.rowSettings
     else
       'THIS SHOULD NOT BE POSSIBLE
-      m.logError("no settings for list - this should not have been called!")
+      m.log.error("no settings for list - this should not have been called!")
       return invalid
     end if
   end function
@@ -136,7 +136,7 @@ namespace listMixin
     else if listContent <> invalid and listContent.rowSettings <> invalid
       return listContent.rowSettings.cellSettings
     else
-      m.logError("no listCotnent for list - this should not have been called!")
+      m.log.error("no listCotnent for list - this should not have been called!")
       return invalid
     end if
   end function
@@ -148,11 +148,11 @@ namespace listMixin
     else if listContent <> invalid and listContent.rowSettings <> invalid and listContent.rowSettings.focusSettings <> invalid
       ? "use listContent ROW FOCUS SETTINGS"
       return listContent.rowSettings.focusSettings
-      m.logError("no listCotnent for list - this should not have been called!")
+      m.log.error("no listCotnent for list - this should not have been called!")
     else if listContent <> invalid and listContent.focusSettings <> invalid
       ? "use listContent FOCUS SETTINGS"
       return listContent.focusSettings
-      m.logError("no listCotnent for list - this should not have been called!")
+      m.log.error("no listCotnent for list - this should not have been called!")
     end if
     return invalid
   end function

@@ -1,8 +1,10 @@
-import "pkg:/source/BaseClass.bs"
+import "pkg:/source/roku_modules/mc/BaseClass.brs"
+import "pkg:/source/roku_modules/mv/Animation.brs"
 
-class ItemFocusManager extends BaseClass
+class ItemFocusManager extends mc.BaseClass
 
   public viewManager = invalid
+  public itemScroller = invalid
   public nextComponent = invalid
   public component = invalid
   public index = 0
@@ -14,20 +16,25 @@ class ItemFocusManager extends BaseClass
   public didFinish = false
   public isRow = false
 
-  function new(viewManager, moveAnimation, moveAnimationInterpolator, ownerDelegate, rowIndex = -1)
+  private container
+  private moveAnimation
+  private rowIndex
+  private delegates
+
+  function new(viewManager, scroller, ownerDelegate, rowIndex = -1)
     super("ItemFocusManager")
-    m.name = "ItemFocusManager"
-    m.viewManager = viewManager
-    m.container = viewManager.container
-    m.moveAnimation = moveAnimation
     m.rowIndex = rowIndex
-    m.moveAnimationInterpolator = moveAnimationInterpolator
-    m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
+    m.viewManager = viewManager
+    m.itemScroller = scroller
+    m.itemScroller.focusManager = m
+    m.container = viewManager.container
+    m.moveAnimation = scroller.moveAnimation
     m.delegates = [viewManager.owner]
+
     if ownerDelegate <> invalid
       m.delegates.push(ownerDelegate)
     else
-      m.logError("There was no delegate passed to this focus manager - events wont be handled")
+      m.log.error("There was no delegate passed to this focus manager - events wont be handled")
     end if
     owner = viewManager.owner
     if owner.delegate <> invalid
@@ -38,7 +45,7 @@ class ItemFocusManager extends BaseClass
 
   function setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
     ' ? ">>>>>>>>>>>>>>>>>>>>>"
-    ' m.logInfo(index, indexPosition, nextIndex, nextPosition, direction)
+    ' m.log.info(index, indexPosition, nextIndex, nextPosition, direction)
     ' ? ">>>>>>>>>>>>>>>>>>>>>"
     m.index = index
     m.indexPosition = indexPosition

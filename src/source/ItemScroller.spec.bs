@@ -11,19 +11,19 @@ namespace tests
 
     override function beforeEach()
 
-      m.owner = new tests.utils.MockNode("owner")
+      m.owner = new rooibos.utils.MockNode("owner")
       m.owner.content = listMixin.createListContent()
       m.owner.translation = [0, 0]
       m.owner.width = 1920
       m.owner.height = 1080
 
-      m.container = new tests.utils.MockNode("container")
+      m.container = new rooibos.utils.MockNode("container")
       m.container.translation = [0, 0]
       m.container.width = 1920
       m.container.height = 1080
 
-      m.animation = new tests.utils.MockNode("animation")
-      m.interpolator = new tests.utils.MockNode("interpolator")
+      m.animation = new rooibos.utils.MockNode("animation")
+      m.interpolator = new rooibos.utils.MockNode("interpolator")
 
       m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
       m.focusManager = { "id": "focusManager" }
@@ -187,7 +187,7 @@ namespace tests
 
       for i = first to last step direction
         comp = comps[i]
-        ' m.logInfo(index, comp.id, "evt", comp.listEvent.name, "ivp", comp.isInViewport, "vs", comp._vs)
+        ' m.log.info(index, comp.id, "evt", comp.listEvent.name, "ivp", comp.isInViewport, "vs", comp._vs)
          ? index; " " ; comp.id; " " ; "evt"; " " ; comp.listEvent.name; " " ; "ivp"; " " ; comp.isInViewport; " " ; "vs"; " " ; comp._vs
       end for
     end function

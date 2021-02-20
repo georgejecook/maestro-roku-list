@@ -1,7 +1,7 @@
-import "pkg:/source/BaseClass.bs"
+import "pkg:/source/roku_modules/mc/BaseClass.brs"
 import "pkg:/source/ListMixin.bs"
 
-class ItemViewManager extends BaseClass
+class ItemViewManager extends mc.BaseClass
 
   public screenRect = { translation: [0, 0], size: [1920, 1080] }
   public componentBufferMode = "none"
@@ -19,6 +19,7 @@ class ItemViewManager extends BaseClass
   public settings = invalid
 
   'tracking
+  public direction
   public visibleItems = []
   public visibleComponents = []
   public hiddenComponents = []
@@ -32,6 +33,7 @@ class ItemViewManager extends BaseClass
   public lastScrollIndex = 0
   public lastScrollDirection = 0
   public renderedComponents = []
+  public isScrolling
 
   function new(name, owner, container, axes, minPos, maxPos)
     super(name)
@@ -71,7 +73,7 @@ class ItemViewManager extends BaseClass
   end function
 
   function _updateLayout()
-    m.logInfo("_updateLayout")
+    m.log.info("_updateLayout")
     m.updateScreenRect()
 
     m.visibleComponents = []
@@ -113,7 +115,7 @@ class ItemViewManager extends BaseClass
       else
         compStates[comp.id] = false
       end if
-      ' m.logInfo(compStates[comp.id], "sStart", sStart, "sEnd", sENd, "cStart", cStart, "cEnd", cENd)
+      ' m.log.info(compStates[comp.id], "sStart", sStart, "sEnd", sENd, "cStart", cStart, "cEnd", cENd)
     end for
 
     return compStates
@@ -155,7 +157,7 @@ class ItemViewManager extends BaseClass
     '   ? " RI " ; renderedIndexes
     '   ? " LRI " ; m.lastRenderedIndexes
     ' end if
-    ' m.logInfo("renderedIndexes index", index, renderedIndexes)
+    ' m.log.info("renderedIndexes index", index, renderedIndexes)
     renderedStateMap = m.createRenderedStateMap(direction, index, renderedIndexes)
     m.renderedComponents = []
     m.applyRenderStateMap(renderedStateMap)
@@ -199,7 +201,7 @@ class ItemViewManager extends BaseClass
   end function
 
   function createRenderedStateMap(direction, index, renderedIndexes)
-    ' m.logMethod("createRenderedStateMap", index, renderedIndexes)
+    ' m.log.method("createRenderedStateMap", index, renderedIndexes)
     renderedStateMap = {}
 
     if m.numberOfItems = 0
@@ -241,7 +243,7 @@ class ItemViewManager extends BaseClass
     itemRect = m.rects[index]
 
     if itemRect = invalid
-      m.logWarn("no itemRect for index", index)
+      m.log.warn("no itemRect for index", index)
       return [-1, -1]
     end if
 
@@ -261,7 +263,7 @@ class ItemViewManager extends BaseClass
     itemRect = m.rects[index]
 
     if itemRect = invalid
-      m.logWarn("no itemRect for index", index)
+      m.log.warn("no itemRect for index", index)
       return invalid
     end if
 
@@ -369,19 +371,19 @@ class ItemViewManager extends BaseClass
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   function createRenderers(items)
-    m.logError("You must override this method")
+    m.log.error("You must override this method")
   end function
 
   function updateLayout()
-    m.logError("You must override this method")
+    m.log.error("You must override this method")
   end function
 
   function applyRenderStateMap(renderedStateMap)
-    m.logError("You must override this method")
+    m.log.error("You must override this method")
   end function
 
   function getRenderer(index)
-    m.logError("You must override this method")
+    m.log.error("You must override this method")
     return invalid
   end function
 
