@@ -1,11 +1,9 @@
 namespace tests
-
   @suite("ItemSCroller tests")
   class ItemScrollerTests extends tests.BaseTestSuite
     public owner
     public container
     public animation
-    public interpolator
     public viewManager
     public scroller
 
@@ -22,12 +20,10 @@ namespace tests
       m.container.width = 1920
       m.container.height = 1080
 
-      m.animation = new rooibos.utils.MockNode("animation")
-      m.interpolator = new rooibos.utils.MockNode("interpolator")
-
       m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
       m.focusManager = { "id": "focusManager" }
-      m.scroller = new ItemScroller(m.viewManager, 1, m.animation, m.interpolator, m.focusManager)
+      m.scroller = new ItemScroller(m.viewManager, 1)
+      m.scroller.focusManager = m.focusManager
       m.configureScroller(1, 20)
     end function
 
@@ -169,7 +165,7 @@ namespace tests
       m.scroller.setFocusIndex(0, false)
       'TODO test me
       comps = m.scroller.components
-      m.checkrenderedComps(comps, [0, 1, 2, 3], [4, 5, 6, 7, 8, 9, 10])
+      m.checkRenderedComps(comps, [0, 1, 2, 3], [4, 5, 6, 7, 8, 9, 10])
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -185,11 +181,13 @@ namespace tests
         last = 0
       end if
 
-      for i = first to last step direction
-        comp = comps[i]
-        ' m.log.info(index, comp.id, "evt", comp.listEvent.name, "ivp", comp.isInViewport, "vs", comp._vs)
-         ? index; " " ; comp.id; " " ; "evt"; " " ; comp.listEvent.name; " " ; "ivp"; " " ; comp.isInViewport; " " ; "vs"; " " ; comp._vs
-      end for
+      if comps.count() > last
+        for i = first to last step direction
+          comp = comps[i]
+          ' m.log.info(index, comp.id, "evt", comp.listEvent.name, "ivp", comp.isInViewport, "vs", comp._vs)
+          ? index; " " ; comp.id; " " ; "evt"; " " ; comp.listEvent.name; " " ; "ivp"; " " ; comp.isInViewport; " " ; "vs"; " " ; comp._vs
+        end for
+      end if
     end function
 
     function resetViewPortStates()
@@ -200,30 +198,36 @@ namespace tests
 
     function checkrenderedComps(comps, renderedIds, offScreenIds)
       for each id in renderedIds
-        m.assertTrue(comps[id].isInViewport)
+        m.assertNotInvalid(comps[id], `rendered comp was invalid: ${id}`)
+        m.assertTrue(comps[id] <> invalid ? comps[id].isInViewport : false)
       end for
 
       for each id in offScreenIds
-        m.assertFalse(comps[id].isInViewport)
+        m.assertNotInvalid(comps[id], `offScreenIds comp was invalid: ${id}`)
+        m.assertFalse(comps[id] <> invalid ? comps[id].isInViewport : false)
       end for
     end function
 
     function checkViewportEvent(comps, willEnterIds = [], enterIds = [], willExitIds = [], exitIds = [])
 
       for each id in enterIds
-        m.assertEqual(comps[id].listEvent.name, "didEnter")
+        m.assertNotInvalid(comps[id], `offnterId ScreenIds comp was invalid: ${id}`)
+        m.assertEqual(comps[id] <> invalid ? comps[id].listEvent.name : "", `exepcted didEnter on ${id} got ${comps[id.listEvent.name]}`)
       end for
 
       for each id in exitIds
-        m.assertEqual(comps[id].listEvent.name, "didExit")
+        m.assertNotInvalid(comps[id], `didExit ScreenIds comp was invalid: ${id}`)
+        m.assertEqual(comps[id] <> invalid ? comps[id].listEvent.name : "", `exepcted didExit on ${id} got ${comps[id.listEvent.name]}`)
       end for
 
       for each id in willEnterIds
-        m.assertEqual(comps[id].listEvent.name, "willEnter")
+        m.assertNotInvalid(comps[id], `willEnter ScreenIds comp was invalid: ${id}`)
+        m.assertEqual(comps[id] <> invalid ? comps[id].listEvent.name : "", `exepcted willEnter on ${id} got ${comps[id.listEvent.name]}`)
       end for
 
       for each id in willExitIds
-        m.assertEqual(comps[id].listEvent.name, "willExit")
+        m.assertNotInvalid(comps[id], `willExit ScreenIds comp was invalid: ${id}`)
+        m.assertEqual(comps[id] <> invalid ? comps[id].listEvent.name : "", `exepcted willExit on ${id} got ${comps[id.listEvent.name]}`)
       end for
 
     end function

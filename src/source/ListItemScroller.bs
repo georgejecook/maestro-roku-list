@@ -1,8 +1,8 @@
 import "pkg:/source/ItemScroller.bs"
 
 class ListItemScroller extends ItemScroller
-  function new(group, moveAnimation, moveAnimationInterpolator, focusManager)
-    super(group, 1, moveAnimation, moveAnimationInterpolator, focusManager)
+  function new(group, focusManager)
+    super(group, 1, focusManager)
   end function
 
   override function setFocusOnRenderer(isMoving)

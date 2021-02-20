@@ -1,8 +1,8 @@
 import "pkg:/source/ItemScroller.bs"
 
 class RowItemScroller extends ItemScroller
-  function new(viewManager, moveAnimation, moveAnimationInterpolator, focusManager)
-    super(viewManager, 0, moveAnimation, moveAnimationInterpolator, focusManager)
+  function new(viewManager, focusManager)
+    super(viewManager, 0, focusManager)
     m.screenPos = 500
   end function
 

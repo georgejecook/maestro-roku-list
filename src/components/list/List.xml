@@ -107,31 +107,6 @@
         color='#ff0000'
         visible='true'
         opacity='0.5' />
-
-    <Animation
-        id='moveAnimation'
-        duration='0.1'
-        repeat='false'
-        control='stop'
-        easeFunction='linear'>
-      <Vector2DFieldInterpolator
-          id='moveAnimationInterpolator'
-          key='[0.0, 1.0]'
-          keyValue='[ [0, 60], [0, 606] ]'
-          fieldToInterp='rowsGroup.translation' />
-    </Animation>
-    <Animation
-        id='focusPointMoveAnimation'
-        duration='0.1'
-        repeat='false'
-        control='stop'
-        easeFunction='linear'>
-      <Vector2DFieldInterpolator
-          id='focusPointAnimationInterpolator'
-          key='[0.0, 1.0]'
-          keyValue='[ [0, 60], [0, 606] ]'
-          fieldToInterp='focusPoint.translation' />
-    </Animation>
   </children>
 
 </component>

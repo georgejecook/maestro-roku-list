@@ -1,6 +1,5 @@
 namespace tests
 
-  @nocatch
   @suite("ItemFocusManager tests")
   class ItemFocusManagerTests extends tests.BaseTestSuite
 
@@ -12,7 +11,6 @@ namespace tests
     public scrollerInterplator
     public scroller
     public animation
-    public interpolator
     public delegate
     public ownerDelegate
 
@@ -35,7 +33,7 @@ namespace tests
       m.delegate = { "id": "delegate" }
       m.ownerDelegate = { "id": "ownerDelegate" }
 
-      m.focusManager = new ItemFocusManager(m.viewManager, m.scroller, m.interpolator, m.ownerDelegate)
+      m.focusManager = new ItemFocusManager(m.viewManager, m.scroller, m.ownerDelegate)
     end function
 
 
