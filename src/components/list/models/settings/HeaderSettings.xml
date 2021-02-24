@@ -13,10 +13,8 @@
         id='height'
         type='integer' />
     <field
-        id='font'
+        id='fontKey'
         type='string' />
-    <field
-        id='fontSize'
-        type='integer' />
+
   </interface>
 </component>

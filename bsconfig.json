@@ -3,7 +3,11 @@
   "files": [
     "manifest",
     "source/**/*.*",
-    "components/**/*.*"
+    "components/**/*.*",
+    {
+      "src": "test-app/**/*.*",
+      "dest": ""
+    }
   ],
   "autoImportComponentScript": true,
   "createPackage": false,
@@ -14,25 +18,16 @@
     },
     {
       "src": "**/WhiteList.xml",
-      "codes": [
-        1067
-      ]
+      "codes": [1067]
     },
     1120
   ],
   "emitDefinitions": true,
-  "plugins": [
-    "maestro-roku-bsc-plugin",
-    "rooibos-roku"
-  ],
+  "plugins": ["maestro-roku-bsc-plugin", "rooibos-roku"],
   "rooibos": {
     "isRecordingCodeCoverage": false,
     "testsFilePattern": null,
-    "tags": [
-      "!integration",
-      "!deprecated",
-      "!fixme"
-    ],
+    "tags": ["!integration", "!deprecated", "!fixme"],
     "showOnlyFailures": true,
     "catchCrashes": true,
     "lineWidth": 70

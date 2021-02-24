@@ -22,8 +22,6 @@ function init()
   m.focusManager.name = "LIST FM "
   ' m.top.clippingRect = [0,0,1920,550]
   m.focusIndicator = m.top.findNode("focusIndicator")
-  m.cellProvider = m.global.cellProvider
-  m.cellTracker = m.global.cellTracker
   m.content = invalid
 end function
 
@@ -49,7 +47,6 @@ end function
 
 function onAnimateToRowChange()
   if m.content <> invalid
-    ' animateToIndex(m.top.rowFocused, m.top.animateToRow, m.top.fastAnimationSpeed)
     m.itemScroller.moveToIndex(m.top.animateToRow)
   end if
 end function

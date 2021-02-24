@@ -13,13 +13,6 @@
         type='boolean' />
 
     <field
-        id='focusMoveAnimationInterpolator'
-        type='node' />
-    <field
-        id='focusMoveAnimation'
-        type='node' />
-
-    <field
         id='width'
         type='float'
         value='1920' />
@@ -32,6 +25,8 @@
         id='rowHidingMode'
         value='hidden'
         type='string' />
+
+
     <field
         id='animateToRow'
         type='integer'

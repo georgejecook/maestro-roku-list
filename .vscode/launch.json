@@ -25,6 +25,28 @@
         "components/**/*.*",
         "images/**/*.*"
       ]
+    },
+    {
+      "type": "brightscript",
+      "request": "launch",
+      "name": "App",
+      "preLaunchTask": "app",
+      "internalConsoleOptions": "neverOpen",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "host": "${env:ROKU_DEV_TARGET}",
+      "password": "${env:ROKU_DEVPASSWORD}",
+      "outDir": "${workspaceFolder}/out",
+      "rootDir": "${workspaceFolder}/build",
+      "consoleOutput": "normal",
+      "stopOnEntry": false,
+      "retainDeploymentArchive": true,
+      "retainStagingFolder": true,
+      "files": [
+        "manifest",
+        "source/**/*.*",
+        "components/**/*.*",
+        "images/**/*.*"
+      ]
     }
   ]
 }

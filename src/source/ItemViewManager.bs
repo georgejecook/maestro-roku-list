@@ -1,6 +1,7 @@
 import "pkg:/source/roku_modules/mc/BaseClass.brs"
 import "pkg:/source/ListMixin.bs"
 
+@strict
 class ItemViewManager extends mc.BaseClass
 
   public screenRect = { translation: [0, 0], size: [1920, 1080] }

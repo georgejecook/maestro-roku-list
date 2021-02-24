@@ -18,7 +18,8 @@ namespace tests.utils
         id: str(i).trim()
       })
     end for
-    content = new rooibos.utils.MockNode("listContent", children)
+    content = new rooibos.utils.MockNode("listContent")
+    content.children = children
     content.focusSettings = listMixin.createFocusSettings()
     content.rowSettings = listMixin.createRowSettings()
 

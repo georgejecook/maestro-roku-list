@@ -1,6 +1,7 @@
 import "pkg:/source/roku_modules/mc/BaseClass.brs"
 import "pkg:/source/roku_modules/mv/Animation.brs"
 
+@strict
 class ItemFocusManager extends mc.BaseClass
 
   public viewManager = invalid
@@ -21,7 +22,7 @@ class ItemFocusManager extends mc.BaseClass
   private rowIndex
   private delegates
 
-  function new(viewManager, scroller, ownerDelegate, rowIndex = -1)
+  function new(viewManager, scroller, ownerDelegate = invalid, rowIndex = -1)
     super("ItemFocusManager")
     m.rowIndex = rowIndex
     m.viewManager = viewManager

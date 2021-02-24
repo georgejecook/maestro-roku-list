@@ -4,7 +4,7 @@ const DiagnosticSeverity = require('brighterscript').DiagnosticSeverity;
 
 let programBuilder = new ProgramBuilder();
 programBuilder.run({
-  project: path.join(__dirname, '../', 'bsconfig-test.json')
+  project: path.join(__dirname, '../', 'bsconfig.json')
 }).then(() => {
   //fail if there are diagnostics
   if (programBuilder.program.getDiagnostics().filter((x) => x.severity === DiagnosticSeverity.Error).length > 0) {

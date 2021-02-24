@@ -1,6 +1,7 @@
 import "pkg:/source/roku_modules/mc/BaseClass.brs"
 import "pkg:/source/roku_modules/mv/Animation.brs"
 
+@strict
 class ItemScroller extends mc.BaseClass
 
   public rects = []
@@ -159,9 +160,6 @@ class ItemScroller extends mc.BaseClass
       m.setFocusIndex(m.index, true, screenPos)
       m.viewManager.updateRenderedComponents(m.direction, m.index)
 
-      if m.moveAnimation.state = "play"
-        m.moveAnimation.control = "pause"
-      end if
       m.moveAnimation.animateToWithSpeed(targetTranslation, m.animSpeed)
 
     else
@@ -208,6 +206,7 @@ class ItemScroller extends mc.BaseClass
   function toggleScrolling(active)
     m.viewManager.setIsScrolling(active)
   end function
+
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ animation callbacks
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -219,7 +218,7 @@ class ItemScroller extends mc.BaseClass
 
     if fraction = 1
       m.focusManager.onFocusAnimationUpdate(1)
-      ? "FRACTIN 1 TOG SCROLL FALSE"
+      ? "FRACTION 1 TOG SCROLL FALSE"
       m.toggleScrolling(false)
 
       if index <> m.index
@@ -242,7 +241,7 @@ class ItemScroller extends mc.BaseClass
   '  * @instance
   '  * @function
   '  * @description Responsible for all state updates, and hooks pertaning to focus position.
-  '  *       NOTE : does NOT update position - you should be in position when calling this. for speed does not recalculate index: you should know the index when you call me!
+  '  *       NOTE : does NOT update position - you should be in position when calling this. for efficiency does not recalculate index: you should know the index when you call me!
   '  * @param {integer} index - the index you KNOW you are on when your move is finished (finished could mean from one index to nextindex, while animating; doesn' have to be targetIndex)
   '  * @param {boolean} isMoving - if true, then deltas are calculated for next position, and observers fired if their screen status will change
   '  */

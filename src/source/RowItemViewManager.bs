@@ -40,10 +40,9 @@ class RowItemViewManager extends ItemViewManager
         index: index
         rowIndex: m.row.index
       })
+      'TODO - for now, no vis options for rows children..
       m.visibleItems.push(item)
 
-      'TODO - for now, no vis options for rows..
-      translation = [translation[0], translation[1]]
       translation[m.axes] = translation[m.axes] + settings.size[m.axes] + settings.space
       index++
     end for
@@ -139,7 +138,6 @@ class RowItemViewManager extends ItemViewManager
       end if
     end for
   end function
-
 
   override function getScreenRect(index, screenPos = invalid, direction = 0)
     rect = super.getScreenRect(index, screenPos, direction)
