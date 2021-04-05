@@ -22,7 +22,7 @@ namespace tests
 
       m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
       m.focusManager = { "id": "focusManager" }
-      m.scroller = new ItemScroller(m.viewManager, 1)
+      m.scroller = new ml.ItemScroller(m.viewManager, 1)
       m.scroller.focusManager = m.focusManager
       m.configureScroller(1, 20)
     end function

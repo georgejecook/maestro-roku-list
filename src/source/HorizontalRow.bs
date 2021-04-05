@@ -1,0 +1,255 @@
+import "pkg:/source/ListMixin.bs"
+import "pkg:/source/ListItemDelegateMixin.bs"
+import "pkg:/source/RowItemScroller.bs"
+import "pkg:/source/RowItemViewManager.bs"
+import "pkg:/source/ItemFocusManager.bs"
+import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
+
+namespace ml
+  @strict
+  @node("ml_HorizontalRow", "mv_BaseView")
+  class HorizontalRow extends mv.BaseView
+
+    'public fields
+    @observer("onContentChange")
+    public content as mc.types.Node
+    public index = -1
+    public owner as mc.types.Node
+    @observer("onListEvent")
+    public listEvent as mc.types.Assocarray
+    public renderState = "none"
+    @observer("onIsRenderedChange")
+    public isRendered = false
+    public isInViewport = false
+    @observer("onAnimateToItemChange")
+    public animateToItem = -1
+    public isHidden = false
+    public focusedCellIndex = -1
+    public focusedCellPercent = 0.0
+    @observer("onIsScrollingChange")
+    public isScrolling = false
+    public size = [0, 0]
+
+    'managers and state
+    private viewManager
+    private focusManager
+    private itemScroller
+
+    'debug
+    public _vs = "none"
+
+    'views
+    private bgRect
+    private contentGroup
+    private cellsGroup
+    private header
+
+    'util
+    private cellProvider = m.global.cellProvider
+    private cellTracker = m.global.cellTracker
+
+    function new()
+      super("ml_HorizontalRow")
+      ml.itemDelegateMixin.setDelegate()
+    end function
+
+    override function initialize()
+      super.initialize()
+      m.contentGroup = m.top.findNode("contentGroup")
+      m.bgRect = m.top.findNode("bgRect")
+      m.cellsGroup = m.top.findNode("cellsGroup")
+
+    end function
+
+    private function createViews()
+      m.bgRect = m.createSGNode("mv_Rectangle", m.top, "bgRect", {
+        width: 1920
+        color: "#000000"
+        opacity: 0
+        height: 500
+      })
+      m.contentGroup = m.createSGNode("Group", m.top, "contentGroup")
+      m.cellsGroup = m.createSGNode("Group", m.top, "cellsGroup")
+      m.header = m.createSGNode("mv_Label", m.top, "header", {
+        text: 'header'
+        color: '#ffffff'
+      })
+    end function
+
+    private function createManagers()
+      m.log.info("createManagers")
+      m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
+      m.focusManager = new ml.ItemFocusManager(m.viewManager, m.top.owner.cellEvents, m.top.index)
+      m.focusManager.name = "ROW FM "
+      m.focusManager.isRow = true
+      m.itemScroller = new RowItemScroller(m.viewManager, m.focusManager)
+    end function
+
+    private function onContentChange(evt)
+      ' m.log.info("onContentChange", evt.getField())
+      if m.content = invalid or not m.content.isSameNode(m.top.content)
+        m.content = m.top.content
+        m.header.text = "ROW " + m.content.title
+        m.calculateHeight()
+        m.createManagers()
+        m.viewManager.setContent(m.content)
+        m.itemScroller.reset()
+      end if
+    end function
+
+    private function calculateHeight()
+      settings = listMixin.getRowSettings(m.top.owner.content, m.content)
+      if settings.height <> -1
+        m.top.height = settings.height
+      else
+        m.top.height = settings.cellSettings.size[1] + settings.contentOffset[1]
+      end if
+    end function
+
+    private function onIsRenderedChange()
+      ' ? "onIsRenderedChange " ; m.top.isRendered
+      if m.viewManager <> invalid
+        m.viewManager.updateRenderedComponents(m.itemScroller.direction, m.itemScroller.index)
+      end if
+    end function
+
+    private function onIsScrollingChange()
+      if m.viewManager <> invalid
+        m.viewManager.setIsScrolling(m.top.isScrolling)
+      end if
+    end function
+
+    private function onListEvent(evt)
+      event = evt.getData()
+
+      if event.name = "willEnter" or event.name = "didEnter"
+        for each component in m.cellsGroup.getChildren(-1, 0)
+          component.listEvent = event
+        end for
+      end if
+    end function
+
+    private function onAnimateToItemChange()
+      if m.content <> invalid
+        m.itemScroller.moveToIndex(m.top.animateToItem)
+      end if
+    end function
+
+    public function getRenderer(index)
+      return m.viewManager.getRenderer(index)
+    end function
+
+    public function getRect(index, useScreenCoords = false)
+      return m.viewManager.getRect(index, useScreenCoords)
+    end function
+
+    public function getScreenRect(index, screenPos = invalid, direction = 0)
+      return m.viewManager.getScreenRect(index, screenPos, direction)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ KeyPress
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onKeyPressLeft() as boolean
+      m.log.method("onKeyPressLeft")
+      m.itemScroller.move(-1, 500)
+      return true
+    end function
+
+    private function onKeyPressRight() as boolean
+      m.log.method("onKeyPressRight")
+      m.itemScroller.move(1, 500)
+      return true
+    end function
+
+    private function getLongPressIntervalForKey(key) as float
+      m.log.method("getLongPressIntervalForKey", key)
+      if key = "left" or key = "right"
+        return 0.2
+      else
+        return 0
+      end if
+    end function
+
+    private function onLongPressStart(key) as boolean
+      m.log.method(">>>>onLongPressStart", key)
+
+      if key = "left" or key = "right"
+        m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
+        if key = "left"
+          m.itemScroller.moveToEnd(-1)
+        else
+          m.itemScroller.moveToEnd(1)
+        end if
+
+        return true
+      end if
+
+      return false
+    end function
+
+    private function onLongPressFinish(key) as boolean
+      if key = "left" or key = "right"
+        m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
+        m.itemScroller.finishAnimating()
+        return true
+      end if
+
+      return false
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ delegate
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    ' function onWillEnter(index, direction)
+    '   ' ? "onWillEnter " ; index ; " " ; direction
+    '   ' m.top.opacity = 1
+    '   ' if direction = 1
+    '   ' else
+    '   '   m.top.opacity = 0
+    '   ' end if
+    ' end function
+
+    ' function onWillExit(index, direction)
+    '   ? "onWillExit " ; index ; " " ; direction
+    ' end function
+
+    ' function onDidEnter(index, direction)
+    '   ? "onDidEnter " ; index ; " " ; direction
+    ' end function
+
+    ' function onDidExit(index, direction)
+    '   ? "onDidExit " ; index ; " " ; direction
+    ' end function
+
+    ' function onWillGainFocus(index, direction)
+    '   ? "onWillGainFocus " ; index ; " " ; direction
+    ' end function
+
+    ' function onWillLoseFocus(index, direction)
+    '   ? "onWillLoseFocus " ; index ; " " ; direction
+    ' end function
+
+    ' private function onDidGainFocus(index, direction)
+    '   '   ? "onDidGainFocus " ; index ; " " ; direction
+    '   '   ' m.top.opacity = 1
+    '   m.bgRect.opacity = 1
+    ' end function
+
+    ' private function onDidLoseFocus(index, direction)
+    '   '   ? "onDidLoseFocus " ; index ; " " ; direction
+    '   '   ' m.top.opacity = 0
+    '   m.bgRect.opacity = 0
+    ' end function
+
+    ' private function onGainingFocus(index, direction, fraction)
+    '   m.bgRect.opacity = fraction
+    ' end function
+
+    ' private function onLosingFocus(index, direction, fraction)
+    '   m.bgRect.opacity = 1 - fraction
+    ' end function
+  end class
+end namespace

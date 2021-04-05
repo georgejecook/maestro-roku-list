@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <component
-    name='List'
+    name='ml_List'
     extends='mv_BaseView'>
   <interface>
     <field
@@ -88,20 +88,7 @@
 
   </interface>
   <children>
-    <Timer
-        id='focusTimer'
-        duration='0.01'
-        control='start'
-        repeat='true' />
-    <Group id='contentGroup'>
-      <Group id='rowsGroup' />
-    </Group>
-    <Rectangle id='focusPoint' />
-    <Rectangle
-        id='focusIndicator'
-        color='#ff0000'
-        visible='true'
-        opacity='0.5' />
+
   </children>
 
 </component>

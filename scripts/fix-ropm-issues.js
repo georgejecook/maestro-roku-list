@@ -1,31 +1,25 @@
 import * as fsExtra from 'fs-extra';
 import * as path from 'path';
+import * as glob from 'glob';
 
-function fixRopmIssues(module, file) {
-
-    let filename = path.resolve(path.join('src/source/roku_modules/', module, file + '.d.bs'));
-    let text = fsExtra.readFileSync(filename).toString();
-    text = text.replace(/(@strict)\n(namespace .*)/gim, (m, m1, m2) => {
-        return `${m2}\n${m1}`;
-    });
-    text = text.replace(/(@usesetfield)\n(namespace .*)/gim, (m, m1, m2) => {
-        return `${m2}\n${m1}`;
-    });
-    text = text.replace(/ mv\.mc\./gim, ` mc.`);
-    text = text.replace(/ mx\.mx\./gim, ` mx.`);
-    text = text.replace(/ mc\.mc\./gim, ` mc.`);
-    text = text.replace(/ mv\.mv\./gim, ` mv.`);
-    // text = text.replace(/(class .* extends )(.*)/gim, (m, m1, m2) => {
-    //     if (m2.startsWith(module)) {
-    //         return `${m1}${m2}`;
-    //     } else {
-    //         return `${m1}${module}.${m2}`;
-    //     }
-    // });
-    fsExtra.writeFileSync(filename, text, 'utf8');
-}
-
-fixRopmIssues('mc', 'BaseClass');
-fixRopmIssues('mv', 'NodeClass');
-fixRopmIssues('mv', 'BaseView');
-fixRopmIssues('mv', 'BaseScreen');
+glob('src/components/roku_modules/maestro/**/*.xml', (er, files) => {
+    for (let f of files) {
+        let text = fsExtra.readFileSync(f).toString();
+        text = text.replace('pkg:/source/roku_modules/maestro/bslib.brs', 'pkg:/source/bslib.brs');
+        fsExtra.writeFileSync(f, text, 'utf8');
+    }
+});
+glob('src/components/roku_modules/maestro/**/*.brs', (er, files) => {
+    for (let f of files) {
+        let text = fsExtra.readFileSync(f).toString();
+        text = text.replace(/maestro_/gim, '');
+        fsExtra.writeFileSync(f, text, 'utf8');
+    }
+});
+glob('src/source/roku_modules/maestro/**/*.brs', (er, files) => {
+    for (let f of files) {
+        let text = fsExtra.readFileSync(f).toString();
+        text = text.replace(/maestro_/gim, '');
+        fsExtra.writeFileSync(f, text, 'utf8');
+    }
+});

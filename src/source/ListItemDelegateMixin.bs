@@ -1,8 +1,8 @@
-namespace listItemDelegateMixin
+namespace ml.itemDelegateMixin
 
   ' /**
   '  * @member setDelegate
-  '  * @memberof module:ListItemDelegateMixin
+  '  * @memberof module:ml.delegateMixin
   '  * @instance
   '  * @function
   '  * @description wires up a cell, or row (or some other list item) to method handlers for the delegate events it may receive. This should be used to add listeners to a cell, or a row renderer. You are free to just simply use the events, that come in onlistEventMap, as well.
@@ -11,6 +11,9 @@ namespace listItemDelegateMixin
   '  */
   function setDelegate(instance = invalid)
     m.listEventMap = {}
+    if instance = invalid
+      instance = m
+    end if
 
     if instance <> invalid
       funcMap = {
@@ -26,50 +29,18 @@ namespace listItemDelegateMixin
         "onLosingFocus": "losingFocus"
       }
 
-      for each eventName in funcMap
-        if mc_isFunction(instance[eventName])
-          m.listEventMap[funcMap[eventName]] = true
+      for each funcName in funcMap
+        if mc_isFunction(instance[funcName])
+          m.listEventMap[funcMap[eventName]] = funcName
         end if
       end for
-    else
-      'no way to get a function pointer by name :(
-      if mc_isFunction(onWillEnter)
-        m.listEventMap["willEnter"] = true
-      end if
-      if mc_isFunction(onWillExit)
-        m.listEventMap["willExit"] = true
-      end if
-      if mc_isFunction(onDidEnter)
-        m.listEventMap["didEnter"] = true
-      end if
-      if mc_isFunction(onDidExit)
-        m.listEventMap["didExit"] = true
-      end if
-      if mc_isFunction(onWillGainFocus)
-        m.listEventMap["willGainFocus"] = true
-      end if
-      if mc_isFunction(onWillLoseFocus)
-        m.listEventMap["willLoseFocus"] = true
-      end if
-      if mc_isFunction(onDidGainFocus)
-        m.listEventMap["didGainFocus"] = true
-      end if
-      if mc_isFunction(onDidLoseFocus)
-        m.listEventMap["didLoseFocus"] = true
-      end if
-      if mc_isFunction(onGainingFocus)
-        m.listEventMap["gainingFocus"] = true
-      end if
-      if mc_isFunction(onLosingFocus)
-        m.listEventMap["losingFocus"] = true
-      end if
     end if
 
     m.isObservingListEvents = m.listEventMap.count() > 0
 
     if m.isObservingListEvents
-      m.listEventInstance = instance
-      mc_toggleObserver(m.top, "listEvent", mc_getFunctionName(onListEventBridge))
+      m.listItemDelegate = instance
+      mc.toggleObserver(m.top, "listEvent", mc.getFunctionName(onListEventBridge))
     end if
   end function
 
@@ -77,92 +48,15 @@ namespace listItemDelegateMixin
     event = sgEvent.getData()
     eventName = event.name
     ' ? eventName
-    if not m.isObservingListEvents or m.listEventMap[eventName] <> true
+    if not m.isObservingListEvents or m.listEventMap[eventName] = invalid
       ' ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
       return
     end if
-    ' ? "onListEventBridge OBSERVED " ; eventName
 
-    'lament: not being able to get functions in the node scope is such a bummer
-    if eventName = "willEnter"
-      if m.listEventInstance <> invalid
-        m.listEventInstance.onWillEnter(event.index, event.direction)
-      else
-        'bs:disable-next-line
-        onWillEnter(event.index, event.direction)
-      end if
-    else if eventName = "willExit"
-      if m.listEventInstance <> invalid
-        m.listEventInstance.onWillExit(event.index, event.direction)
-      else
-        'bs:disable-next-line
-        onWillExit(event.index, event.direction)
-      end if
-
-    else if eventName = "didEnter"
-      if m.listEventInstance <> invalid
-        m.listEventInstance.onDidEnter(event.index, event.direction)
-      else
-        'bs:disable-next-line
-        onDidEnter(event.index, event.direction)
-      end if
-
-    else if eventName = "didExit"
-      if m.listEventInstance <> invalid
-        m.listEventInstance.onDidExit(event.index, event.direction)
-      else
-        'bs:disable-next-line
-        onDidExit(event.index, event.direction)
-      end if
-
-    else if eventName = "willGainFocus"
-      if m.listEventInstance <> invalid
-        m.listEventInstance.onWillGainFocus(event.index, event.direction)
-      else
-        'bs:disable-next-line
-        onWillGainFocus(event.index, event.direction)
-      end if
-
-    else if eventName = "willLoseFocus"
-      if m.listEventInstance <> invalid
-        m.listEventInstance.onWillLoseFocus(event.index, event.direction)
-      else
-        'bs:disable-next-line
-        onWillLoseFocus(event.index, event.direction)
-      end if
-
-    else if eventName = "didGainFocus"
-      if m.listEventInstance <> invalid
-        m.listEventInstance.onDidGainFocus(event.index, event.direction)
-      else
-        'bs:disable-next-line
-        onDidGainFocus(event.index, event.direction)
-      end if
-
-    else if eventName = "didLoseFocus"
-      if m.listEventInstance <> invalid
-        m.listEventInstance.onDidLoseFocus(event.index, event.direction)
-      else
-        'bs:disable-next-line
-        onDidLoseFocus(event.index, event.direction)
-      end if
-
-    else if eventName = "gainingFocus"
-      if m.listEventInstance <> invalid
-        m.listEventInstance.onGainingFocus(event.index, event.direction, event.fraction)
-      else
-        'bs:disable-next-line
-        onGainingFocus(event.index, event.direction, event.fraction)
-      end if
-
-    else if eventName = "losingFocus"
-      if m.listEventInstance <> invalid
-        m.listEventInstance.onLosingFocus(event.index, event.direction, event.fraction)
-      else
-        'bs:disable-next-line
-        onLosingFocus(event.index, event.direction, event.fraction)
-      end if
-
+    if eventName = "gainingFocus" or eventName = "losingFocus"
+      m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction, event.fraction)
+    else
+      m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction)
     end if
 
   end function

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <component
-    name='RowSettings'
+    name='ml_RowSettings'
     extends='Node'>
   <interface>
     <field

@@ -1,6 +1,6 @@
 
 namespace tests
-  class TestItemViewManager extends ItemViewManager
+  class TestItemViewManager extends ml.ItemViewManager
     public itemSize = [100, 100]
     public space = 0
     private comps

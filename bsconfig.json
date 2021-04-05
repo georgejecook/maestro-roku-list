@@ -15,12 +15,7 @@
   "diagnosticFilters": [
     {
       "src": "**/roku_modules/**/*.*"
-    },
-    {
-      "src": "**/WhiteList.xml",
-      "codes": [1067]
-    },
-    1120
+    }
   ],
   "emitDefinitions": true,
   "plugins": ["maestro-roku-bsc-plugin", "rooibos-roku"],
@@ -36,5 +31,9 @@
     "strip": false,
     "insertPkgPath": true
   },
-  "sourceMap": true
+  "sourceMap": true,
+  "maestro": {
+    "excludeFilters": ["**/roku_modules/**/*", "**/rooibos/**/*"],
+    "buildForIDE": true
+  }
 }

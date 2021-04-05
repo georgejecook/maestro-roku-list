@@ -1,17 +1,18 @@
 import "pkg:/source/ItemScroller.bs"
+namespace ml
+  class ListItemScroller extends ml.ItemScroller
+    function new(group, focusManager)
+      super(group, 1, focusManager)
+    end function
 
-class ListItemScroller extends ItemScroller
-  function new(group, focusManager)
-    super(group, 1, focusManager)
-  end function
-
-  override function setFocusOnRenderer(isMoving)
-    if not isMoving
-      m.log.info("stopped scrolling on row", m.index)
-      row = m.viewManager.getRenderer(m.index)
-      if row <> invalid
-        row.setFocus(true)
+    override function setFocusOnRenderer(isMoving)
+      if not isMoving
+        m.log.info("stopped scrolling on row", m.index)
+        row = m.viewManager.getRenderer(m.index)
+        if row <> invalid
+          row.setFocus(true)
+        end if
       end if
-    end if
-  end function
-end class
+    end function
+  end class
+end namespace

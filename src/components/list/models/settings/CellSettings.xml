@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <component
-    name='CellSettings'
+    name='ml_CellSettings'
     extends='Node'>
   <interface>
     <field

@@ -27,13 +27,13 @@ namespace tests
 
       m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
 
-      m.scroller = new ItemScroller(m.viewManager, 1)
+      m.scroller = new ml.ItemScroller(m.viewManager, 1)
       m.configureScroller(1, 20)
 
       m.delegate = { "id": "delegate" }
       m.ownerDelegate = { "id": "ownerDelegate" }
 
-      m.focusManager = new ItemFocusManager(m.viewManager, m.scroller, m.ownerDelegate)
+      m.focusManager = new ml.ItemFocusManager(m.viewManager, m.scroller, m.ownerDelegate)
     end function
 
 
@@ -50,7 +50,7 @@ namespace tests
 
     @it("does not need owner delegate")
     function _()
-      m.focusManager = new ItemFocusManager(m.viewManager, m.scroller, invalid)
+      m.focusManager = new ml.ItemFocusManager(m.viewManager, m.scroller, invalid)
       m.assertEqual(m.focusManager.delegates[0].id, "owner")
       m.assertArrayCount(m.focusManager.delegates, 1)
 
@@ -62,7 +62,7 @@ namespace tests
     @params(2)
     @params(3)
     function _(index)
-      m.focusManager = new ItemFocusManager(m.viewManager, m.scroller, invalid,  index)
+      m.focusManager = new ml.ItemFocusManager(m.viewManager, m.scroller, invalid,  index)
       m.assertEqual(m.focusManager.delegates[0].id, "owner")
       m.assertArrayCount(m.focusManager.delegates, 1)
       m.assertEqual(m.focusManager.rowIndex, index)

@@ -1,5 +1,5 @@
-import "pkg:/source/roku_modules/mioc/MIOC.brs"
-import "pkg:/source/roku_modules/mc/Tasks.brs"
+import "pkg:/source/roku_modules/maestro/core/MIOC.brs"
+import "pkg:/source/roku_modules/maestro/core/Tasks.brs"
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ Initialization

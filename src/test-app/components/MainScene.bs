@@ -1,7 +1,7 @@
 import "pkg:/source/roku_modules/log/LogMixin.brs"
-import "pkg:/source/roku_modules/mioc/MIOC.brs"
-import "pkg:/source/roku_modules/mc/Tasks.brs"
-import "pkg:/source/roku_modules/mc/Utils.brs"
+import "pkg:/source/roku_modules/maestro/core/MIOC.brs"
+import "pkg:/source/roku_modules/maestro/core/Tasks.brs"
+import "pkg:/source/roku_modules/maestro/core/Utils.brs"
 
 function Init() as void
   createObject("roSGNode", "TrackerTask")
