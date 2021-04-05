@@ -40,6 +40,7 @@ namespace ml
       m.container = m.viewManager.container
       m.axes = axes
       m.moveAnimation = new mv.animations.Move(m.container, 1, m.container.translation, m.container.translation)
+      m.moveAnimation.observeFraction(m.onAnimationFractionChange, m)
     end function
 
     public function onViewManagerUpdate()
@@ -170,7 +171,7 @@ namespace ml
         ? "speed"; m.animSpeed ; " target Trans "; targetTranslation
         m.moveAnimation.animateToWithSpeed(targetTranslation, m.animSpeed)
         ? ">>>>>>> animate prepare"
-        ' m.moveAnimation.animateTo(targetTranslation, 10)
+        m.moveAnimation.animateTo(targetTranslation, 5)
         m.moveAnimation.start()
         ? ">>>>>>> animate started"
 
@@ -224,7 +225,7 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     function onAnimationFractionChange(fraction)
-      ' m.log.info("onAnimationFractionChange", fraction)
+      m.log.info("onAnimationFractionChange", fraction)
       position = m.container.translation[m.axes]
       index = m.viewManager.getIndexAtPosition(position, m.direction)
 
