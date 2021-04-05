@@ -56,10 +56,11 @@ namespace ml
     end function
 
     function setContent(content)
+      m.log.info("setContent")
       m.content = content
-      m.settings = listMixin.getRowSettings(m.owner.content, m.content)
+      m.settings = ml.listMixin.getRowSettings(m.owner.content, m.content)
 
-      m.container.removeChildren(m.container.getChildren(-1, 0))
+      ' m.container.removeChildren(m.container.getChildren(-1, 0))
       m._createRenderers(content)
       m._updateLayout()
 
@@ -159,7 +160,7 @@ namespace ml
       '   ? " RI " ; renderedIndexes
       '   ? " LRI " ; m.lastRenderedIndexes
       ' end if
-      ' m.log.info("renderedIndexes index", index, renderedIndexes)
+      m.log.info("renderedIndexes index", index, renderedIndexes)
       renderedStateMap = m.createRenderedStateMap(direction, index, renderedIndexes)
       m.renderedComponents = []
       m.applyRenderStateMap(renderedStateMap)
@@ -203,7 +204,7 @@ namespace ml
     end function
 
     function createRenderedStateMap(direction, index, renderedIndexes)
-      ' m.log.method("createRenderedStateMap", index, renderedIndexes)
+      m.log.method("createRenderedStateMap", index, renderedIndexes)
       renderedStateMap = {}
 
       if m.numberOfItems = 0
@@ -220,7 +221,7 @@ namespace ml
         startIndex = 0
       end if
 
-      ' ? " endindex " ; endIndex ; " m.numberOfItems "; m.numberOfItems
+      ? " endindex " ; endIndex ; " m.numberOfItems "; m.numberOfItems
       if endIndex > m.numberOfItems
         endIndex = m.numberOfItems - 1
       end if
@@ -229,7 +230,7 @@ namespace ml
 
         rect = m.rects[i]
         if rect <> invalid
-          ' ? "ROW "; i ; " rect idx "; rect.index ; " state " ; state
+          ? "ROW "; i ; " rect idx "; rect.index ; " state " ; state
           renderedStateMap[str(rect.index).trim()] = state
         else
           ? " NO RECT "; i
@@ -314,7 +315,7 @@ namespace ml
         itemRect = m.rects[i]
         screenPos = m.getScreenPositionForItem(itemRect, direction)
         itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
-        ' ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
+        ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
         if itemPos > abs(position)
           return i - 1
         end if

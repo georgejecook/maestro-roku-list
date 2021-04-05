@@ -24,6 +24,7 @@ end function
 function begin(args = invalid)
   m.log.info("begin")
   m.top._global = m.global
+  mioc.createContainer()
   appController = m.top.findNode("mainGroup").createChild("AppController")
   appController@._initialize()
   appController.setFocus(true)

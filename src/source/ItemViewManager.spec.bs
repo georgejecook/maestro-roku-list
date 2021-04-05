@@ -9,7 +9,7 @@ namespace tests
 
     override function beforeEach()
       m.owner = new rooibos.utils.MockNode("owner")
-      m.owner.content = listMixin.createListContent()
+      m.owner.content = ml.listMixin.createListContent()
       m.owner.translation = [0, 0]
       m.owner.width = 1920
       m.owner.height = 1080

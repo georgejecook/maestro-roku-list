@@ -27,7 +27,7 @@ function initFlyweight()
 end function
 
 function prebakeCells()
-  m.cellProvider@.addPreBakedCells(200, "Cell")
+  m.cellProvider@.addPreBakedCells(200, "ml_Cell")
 end function
 
 
@@ -46,7 +46,7 @@ end function
 
 function onFirstShow()
   m.log.info("onFirstShow")
-  screen = m.top.findNode("contentGroup").createChild("ListScreen")
-  mv.initializeView(screen)
+  prebakeCells()
+  screen = mc.createSGNode("ListScreen", m.top.findNode("contentGroup"), "listScreen")
   mv.setFocus(screen)
 end function

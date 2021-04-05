@@ -1,14 +1,14 @@
-namespace listMixin
+namespace ml.listMixin
   function createListContent(rowContent = [], focusSettings = invalid, rowSettings = invalid)
     content = createObject("roSGNode", "ml_ListContent")
     content.appendChildren(rowContent)
 
     if rowSettings = invalid
-      rowSettings = listMixin.createRowSettings()
+      rowSettings = ml.listMixin.createRowSettings()
     end if
 
     if focusSettings = invalid
-      focusSettings = listMixin.createFocusSettings()
+      focusSettings = ml.listMixin.createFocusSettings()
     end if
 
     content.update({
@@ -23,15 +23,15 @@ namespace listMixin
     settings = createObject("roSGNode", "ml_RowSettings")
 
     if cellSettings = invalid
-      cellSettings = listMixin.createCellSettings()
+      cellSettings = ml.listMixin.createCellSettings()
     end if
 
     if headerSettings = invalid
-      headerSettings = listMixin.createHeaderSettings()
+      headerSettings = ml.listMixin.createHeaderSettings()
     end if
 
     if focusSettings = invalid
-      focusSettings = listMixin.createFocusSettings()
+      focusSettings = ml.listMixin.createFocusSettings()
     end if
 
     settings.update({
@@ -124,7 +124,7 @@ namespace listMixin
     else
       'THIS SHOULD NOT BE POSSIBLE
       m.log.error("no settings for list - this should not have been called!")
-      return invalid
+      return createObject("roSGNode", "ml_RowSettings")
     end if
   end function
 
@@ -136,7 +136,7 @@ namespace listMixin
     else if listContent <> invalid and listContent.rowSettings <> invalid
       return listContent.rowSettings.cellSettings
     else
-      m.log.error("no listCotnent for list - this should not have been called!")
+      m.log.error("no listContent for list - this should not have been called!")
       return invalid
     end if
   end function
@@ -148,11 +148,11 @@ namespace listMixin
     else if listContent <> invalid and listContent.rowSettings <> invalid and listContent.rowSettings.focusSettings <> invalid
       ? "use listContent ROW FOCUS SETTINGS"
       return listContent.rowSettings.focusSettings
-      m.log.error("no listCotnent for list - this should not have been called!")
+      m.log.error("no listContent for list - this should not have been called!")
     else if listContent <> invalid and listContent.focusSettings <> invalid
       ? "use listContent FOCUS SETTINGS"
       return listContent.focusSettings
-      m.log.error("no listCotnent for list - this should not have been called!")
+      m.log.error("no listContent for list - this should not have been called!")
     end if
     return invalid
   end function

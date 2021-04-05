@@ -5,10 +5,34 @@ import "pkg:/source/roku_modules/maestro/view/BaseScreen.brs"
 @node("ListScreen", "mv_BaseScreen")
 class ListScreen extends mv.BaseScreen
 
+  @observer("onRemoveItems")
+  @alwaysnotify
+  public removeItems = 0
+
+  @observer("onShowItems")
+  @alwaysnotify
+  public showItems = 0
+
+  @observer("onHideItems")
+  @alwaysnotify
+  public hideItems = 0
+
+  @observer("onShowRows")
+  @alwaysnotify
+  public showRows = 0
+
+  @observer("onHideRows")
+  @alwaysnotify
+  public hideRows = 0
+
   'views
   private list
   private listHolder
   private bgRect
+
+  'style
+  private numberOfRows = 1
+  private defaultCellType = "ml_Cell"
 
   'state
   public cellProvider as mc.types.Node
@@ -19,14 +43,14 @@ class ListScreen extends mv.BaseScreen
     super("ListScreen")
     m.log = new log.Logger("ListScreen")
     m.bgRect = m.createSGNode("mv_Rectangle", m.top, "bgRect", {
-      size:[1920, 1080]
-      color:"#b286f0"
+      size: [1920, 1080]
+      color: "#b286f0"
     })
     m.listHolder = m.createSGNode("Group", m.top, "listHolder")
     m.cellProvider = m.global.cellProvider
     m.cellTracker = m.global.cellTracker
 
-    m.list = m.createSGNode("mv_List", m.listHolder, "list")
+    m.list = m.createSGNode("ml_List", m.listHolder, "list")
     m.list.translation = [0, 0]
     m.onResetChange()
   end function
@@ -34,17 +58,18 @@ class ListScreen extends mv.BaseScreen
   function onResetChange()
     ? "resetting"
     m.list.content = invalid
-    content = listMixin.createListContent(m.createData())
-    m.list.content = content
+    content = ml.listMixin.createListContent(m.createData())
+     m.list.content = content
   end function
 
   function createData()
     content = []
-    for i = 0 to m.top._numberOfRows
+    for i = 0 to m.numberOfRows -1
       row = createObject("roSGNode", "ContentNode")
       row.title = "ROW " + str(i)
       row.addField("isHidden", "boolean", true)
       row.addField("isFocusable", "boolean", true)
+      content.push(row)
       if i <> 0
         if i mod 9 = 0
           row.addFields({ "focusType": "floatingWrap" })
@@ -75,7 +100,7 @@ class ListScreen extends mv.BaseScreen
           "cellType": cellType
         })
       end if
-      row.appendChildren(m.makeItems(m.top._defaultCellType, 60))
+      row.appendChildren(m.makeItems(m.defaultCellType, 60))
     end for
     return content
   end function
@@ -101,26 +126,6 @@ class ListScreen extends mv.BaseScreen
 
 
   function currFocusItemIndexChanged()
-  end function
-
-  function onAddTypeOnes()
-    m.addItems("SimpleCell", m.top._addTypeOnes)
-  end function
-
-  function onAddComplex()
-    m.addItems("ComplexCell", m.top._addTypeComplex)
-  end function
-
-  function onAddTypeTwos()
-    m.addItems("SimpleCell2", m.top._addTypeTwos)
-  end function
-
-  function onAddTypeOnePrebakes()
-    m.cellProvider.callfunc("addPreBakedCells", m.top._addTypeOnePrebakes, "SimpleCell")
-  end function
-
-  function onAddTypeTwoPrebakes()
-    m.cellProvider.callfunc("addPreBakedCells", m.top._addTypeTwoPrebakes, "SimpleCell2")
   end function
 
   function addItems(cellType, number)
@@ -155,11 +160,11 @@ class ListScreen extends mv.BaseScreen
     return items
   end function
 
-  function onRemove()
+  function onRemoveItems(items)
     row = m.list.content.getChild(focusedRow)
 
-    startIndex = row.getChildCount() - m.top._removeItems
-    children = row.getChildren(m.top._removeItems, startIndex)
+    startIndex = row.getChildCount() - items
+    children = row.getChildren(items, startIndex)
     row.removeChildren(children)
 
   end function
@@ -178,19 +183,15 @@ class ListScreen extends mv.BaseScreen
 
   end function
 
-  function onHideRow()
-    ? "onHide"
-
+  function onHideRows(rows)
     row = m.list.content.getChild(focusedRow)
-    m.toggleCellState(m.getRowItems(row, m.top._hideRowItems), "hidden")
+    m.toggleCellState(m.getRowItems(row, rows), "hidden")
   end function
 
 
-  function onShowRow()
-    ? "onShow"
-
+  function onShowRows(rows)
     row = m.list.content.getChild(focusedRow)
-    m.toggleCellState(m.getRowItems(row, m.top._showRowItems), "show")
+    m.toggleCellState(m.getRowItems(row, rows), "show")
   end function
 
   function getRowItems(row, number)
@@ -202,8 +203,8 @@ class ListScreen extends mv.BaseScreen
     return items
   end function
 
-  function onHideItems()
-    for i = 0 to m.top._hideItems
+  function onHideItems(items)
+    for i = 0 to items
       dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
       if dynamicCell <> invalid
         dynamicCell.viewState = "hidden"
@@ -211,8 +212,8 @@ class ListScreen extends mv.BaseScreen
     end for
   end function
 
-  function onShowItems()
-    for i = 0 to m.top._showItems
+  function onShowItems(items)
+    for i = 0 to items
       dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
       if dynamicCell <> invalid
         dynamicCell.viewState = "show"
@@ -237,7 +238,7 @@ class ListScreen extends mv.BaseScreen
   function onKeyPressBack() as boolean
     ? "going back!"
 
-    if not m.top.isRoot
+    if m.top.isRoot <> true
       m.list.isHidden = true
       m.pop()
     end if

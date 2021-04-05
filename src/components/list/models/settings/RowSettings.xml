@@ -17,13 +17,16 @@
         type='node' />
     <field
         id='contentOffset'
-        type='floatarray' />
+        type='floatarray'
+        value='[0,0]' />
     <field
         id='space'
-        type='integer' />
+        type='integer'
+        value='0' />
     <field
         id='screenPos'
-        type='integer' />
+        type='integer'
+        value='0' />
     <field
         id='height'
         type='integer'

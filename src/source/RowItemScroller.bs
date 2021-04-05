@@ -2,8 +2,8 @@ import "pkg:/source/ItemScroller.bs"
 
 namespace ml
   class RowItemScroller extends ml.ItemScroller
-    function new(viewManager, focusManager)
-      super(viewManager, 0, focusManager)
+    function new(viewManager)
+      super(viewManager, 0)
       m.screenPos = 500
     end function
 
@@ -14,7 +14,7 @@ namespace ml
     end function
 
     override function getFocusSettings()
-      return listMixin.getFocusSettings(m.viewManager.owner.content, m.viewManager.content)
+      return ml.listMixin.getFocusSettings(m.viewManager.owner.content, m.viewManager.content)
     end function
 
   end class

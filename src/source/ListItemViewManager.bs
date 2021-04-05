@@ -4,10 +4,6 @@ import "pkg:/source/ListMixin.bs"
 namespace ml
   class ListItemViewManager extends ml.ItemViewManager
 
-    public comps
-    public visibleComps
-    public hiddenComps
-
     function new(list, container, minPos = 0, maxPos = 1080)
       super("ListItemViewManager", list, container, 1, minPos, maxPos)
       m.delegate = list.rowEvents
@@ -16,7 +12,7 @@ namespace ml
     end function
 
     override function getRenderer(index)
-      return m.comps[index]
+      return m.components[index]
     end function
 
     override function createRenderers(content)
@@ -29,18 +25,14 @@ namespace ml
       if content <> invalid
         index = 0
         for each rowContent in content.getChildren(-1, 0)
-          settings = listMixin.getRowSettings(m.content, rowContent)
+          settings = ml.listMixin.getRowSettings(m.content, rowContent)
 
-          if rowContent.rowCompName <> invalid
-            comp = m.createRow(rowContent, index, settings)
-          else
-            comp = m.createRow("HorizontalRow", index, settings)
-          end if
+          comp = m.createRow(rowContent, index, settings)
           if comp <> invalid
             comp.index = index
             comp.renderState = "none"
 
-            m.comps.push(comp)
+            m.components.push(comp)
           else
             m.log.error("could not create row for index ")
           end if
@@ -49,24 +41,24 @@ namespace ml
       end if
     end function
 
-    function createRow(componentName, index, settings)
-      comp = m.container.createChild(componentName)
-      comp.id = str(index).trim()
-      comp.renderState = "none"
-      comp.owner = m.owner
-      comp.content = rowContent
-      'TODO - measure the heights.
-      comp.isInViewport = index < 5
-
-      return comp
+    function createRow(rowContent, index, settings)
+      compName = rowContent.rowCompName <> invalid ? rowContent.rowCompName <> invalid : "ml_HorizontalRow"
+      return m.createSGNode(compName, m.container, str(index).trim(), {
+        renderState: "rendered"
+        isRendered: true
+        content: rowContent
+        owner: m.owner
+        'TODO - measure the heights.
+        isInViewport: index < 5
+      })
     end function
 
     override function updateLayout()
       y = 0
       w = m.owner.width
 
-      for each comp in m.comps
-        settings = listMixin.getRowSettings(m.content, comp.content)
+      for each comp in m.components
+        settings = ml.listMixin.getRowSettings(m.content, comp.content)
         comp.visible = comp.content.isHidden <> true
 
         if comp.visible
@@ -82,10 +74,10 @@ namespace ml
             index: comp.index
             screenPos: settings.screenPos
           })
-          m.visiblecomps.push(comp)
+          m.visibleComponents.push(comp)
           m.visibleItems.push(comp.content)
         else
-          m.hiddencomps.push(comp)
+          m.hiddenComponents.push(comp)
         end if
 
       end for
@@ -93,9 +85,9 @@ namespace ml
     end function
 
     override function applyRenderStateMap(renderStateMap)
-      ' ? "updating renderStateMap: " ; formatJson(renderStateMap)
+      ? "LIST updating renderStateMap: " ; formatJson(renderStateMap)
       for each id in renderStateMap
-        comp = m.comps[id.toInt()]
+        comp = m.components[id.toInt()]
 
         if comp <> invalid and comp.renderState <> renderStateMap[id]
           comp.renderState = renderStateMap[id]

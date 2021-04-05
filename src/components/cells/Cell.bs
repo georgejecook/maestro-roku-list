@@ -11,7 +11,7 @@ function init()
   ' m.top.observeField("content", "onContentChange")
   ' m.top.observeField("listEvent", "onListEvent")
   m.top.observeField("initialState", "onInitialStateChange")
-  ListItemDelegateMixin.setDelegate()
+  ml.itemDelegateMixin.setDelegate()
   m.content = invalid
 end function
 

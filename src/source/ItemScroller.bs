@@ -1,5 +1,6 @@
 import "pkg:/source/roku_modules/maestro/core/BaseClass.brs"
 import "pkg:/source/roku_modules/maestro/view/Animation.brs"
+import "pkg:/source/ListMixin.bs"
 
 namespace ml
 
@@ -32,12 +33,13 @@ namespace ml
 
     private animSpeed
     private settings
+
     function new(viewManager, axes)
       super("ItemScroller")
       m.viewManager = viewManager
       m.container = m.viewManager.container
       m.axes = axes
-      m.moveAnimation = mv.animations.utils.moveTo(m.container, 1, m.container.translation, false)
+      m.moveAnimation = new mv.animations.Move(m.container, 1, m.container.translation, m.container.translation)
     end function
 
     public function onViewManagerUpdate()
@@ -52,7 +54,11 @@ namespace ml
     end function
 
     function getFocusSettings()
-      return m.viewManager.content.focusSettings
+      if m.viewManager.content <> invalid
+        return m.viewManager.content.focusSettings
+      else
+        return ml.listMixin.createFocusSettings()
+      end if
     end function
 
     public function reset()
@@ -161,8 +167,12 @@ namespace ml
         m.toggleScrolling(true)
         m.setFocusIndex(m.index, true, screenPos)
         m.viewManager.updateRenderedComponents(m.direction, m.index)
-
+        ? "speed"; m.animSpeed ; " target Trans "; targetTranslation
         m.moveAnimation.animateToWithSpeed(targetTranslation, m.animSpeed)
+        ? ">>>>>>> animate prepare"
+        ' m.moveAnimation.animateTo(targetTranslation, 10)
+        m.moveAnimation.start()
+        ? ">>>>>>> animate started"
 
       else
         m.container.translation = targetTranslation

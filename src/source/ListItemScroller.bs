@@ -1,8 +1,8 @@
 import "pkg:/source/ItemScroller.bs"
 namespace ml
   class ListItemScroller extends ml.ItemScroller
-    function new(group, focusManager)
-      super(group, 1, focusManager)
+    function new(group)
+      super(group, 1)
     end function
 
     override function setFocusOnRenderer(isMoving)

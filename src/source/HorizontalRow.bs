@@ -13,6 +13,7 @@ namespace ml
     'public fields
     @observer("onContentChange")
     public content as mc.types.Node
+    private _lastContent
     public index = -1
     public owner as mc.types.Node
     @observer("onListEvent")
@@ -28,12 +29,14 @@ namespace ml
     public focusedCellPercent = 0.0
     @observer("onIsScrollingChange")
     public isScrolling = false
-    public size = [0, 0]
+    public height = 0
+    public width = 0
 
     'managers and state
     private viewManager
     private focusManager
     private itemScroller
+    private isInitialized = false
 
     'debug
     public _vs = "none"
@@ -55,10 +58,10 @@ namespace ml
 
     override function initialize()
       super.initialize()
-      m.contentGroup = m.top.findNode("contentGroup")
-      m.bgRect = m.top.findNode("bgRect")
-      m.cellsGroup = m.top.findNode("cellsGroup")
-
+      m.createViews()
+      m.createManagers()
+      m.isInitialized = true
+      m.onContentChange()
     end function
 
     private function createViews()
@@ -78,18 +81,21 @@ namespace ml
 
     private function createManagers()
       m.log.info("createManagers")
-      m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
-      m.focusManager = new ml.ItemFocusManager(m.viewManager, m.top.owner.cellEvents, m.top.index)
+      m.viewManager = new ml.RowItemViewManager(m.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
+      m.itemScroller = new ml.RowItemScroller(m.viewManager)
+      m.focusManager = new ml.ItemFocusManager(m.viewManager, m.itemScroller, m.owner.cellEvents, m.index)
       m.focusManager.name = "ROW FM "
       m.focusManager.isRow = true
-      m.itemScroller = new RowItemScroller(m.viewManager, m.focusManager)
     end function
 
-    private function onContentChange(evt)
-      ' m.log.info("onContentChange", evt.getField())
-      if m.content = invalid or not m.content.isSameNode(m.top.content)
-        m.content = m.top.content
-        m.header.text = "ROW " + m.content.title
+    private function onContentChange()
+      m.log.info("onContentChange")
+      if m.isInitialized and (m._lastContent = invalid or not m._lastContent.isSameNode(m.content))
+        m._lastContent = m.content
+        if m.content <> invalid
+          'configure header here
+          m.header.text = "ROW " + m.content.title
+        end if
         m.calculateHeight()
         m.createManagers()
         m.viewManager.setContent(m.content)
@@ -98,16 +104,16 @@ namespace ml
     end function
 
     private function calculateHeight()
-      settings = listMixin.getRowSettings(m.top.owner.content, m.content)
+      settings = ml.listMixin.getRowSettings(m.owner.content, m.content)
       if settings.height <> -1
-        m.top.height = settings.height
+        m.height = settings.height
       else
-        m.top.height = settings.cellSettings.size[1] + settings.contentOffset[1]
+        m.height = settings.cellSettings.size[1] + settings.contentOffset[1]
       end if
     end function
 
     private function onIsRenderedChange()
-      ' ? "onIsRenderedChange " ; m.top.isRendered
+      ' ? "onIsRenderedChange " ; m.isRendered
       if m.viewManager <> invalid
         m.viewManager.updateRenderedComponents(m.itemScroller.direction, m.itemScroller.index)
       end if
@@ -115,13 +121,11 @@ namespace ml
 
     private function onIsScrollingChange()
       if m.viewManager <> invalid
-        m.viewManager.setIsScrolling(m.top.isScrolling)
+        m.viewManager.setIsScrolling(m.isScrolling)
       end if
     end function
 
-    private function onListEvent(evt)
-      event = evt.getData()
-
+    private function onListEvent(event)
       if event.name = "willEnter" or event.name = "didEnter"
         for each component in m.cellsGroup.getChildren(-1, 0)
           component.listEvent = event
@@ -131,7 +135,7 @@ namespace ml
 
     private function onAnimateToItemChange()
       if m.content <> invalid
-        m.itemScroller.moveToIndex(m.top.animateToItem)
+        m.itemScroller.moveToIndex(m.animateToItem)
       end if
     end function
 
@@ -205,10 +209,10 @@ namespace ml
 
     ' function onWillEnter(index, direction)
     '   ' ? "onWillEnter " ; index ; " " ; direction
-    '   ' m.top.opacity = 1
+    '   ' m.opacity = 1
     '   ' if direction = 1
     '   ' else
-    '   '   m.top.opacity = 0
+    '   '   m.opacity = 0
     '   ' end if
     ' end function
 
@@ -234,13 +238,13 @@ namespace ml
 
     ' private function onDidGainFocus(index, direction)
     '   '   ? "onDidGainFocus " ; index ; " " ; direction
-    '   '   ' m.top.opacity = 1
+    '   '   ' m.opacity = 1
     '   m.bgRect.opacity = 1
     ' end function
 
     ' private function onDidLoseFocus(index, direction)
     '   '   ? "onDidLoseFocus " ; index ; " " ; direction
-    '   '   ' m.top.opacity = 0
+    '   '   ' m.opacity = 0
     '   m.bgRect.opacity = 0
     ' end function
 

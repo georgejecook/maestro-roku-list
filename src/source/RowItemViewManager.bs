@@ -29,12 +29,19 @@ namespace ml
     end function
 
     override function updateLayout()
-      translation = [0, 0]
+      m.log.info("ROW updateLayout")
+
       index = 0
       m.contentGroup.translation = m.settings.contentOffset
 
+      offset = 0
       for each item in m.content.getChildren(-1, 0)
-        settings = listMixin.getCellSettings(m.owner.content, m.content, item)
+        settings = ml.listMixin.getCellSettings(m.owner.content, m.content, item)
+        if m.axes = 0
+          translation = [offset, 0]
+        else
+          translation = [0, offset]
+        end if
         m.rects.push({
           translation: translation,
           size: settings.size
@@ -44,7 +51,7 @@ namespace ml
         'TODO - for now, no vis options for rows children..
         m.visibleItems.push(item)
 
-        translation[m.axes] = translation[m.axes] + settings.size[m.axes] + settings.space
+        offset += settings.size[m.axes] + settings.space
         index++
       end for
     end function
@@ -54,7 +61,7 @@ namespace ml
     end function
 
     override function applyRenderStateMap(renderStateMap)
-      ' m.log.info("applyRenderStateMap", m.row.index, m.row.isRendered)
+      m.log.info("ROW applyRenderStateMap", m.row.index, m.row.isRendered)
       m.renderedComponents = []
       if m.row.isRendered
         for each id in renderStateMap
@@ -70,6 +77,7 @@ namespace ml
     end function
 
     function applyrenderStateForCell(id, renderState)
+      m.log.info("applyrenderStateForCell", id, renderState)
       index = id.toInt()
       isrendered = m.row.isrendered
       item = m.content.getChild(index)
@@ -77,8 +85,8 @@ namespace ml
       if item <> invalid
         if renderState = "rendered"
           if m.cellsById[id] = invalid
-            settings = listMixin.getCellSettings(m.owner.content, m.content, item)
-            ' ? "GETTING CELL " ; id
+            settings = ml.listMixin.getCellSettings(m.owner.content, m.content, item)
+            ? "GETTING CELL " ; id
             cell = m.cellProvider@.getCell(settings.compName)
 
             if cell <> invalid
@@ -92,7 +100,7 @@ namespace ml
               cell.visible = true
               ' cell.visible = isrendered
 
-              ' ? ">>>>>>>> " ; isrendered
+              ? ">>>>>>>> " ; isrendered
 
               ' if isrendered
               cell.content = item
@@ -112,11 +120,11 @@ namespace ml
         else
           cell = m.cellsById[id]
           if cell <> invalid
-            ' ? "RELEASING " ; id
+            ? "RELEASING " ; id
             m.cellProvider@.releaseCell(cell)
             m.cellsById.delete(id)
           else
-            ' ? " COULD NOT FIND CELL TO RELEASE"
+            ? " COULD NOT FIND CELL TO RELEASE"
           end if
         end if
       end if
