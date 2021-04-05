@@ -32,18 +32,6 @@ function getTrackers(cellType)
   return trackers
 end function
 
-function getRopmSafeCellType(cellType)
-  if cellType = invalid
-    cellType = ""
-    prefix = getRopmPrefix(resetCells, "resetCells")
-    if left(cellType, len(prefix)) <> prefix
-      cellType += prefix + "_" + cellType
-    end if
-  end if
-
-  return cellType
-end function
-
 function getRopmPrefix(func, rootName)
   name = mc.getFunctionName(func)
   parts = name.split("_")
@@ -53,7 +41,6 @@ function getRopmPrefix(func, rootName)
 end function
 
 function addPreBakedCells(number, cellType = invalid)
-  cellType = getRopmSafeCellType(cellType)
   m.log.info("adding ", number, cellType, "cells")
   trackers = getTrackers(cellType)
 
@@ -74,7 +61,6 @@ end function
 
 function getCell(cellType = invalid)
   ' ? "asked for cell of "; cellType
-  cellType = getRopmSafeCellType(cellType)
 
   trackers = getTrackers(cellType)
 

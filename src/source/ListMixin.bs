@@ -1,6 +1,6 @@
 namespace listMixin
   function createListContent(rowContent = [], focusSettings = invalid, rowSettings = invalid)
-    content = createObject("roSGNode", "ListContent")
+    content = createObject("roSGNode", "ml_ListContent")
     content.appendChildren(rowContent)
 
     if rowSettings = invalid
@@ -19,8 +19,8 @@ namespace listMixin
     return content
   end function
 
-  function createRowSettings(cellSettings = invalid, focusSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, headerSettings = invalid, compName = "HorizontalRow", height = -1)
-    settings = createObject("roSGNode", "RowSettings")
+  function createRowSettings(cellSettings = invalid, focusSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, headerSettings = invalid, compName = "ml_HorizontalRow", height = -1)
+    settings = createObject("roSGNode", "ml_RowSettings")
 
     if cellSettings = invalid
       cellSettings = listMixin.createCellSettings()
@@ -49,7 +49,7 @@ namespace listMixin
   end function
 
   function createHeaderSettings(labelTranslation = [30, 20], height = 50, font = "font:MediumSystemBold", fontSize = 30)
-    settings = createObject("roSGNode", "HeaderSettings")
+    settings = createObject("roSGNode", "ml_HeaderSettings")
 
     settings.update({
       labelTranslation: labelTranslation
@@ -61,8 +61,8 @@ namespace listMixin
     return settings
   end function
 
-  function createCellSettings(compName = "Cell", size = [300, 500], space = 30, screenPos = 0)
-    settings = createObject("roSGNode", "CellSettings")
+  function createCellSettings(compName = "ml_Cell", size = [300, 500], space = 30, screenPos = 0)
+    settings = createObject("roSGNode", "ml_CellSettings")
 
     settings.update({
       compName: compName
@@ -92,7 +92,7 @@ namespace listMixin
   ' end function
 
   function createFocusSettings(animSpeed = 0.3, fastAnimSpeed = 0.1, animStyle = "fixed")
-    settings = createObject("roSGNode", "FocusSettings")
+    settings = createObject("roSGNode", "ml_FocusSettings")
     settings.update({
       animSpeed: animSpeed
       fastAnimSpeed: fastAnimSpeed
@@ -113,7 +113,7 @@ namespace listMixin
   ' content.appendChild(makeShowRow(show))
   ' end for
 
-  function setTileSettings(compName = "Cell", cellSize = [300, 500])
+  function setTileSettings(compName = "ml_Cell", cellSize = [300, 500])
   end function
 
   function getRowSettings(listContent, rowContent = invalid)

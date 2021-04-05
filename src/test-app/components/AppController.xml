@@ -3,12 +3,6 @@
     name='AppController'
     extends='mv_BaseScreen'>
   <interface>
-    <field
-        id='isFocusedOnContent'
-        type='boolean'
-        value='false'
-        onChange='onIsFocusedOnContentChange' />
-
   </interface>
 
   <children>

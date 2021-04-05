@@ -1,5 +1,5 @@
 import "pkg:/source/ListMixin.bs"
-import "pkg:/source/ListItemDelegateMixin.bs"
+import "pkg:/source/ItemDelegateMixin.bs"
 import "pkg:/source/RowItemScroller.bs"
 import "pkg:/source/RowItemViewManager.bs"
 import "pkg:/source/ItemFocusManager.bs"
@@ -71,8 +71,8 @@ namespace ml
       m.contentGroup = m.createSGNode("Group", m.top, "contentGroup")
       m.cellsGroup = m.createSGNode("Group", m.top, "cellsGroup")
       m.header = m.createSGNode("mv_Label", m.top, "header", {
-        text: 'header'
-        color: '#ffffff'
+        text: "header"
+        color: "#ffffff"
       })
     end function
 

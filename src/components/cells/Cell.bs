@@ -1,5 +1,5 @@
 import "pkg:/source/roku_modules/maestro/core/Utils.brs"
-import "pkg:/source/ListItemDelegateMixin.bs"
+import "pkg:/source/ItemDelegateMixin.bs"
 
 function init()
   m.poster = m.top.findNode("poster")
