@@ -170,11 +170,7 @@ namespace ml
         m.viewManager.updateRenderedComponents(m.direction, m.index)
         ? "speed"; m.animSpeed ; " target Trans "; targetTranslation
         m.moveAnimation.animateToWithSpeed(targetTranslation, m.animSpeed)
-        ? ">>>>>>> animate prepare"
-        m.moveAnimation.animateTo(targetTranslation, 5)
         m.moveAnimation.start()
-        ? ">>>>>>> animate started"
-
       else
         m.container.translation = targetTranslation
         'TODO -check if jump is bigger than a certain amount

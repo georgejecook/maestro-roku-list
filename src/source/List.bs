@@ -172,8 +172,7 @@ namespace ml
       ? " onNextFocusIndexChange TARGET " ; m.targetFocusRect
     end function
 
-    private function onFocusedRowPercentChange(evt) as void
-      fraction = evt.getData()
+    private function onFocusedRowPercentChange(fraction) as void
       if m.sourceFocusRect = invalid or m.targetFocusRect = invalid
         ? "NO FOCUS RECTS! Ensure m.nextFocusIndex was set!"
         return
@@ -186,7 +185,7 @@ namespace ml
       m.focusIndicator.translation = translation
       m.focusIndicator.width = size[0]
       m.focusIndicator.height = size[1]
-      ? "onFocusedRowPercentChange " ; evt.getData() ; " " ; translation[1]; " " ; m.targetFocusRect.translation[1]
+      ? "onFocusedRowPercentChange " ; fraction ; " " ; translation[1]; " " ; m.targetFocusRect.translation[1]
     end function
 
     private function interpolate(a, b, fraction)

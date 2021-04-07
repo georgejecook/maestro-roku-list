@@ -31,7 +31,7 @@ class ListScreen extends mv.BaseScreen
   private bgRect
 
   'style
-  private numberOfRows = 1
+  private numberOfRows = 20
   private defaultCellType = "ml_Cell"
 
   'state
