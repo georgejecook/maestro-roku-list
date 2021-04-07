@@ -67,7 +67,7 @@ namespace ml
           'TODO better handle the whole visibility
 
           y += comp.height + settings.space
-          ' ? " SCREEN POS "; settings.screenPos
+          ' ? ">>> SCREEN POS "; settings.screenPos
           m.rects.push({
             translation: comp.translation
             size: [w, comp.height]

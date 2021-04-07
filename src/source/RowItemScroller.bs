@@ -4,7 +4,6 @@ namespace ml
   class RowItemScroller extends ml.ItemScroller
     function new(viewManager)
       super(viewManager, 0)
-      m.screenPos = 500
     end function
 
     override function setFocusOnRenderer(isMoving)

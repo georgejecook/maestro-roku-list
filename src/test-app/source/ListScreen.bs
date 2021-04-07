@@ -38,6 +38,8 @@ class ListScreen extends mv.BaseScreen
   public cellProvider as mc.types.Node
   public cellTracker as mc.types.Node
   private contentId = 0
+  private rowSettings
+  private cellSettings
 
   function new()
     super("ListScreen")
@@ -56,19 +58,19 @@ class ListScreen extends mv.BaseScreen
   end function
 
   function onResetChange()
-    ? "resetting"
     m.list.content = invalid
-    content = ml.listMixin.createListContent(m.createData())
-     m.list.content = content
+    m.cellSettings = ml.listMixin.createCellSettings("ml_Cell", [480, 430], 30)
+    m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30, invalid)
+    content = ml.listMixin.createListContent(m.createData(), invalid, m.rowSettings)
+    m.list.content = content
   end function
 
   function createData()
     content = []
-    for i = 0 to m.numberOfRows -1
-      row = createObject("roSGNode", "ContentNode")
+    for i = 0 to m.numberOfRows - 1
+      row = createObject("roSGNode", "ml_RowContent")
+      row.settings = ml.listMixin.createRowSettings(m.cellSettings, invalid)
       row.title = "ROW " + str(i)
-      row.addField("isHidden", "boolean", true)
-      row.addField("isFocusable", "boolean", true)
       content.push(row)
       if i <> 0
         if i mod 9 = 0
@@ -80,16 +82,16 @@ class ListScreen extends mv.BaseScreen
         end if
 
         if i = 1
-          row.addFields({ "yOffset": 650 })
+          row.settings.screenPos = 650
           row.title += " post hero"
         else if i mod 5 = 0
-          row.addFields({ "yOffset": 400 })
+          row.settings.screenPos = 400
           row.title += " 400"
         else if i mod 5 = 3
-          row.addFields({ "yOffset": 400 })
+          row.settings.screenPos = 700
           row.title += " 700"
         else
-          row.addFields({ "yOffset": 0 })
+          row.settings.screenPos = 0
           row.title += " 0"
         end if
       end if

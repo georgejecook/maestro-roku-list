@@ -31,7 +31,7 @@ namespace ml.itemDelegateMixin
 
       for each funcName in funcMap
         if mc_isFunction(instance[funcName])
-          m.listEventMap[funcMap[eventName]] = funcName
+          m.listEventMap[funcMap[funcName]] = funcName
         end if
       end for
     end if

@@ -118,8 +118,10 @@ namespace ml.listMixin
 
   function getRowSettings(listContent, rowContent = invalid)
     if rowContent <> invalid and rowContent.settings <> invalid
+      ' ? " USING ROW SETTINGS " ; rowContent.settings.screenPos
       return rowContent.settings
     else if listContent <> invalid and listContent.rowSettings <> invalid
+      ' ? " USING LIST SETTINGS"
       return listContent.rowSettings
     else
       'THIS SHOULD NOT BE POSSIBLE
@@ -143,14 +145,14 @@ namespace ml.listMixin
 
   function getFocusSettings(listContent, rowContent = invalid)
     if rowContent <> invalid and rowContent.settings <> invalid and rowContent.settings.focusSettings <> invalid
-      ? "use row content FOCUS SETTINGS"
+      ' ? "use row content FOCUS SETTINGS"
       return rowContent.settings.focusSettings
     else if listContent <> invalid and listContent.rowSettings <> invalid and listContent.rowSettings.focusSettings <> invalid
-      ? "use listContent ROW FOCUS SETTINGS"
+      ' ? "use listContent ROW FOCUS SETTINGS"
       return listContent.rowSettings.focusSettings
       m.log.error("no listContent for list - this should not have been called!")
     else if listContent <> invalid and listContent.focusSettings <> invalid
-      ? "use listContent FOCUS SETTINGS"
+      ' ? "use listContent FOCUS SETTINGS"
       return listContent.focusSettings
       m.log.error("no listContent for list - this should not have been called!")
     end if

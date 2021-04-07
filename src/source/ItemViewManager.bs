@@ -30,7 +30,7 @@ namespace ml
     public minPos = 0
     public maxPos = 1080
     public lookAheadDistance = 1000
-    public lookBehindDistance = 500
+    public lookBehindDistance = 1000
     public lastRenderedIndexes = { startIndex: -1, endIndex: -1 }
     public lastScrollIndex = 0
     public lastScrollDirection = 0
@@ -221,7 +221,7 @@ namespace ml
         startIndex = 0
       end if
 
-      ? " endindex " ; endIndex ; " m.numberOfItems "; m.numberOfItems
+      ' ? " endindex " ; endIndex ; " m.numberOfItems "; m.numberOfItems
       if endIndex > m.numberOfItems
         endIndex = m.numberOfItems - 1
       end if
@@ -230,7 +230,7 @@ namespace ml
 
         rect = m.rects[i]
         if rect <> invalid
-          ? "ROW "; i ; " rect idx "; rect.index ; " state " ; state
+          ' ? "ROW "; i ; " rect idx "; rect.index ; " state " ; state
           renderedStateMap[str(rect.index).trim()] = state
         else
           ? " NO RECT "; i
@@ -282,12 +282,16 @@ namespace ml
     end function
 
     function getScreenPositionForItem(itemRect, direction = 0, screenPos = invalid)
-      screenPos = m.minPos
+      if screenPos = invalid
+        screenPos = m.minPos
+      end if
+
       if itemRect <> invalid
         if screenPos <> invalid
           ' ? " USING SCREEN POS" ; screenPos
           screenPos = screenPos
         else if itemRect.screenPos <> invalid
+          ' ? " USING ITEM RECT SCREEN POS"
           screenPos = itemRect.screenPos
         else if m.direction = -1
           screenPos = m.minPos
@@ -315,7 +319,7 @@ namespace ml
         itemRect = m.rects[i]
         screenPos = m.getScreenPositionForItem(itemRect, direction)
         itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
-        ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
+        ' ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
         if itemPos > abs(position)
           return i - 1
         end if

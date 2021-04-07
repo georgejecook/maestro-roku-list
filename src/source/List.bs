@@ -137,6 +137,7 @@ namespace ml
     end function
 
     public function getCellScreenRect(rowIndex, cellIndex, rowScreenPos = invalid, cellScreenPos = invalid)
+      ' ? "+++ rowScreenPos"; rowScreenPos
       rowScreenRect = m.getRowScreenRect(rowIndex, rowScreenPos)
 
       if rowScreenRect <> invalid
@@ -180,12 +181,12 @@ namespace ml
 
       translation = m.interpolate(m.sourceFocusRect.translation, m.targetFocusRect.translation, fraction)
       size = m.interpolate(m.sourceFocusRect.size, m.targetFocusRect.size, fraction)
-      ? "translation " ; translation
-      ? "size " ; size
+      ' ? "translation " ; translation
+      ' ? "size " ; size
       m.focusIndicator.translation = translation
       m.focusIndicator.width = size[0]
       m.focusIndicator.height = size[1]
-      ? "onFocusedRowPercentChange " ; fraction ; " " ; translation[1]; " " ; m.targetFocusRect.translation[1]
+      ' ? "onFocusedRowPercentChange " ; fraction ; " " ; translation[1]; " " ; m.targetFocusRect.translation[1]
     end function
 
     private function interpolate(a, b, fraction)

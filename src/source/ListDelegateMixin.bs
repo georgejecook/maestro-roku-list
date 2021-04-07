@@ -70,7 +70,7 @@ namespace ml.delegateMixin
 
       for each funcName in funcMap
         if mc_isFunction(instance[funcName])
-          m.listCellEventMap[funcMap[eventName]] = funcName
+          m.listCellEventMap[funcMap[funcName]] = funcName
         end if
       end for
     end if
