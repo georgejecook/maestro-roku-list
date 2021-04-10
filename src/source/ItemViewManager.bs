@@ -204,7 +204,7 @@ namespace ml
     end function
 
     function createRenderedStateMap(direction, index, renderedIndexes)
-      m.log.method("createRenderedStateMap", index, renderedIndexes)
+      m.log.method("createRenderedStateMap", m.__className, index, renderedIndexes)
       renderedStateMap = {}
 
       if m.numberOfItems = 0

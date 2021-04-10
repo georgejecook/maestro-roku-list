@@ -157,13 +157,13 @@ namespace ml
 
     private function onKeyPressLeft() as boolean
       m.log.method("onKeyPressLeft")
-      m.itemScroller.move(-1, 500)
+      m.itemScroller.move(-1)
       return true
     end function
 
     private function onKeyPressRight() as boolean
       m.log.method("onKeyPressRight")
-      m.itemScroller.move(1, 500)
+      m.itemScroller.move(1)
       return true
     end function
 

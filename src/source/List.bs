@@ -29,7 +29,7 @@ namespace ml
     public nextFocusIndex as mc.types.Array
     public cellEvents as mc.types.Node
     public rowEvents as mc.types.Node
-    public viewPortEvents as mc.types.Array
+    public listEvent as mc.types.Assocarray
 
     public rowFocused = -1
     public itemFocused = -1

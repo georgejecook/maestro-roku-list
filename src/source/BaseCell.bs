@@ -1,0 +1,44 @@
+import "pkg:/source/roku_modules/maestro/core/Utils.brs"
+import "pkg:/source/ItemDelegateMixin.bs"
+import "pkg:/source/ListMixin.bs"
+import "pkg:/source/ItemDelegateMixin.bs"
+import "pkg:/source/RowItemScroller.bs"
+import "pkg:/source/RowItemViewManager.bs"
+import "pkg:/source/ItemFocusManager.bs"
+import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
+
+namespace ml
+  @strict
+  @node("ml_BaseCell", "Group")
+  class BaseCell
+
+    public index = -1
+
+    @observer("onContentChange")
+    public content as mc.types.Node
+    @observer("onInitialStateChange")
+    public initialState as mc.types.AssocArray
+
+    public listEvent as mc.types.AssocArray
+    public size as mc.types.Array
+
+    protected list
+    protected row
+
+    function new()
+      ml.itemDelegateMixin.setDelegate()
+    end function
+
+    protected function onContentChange()
+      if m.content = invalid or not m.content.isSamenode(m.top.content)
+        'TODO
+      end if
+    end function
+
+    private function onInitialStateChange(state)
+      m.list = state.list
+      m.row = state.row
+      m.size = state.size
+    end function
+  end class
+end namespace

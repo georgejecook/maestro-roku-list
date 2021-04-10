@@ -15,7 +15,7 @@ namespace ml
       m.cellTracker = cellTracker
       m.row = row
       m.lookAheadDistance = maxPos * 1.5
-      m.lookBehindDistance = maxPos / 2
+      m.lookBehindDistance = maxPos * 1.5
 
     end function
 
@@ -64,10 +64,12 @@ namespace ml
       m.log.info("ROW applyRenderStateMap", m.row.index, m.row.isRendered)
       m.renderedComponents = []
       if m.row.isRendered
+        ? "ROW IS RENDERED" ; m.row.index ; m.row.renderState
         for each id in renderStateMap
           m.applyrenderStateForCell(id, renderStateMap[id])
         end for
       else
+        ? "ROW IS NOT !! RENDERED" ; m.row.index
         for each id in renderStateMap
           m.applyrenderStateForCell(id, "none")
         end for
@@ -77,7 +79,7 @@ namespace ml
     end function
 
     function applyrenderStateForCell(id, renderState)
-      m.log.info("applyrenderStateForCell", id, renderState)
+      ' m.log.info("applyrenderStateForCell", id, renderState)
       index = id.toInt()
       isrendered = m.row.isrendered
       item = m.content.getChild(index)
@@ -86,7 +88,7 @@ namespace ml
         if renderState = "rendered"
           if m.cellsById[id] = invalid
             settings = ml.listMixin.getCellSettings(m.owner.content, m.content, item)
-            ? "GETTING CELL " ; id
+            ' ? "GETTING CELL " ; id
             cell = m.cellProvider@.getCell(settings.compName)
 
             if cell <> invalid
@@ -100,7 +102,7 @@ namespace ml
               cell.visible = true
               ' cell.visible = isrendered
 
-              ? ">>>>>>>> " ; isrendered
+              ' ? ">>>>>>>> " ; isrendered
 
               ' if isrendered
               cell.content = item
@@ -124,7 +126,7 @@ namespace ml
             m.cellProvider@.releaseCell(cell)
             m.cellsById.delete(id)
           else
-            ? " COULD NOT FIND CELL TO RELEASE"
+            ? " COULD NOT FIND CELL TO RELEASE" ; id
           end if
         end if
       end if

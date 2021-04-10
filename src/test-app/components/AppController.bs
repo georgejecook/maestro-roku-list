@@ -1,5 +1,6 @@
 import "pkg:/source/roku_modules/maestro/core/MIOC.brs"
 import "pkg:/source/roku_modules/maestro/core/Tasks.brs"
+import "pkg:/source/roku_modules/maestro/core/Utils.brs"
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ Initialization
@@ -7,6 +8,12 @@ import "pkg:/source/roku_modules/maestro/core/Tasks.brs"
 
 function Init()
   mv.initializeFocusManager(m.global)
+  tick = m.top.getScene().createChild("Timer")
+  tick.duration = 0.01
+  tick.repeat = true
+  tick.control = "start"
+  mc.setOrAddNodeField(m.global, "tick", tick)
+  mc.tasks.observeNodeField(tick, "fire", onInfoChange, "none")
   initFlyweight()
 end function
 
@@ -27,7 +34,7 @@ function initFlyweight()
 end function
 
 function prebakeCells()
-  m.cellProvider@.addPreBakedCells(200, "ml_Cell")
+  m.cellProvider@.addPreBakedCells(200, "ml_SimpleCell")
 end function
 
 

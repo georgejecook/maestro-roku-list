@@ -1,5 +1,6 @@
 import "pkg:/source/ListMixin.bs"
 import "pkg:/source/roku_modules/maestro/view/BaseScreen.brs"
+import "pkg:/source/ListDelegateMixin.bs"
 
 @strict
 @node("ListScreen", "mv_BaseScreen")
@@ -32,7 +33,7 @@ class ListScreen extends mv.BaseScreen
 
   'style
   private numberOfRows = 20
-  private defaultCellType = "ml_Cell"
+  private defaultCellType = "ml_SimpleCell"
 
   'state
   public cellProvider as mc.types.Node
@@ -41,7 +42,7 @@ class ListScreen extends mv.BaseScreen
   private rowSettings
   private cellSettings
 
-  function new()
+  private function new()
     super("ListScreen")
     m.log = new log.Logger("ListScreen")
     m.bgRect = m.createSGNode("mv_Rectangle", m.top, "bgRect", {
@@ -54,18 +55,19 @@ class ListScreen extends mv.BaseScreen
 
     m.list = m.createSGNode("ml_List", m.listHolder, "list")
     m.list.translation = [0, 0]
+    ml.delegateMixin.setListDelegate(m.list)
     m.onResetChange()
   end function
 
-  function onResetChange()
+  private function onResetChange()
     m.list.content = invalid
-    m.cellSettings = ml.listMixin.createCellSettings("ml_Cell", [480, 430], 30)
+    m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [480, 430], 30)
     m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30, invalid)
     content = ml.listMixin.createListContent(m.createData(), invalid, m.rowSettings)
     m.list.content = content
   end function
 
-  function createData()
+  private function createData()
     content = []
     for i = 0 to m.numberOfRows - 1
       row = createObject("roSGNode", "ml_RowContent")
@@ -82,13 +84,13 @@ class ListScreen extends mv.BaseScreen
         end if
 
         if i = 1
-          row.settings.screenPos = 650
+          ' row.settings.screenPos = 650
           row.title += " post hero"
         else if i mod 5 = 0
-          row.settings.screenPos = 400
+          ' row.settings.screenPos = 400
           row.title += " 400"
         else if i mod 5 = 3
-          row.settings.screenPos = 700
+          ' row.settings.screenPos = 700
           row.title += " 700"
         else
           row.settings.screenPos = 0
@@ -107,35 +109,35 @@ class ListScreen extends mv.BaseScreen
     return content
   end function
 
-  function itemFocusedChanged()
+  private function itemFocusedChanged()
     print "itemFocused changed to: "; m.list.itemFocused
   end function
 
-  function itemSelcetedChanged()
+  private function itemSelcetedChanged()
     print "itemFocused changed to: "; m.list.itemFocused
     newScreen = createObject("roSGNode", "ListScreen")
     m.push(newScreen)
     mv.setFocus(newScreen)
   end function
 
-  function itemUnfocusedChanged()
+  private function itemUnfocusedChanged()
     print "itemUnfocused changed to: "; m.list.itemUnfocused
   end function
 
-  function itemSelectedChanged()
+  private function itemSelectedChanged()
     print "itemSelected changed to: "; m.list.itemSelected
   end function
 
 
-  function currFocusItemIndexChanged()
+  private function currFocusItemIndexChanged()
   end function
 
-  function addItems(cellType, number)
+  private function addItems(cellType, number)
     row = m.list.content.getChild(focusedRow)
     row.appendChildren(m.makeItems(cellType, number))
   end function
 
-  function makeItems(cellType, number)
+  private function makeItems(cellType, number)
     d = createObject("roDateTime")
     nonce = str(d.asSeconds()).trim()
     items = []
@@ -143,26 +145,27 @@ class ListScreen extends mv.BaseScreen
       child = createObject("roSGNode", "ContentNode")
       child.id = str(m.contentId).trim()
       child.description = "some really long " + child.id + "text in here " + child.id
-      child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/360/300?n=" + nonce
+      ' child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(230).trim() + "/360/300?n=" + nonce
+      child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/360/360?n=" + nonce
       ' child.HDGRIDPOSTERURL = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
       child.title = "Item " + child.id.tostr()
 
-      if m.contentId mod 5 = 0
-        cellType = "SimpleCell"
-      else if m.contentId mod 7 = 0
-        cellType = "ComplexCell"
-      end if
+      ' if m.contentId mod 5 = 0
+      '   cellType = "SimpleCell"
+      ' else if m.contentId mod 7 = 0
+      '   cellType = "ComplexCell"
+      ' end if
 
-      child.addFields({
-        "cellType": cellType
-      })
+      ' child.addFields({
+      '   "cellType": cellType
+      ' })
       items.push(child)
       m.contentId++
     end for
     return items
   end function
 
-  function onRemoveItems(items)
+  private function onRemoveItems(items)
     row = m.list.content.getChild(focusedRow)
 
     startIndex = row.getChildCount() - items
@@ -171,7 +174,7 @@ class ListScreen extends mv.BaseScreen
 
   end function
 
-  function toggleCellState(items, state)
+  private function toggleCellState(items, state)
 
     for each item in items
       if item <> invalid
@@ -185,18 +188,18 @@ class ListScreen extends mv.BaseScreen
 
   end function
 
-  function onHideRows(rows)
+  private function onHideRows(rows)
     row = m.list.content.getChild(focusedRow)
     m.toggleCellState(m.getRowItems(row, rows), "hidden")
   end function
 
 
-  function onShowRows(rows)
+  private function onShowRows(rows)
     row = m.list.content.getChild(focusedRow)
     m.toggleCellState(m.getRowItems(row, rows), "show")
   end function
 
-  function getRowItems(row, number)
+  private function getRowItems(row, number)
     items = []
     for i = 0 to number
       items.push(row.getChild(i))
@@ -205,7 +208,7 @@ class ListScreen extends mv.BaseScreen
     return items
   end function
 
-  function onHideItems(items)
+  private function onHideItems(items)
     for i = 0 to items
       dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
       if dynamicCell <> invalid
@@ -214,7 +217,7 @@ class ListScreen extends mv.BaseScreen
     end for
   end function
 
-  function onShowItems(items)
+  private function onShowItems(items)
     for i = 0 to items
       dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
       if dynamicCell <> invalid
@@ -228,16 +231,16 @@ class ListScreen extends mv.BaseScreen
   '++ keypresses
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  function onKeyPressOption() as boolean
+  private function onKeyPressOption() as boolean
     ? "pressed option"
     return true
   end function
 
-  function onKeyPressFastForward() as boolean
+  private function onKeyPressFastForward() as boolean
     return true
   end function
 
-  function onKeyPressBack() as boolean
+  private function onKeyPressBack() as boolean
     ? "going back!"
 
     if m.top.isRoot <> true
@@ -270,4 +273,17 @@ class ListScreen extends mv.BaseScreen
       mv.setFocus(m.list)
     end if
   end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ list delegate
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  private function onCellDidGainFocus(rowIndex, itemIndex, direction)
+    ? "onCellDidGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
+  end function
+
+  private function onCellDidLoseFocus(rowIndex, itemIndex, direction)
+    ? "onCellDidLoseFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
+  end function
+
+
 end class

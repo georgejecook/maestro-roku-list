@@ -24,20 +24,24 @@ namespace ml.delegateMixin
       m.listDelegate = invalid
     end if
 
+    ? "SET LIST DELEGATE: CE "; m.isObservingCellEvents ; " RE " ; m.isObservingRowEvents
     ml.delegateMixin.toggleDelegateActive(list, m.isObservingCellEvents or m.isObservingRowEvents)
 
   end function
 
   function toggleDelegateActive(list, isActive)
+    ? "TOGGLE ACTIVE "; isActive
     if isActive
       if m.isObservingCellEvents
-        mc.toggleObserver(list.cellEvents, "listEvent", mc.getFunctionName(onCellEventBridge))
-        mc.toggleObserver(list.cellEvents, "viewportEvents", mc.getFunctionName(onCellEventsBridge))
+        ? "LISTENING TO CELL EVENTS"
+        mc.toggleObserver(list.cellEvents, "listEvent", mc.getFunctionName(ml.delegateMixin.onCellEventBridge))
+        mc.toggleObserver(list.cellEvents, "viewportEvents", mc.getFunctionName(ml.delegateMixin.onCellEventsBridge))
       end if
 
       if m.isObservingRowEvents
-        mc.toggleObserver(list.rowEvents, "listEvent", mc.getFunctionName(onRowEventBridge))
-        mc.toggleObserver(list.rowEvents, "viewportEvents", mc.getFunctionName(onRowEventsBridge))
+        ? "LISTENING TO ROW EVENTS"
+        mc.toggleObserver(list.rowEvents, "listEvent", mc.getFunctionName(ml.delegateMixin.onRowEventBridge))
+        mc.toggleObserver(list.rowEvents, "viewportEvents", mc.getFunctionName(ml.delegateMixin.onRowEventsBridge))
       end if
     else
       mc.toggleObserver(list.cellEvents, "listEvent")
@@ -85,7 +89,9 @@ namespace ml.delegateMixin
   end function
 
   function onCellEventsBridge(sgEvent) as void
+    ? "CELL EVENT BRIDGE 1"
     if m.isObservingCellEvents
+      ? "CELL EVENT BRIDGE 2"
       for each event in sgEvent.getData()
         ml.delegateMixin.handleCellEvent(event)
       end for
@@ -130,7 +136,7 @@ namespace ml.delegateMixin
       }
 
       for each funcName in funcMap
-        if mc_isFunction(instance[eventName])
+        if mc_isFunction(instance[funcName])
           m.listRowEventMap[funcMap[funcName]] = funcName
         end if
       end for

@@ -61,7 +61,7 @@ namespace ml.listMixin
     return settings
   end function
 
-  function createCellSettings(compName = "ml_Cell", size = [300, 500], space = 30, screenPos = 0)
+  function createCellSettings(compName = "ml_SimpleCell", size = [300, 500], space = 30, screenPos = 0)
     settings = createObject("roSGNode", "ml_CellSettings")
 
     settings.update({

@@ -1,0 +1,12 @@
+ - move up does not activate focus
+ - focus skips when using offsets on y
+ - x focus is in the wrong place
+ - running out of cells
+ - listEvent being set on ml_list node - some delegate issue going on there
+ - losing the cell titles
+ - not getting first set of willappear and did appear when setting data
+ - images don't load till cell is recycled a cpl of times
+ - left and right don't work on row
+ - move to end resets to start..
+ - moving back on row only shows 2 items
+ - 

@@ -1,0 +1,136 @@
+import "pkg:/source/roku_modules/maestro/core/Utils.brs"
+import "pkg:/source/ItemDelegateMixin.bs"
+import "pkg:/source/ListMixin.bs"
+import "pkg:/source/ItemDelegateMixin.bs"
+import "pkg:/source/RowItemScroller.bs"
+import "pkg:/source/RowItemViewManager.bs"
+import "pkg:/source/ItemFocusManager.bs"
+import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
+import "pkg:/source/BaseCell.bs"
+
+namespace ml
+  @strict
+  @node("ml_SimpleCell", "ml_BaseCell")
+  class SimpleCell extends ml.BaseCell
+
+    private poster
+    private rectangle
+    private label
+    private scale
+    private lastContent
+
+    function new()
+      super()
+      m.poster = mc.createSGNode("mv_Poster", m.top, "poster", {
+        translation: [0, 0]
+        scaleRotateCenter: [0, 320]
+        loadingBitmapUri: "http://via.placeholder.com/370x300"
+        failedBitmapUri: "http://via.placeholder.com/370x300"
+        uri: "http://via.placeholder.com/370x300"
+        loadWidth: 480
+        loadHeight: 320
+        width: 480
+        height: 320
+        loadDisplayMode: "scaleToFit"
+      })
+      m.rectangle = mc.createSGNode("mv_Rectangle", m.top, "rectangle", {
+        opacity: 0.4
+        color: "#000000"
+        width: 480
+        height: 70
+      })
+      m.label = mc.createSGNode("mv_Label", m.top, "label", {
+        width: 460
+        horizAlign: "center"
+        translation: [10, 100]
+      })
+      m.label = m.top.findNode("label")
+      m.size = [480, 320]
+      m.scale = 1
+    end function
+
+    override function onContentChange()
+      ' ? " SC 1"
+      if m.content = invalid or not m.content.isSamenode(m.lastContent)
+        ' ? " SC 2"
+        m.lastContent = m.content
+        m.poster.width = m.size[0]
+        m.poster.height = m.size[1]
+        m.setScale(0, true)
+
+        m.label.text = "C:" + m.lastContent.title
+        m.poster.uri = m.lastContent.HDGRIDPOSTERURL
+        m.onScrollChange()
+      end if
+    end function
+
+    private function onScrollChange()
+      ' ? "SC: onScrollChange " ; m.row.isScrolling ; " " ; m.list.isScrolling
+      isScrolling = m.row.isScrolling or m.list.isScrolling
+      ' ? "SC: onCellScrollChange row " ; m.row.isScrolling
+      '  ? "SC: onCellScrollChange list " ; m.list.isScrolling
+      ' m.label.visible = not isScrolling
+      ' m.label2.visible = not isScrolling
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ delegate
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onWillEnter(index, direction)
+      ' ? "SC: onCellWillEnter " ; index ; " " ; direction
+      m.onContentChange()
+    end function
+
+    private function onWillExit(index, direction)
+      ' ? "SC: onCellWillExit " ; index ; " " ; direction
+    end function
+
+    private function onDidEnter(index, direction)
+      ' ? "SC: onCellDidEnter " ; index ; " " ; direction
+      m.onContentChange()
+    end function
+
+    private function onDidExit(index, direction)
+      ' ? "SC: onCellDidExit " ; index ; " " ; direction
+    end function
+
+    private function onWillGainFocus(index, direction)
+      ' ? "SC: onCellWillGainFocus " ; index ; " " ; direction
+    end function
+
+    private function onWillLoseFocus(index, direction)
+      ' ? "SC: onCellWillLoseFocus " ; index ; " " ; direction
+    end function
+
+    private function onDidGainFocus(index, direction)
+      ' ? "SC: onCellDidGainFocus " ; index ; " " ; direction
+    end function
+
+    private function onDidLoseFocus(index, direction)
+      ' ? "SC: onCellDidLoseFocus " ; index ; " " ; direction
+    end function
+
+    private function onGainingFocus(index, direction, fraction)
+      ' ? "SC: onGainingFocus " ; index ; " " ; direction ; " "  ; fraction
+      m.setScale(fraction, true)
+    end function
+
+    private function onLosingFocus(index, direction, fraction)
+      ' ? "SC: onLosingFocus " ; index ; " " ; direction ; " " ; fraction
+      m.setScale(fraction, false)
+    end function
+
+    private function setScale(fraction, isGaining) as void
+    return
+      if isGaining
+        m.scale = fraction + 1
+      else
+        m.scale = 2 - (fraction + 1)
+      end if
+      m.poster.height = 480 * m.scale
+      m.poster.width = 320 * m.scale
+
+    end function
+  end class
+end namespace

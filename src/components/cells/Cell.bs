@@ -1,7 +1,8 @@
 import "pkg:/source/roku_modules/maestro/core/Utils.brs"
 import "pkg:/source/ItemDelegateMixin.bs"
 
-function init()
+
+function create()
   m.poster = m.top.findNode("poster")
   m.poster2 = m.top.findNode("poster2")
   m.label = m.top.findNode("label")
@@ -43,8 +44,8 @@ function onScrollChange()
   isScrolling = m.row.isScrolling or m.list.isScrolling
   ' ? "onCellScrollChange row " ; m.row.isScrolling
   ' ? "onCellScrollChange list " ; m.list.isScrolling
-  m.label.visible = not isScrolling
-  m.label2.visible = not isScrolling
+  ' m.label.visible = not isScrolling
+  ' m.label2.visible = not isScrolling
 end function
 
 function onInitialStateChange(evt)

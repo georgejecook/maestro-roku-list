@@ -43,13 +43,16 @@ namespace ml
 
     function createRow(rowContent, index, settings)
       compName = rowContent.rowCompName <> invalid ? rowContent.rowCompName <> invalid : "ml_HorizontalRow"
+      ? "CREATE ROW " ;m.componentBufferMode
+      isRendered = index < 4
       return m.createSGNode(compName, m.container, str(index).trim(), {
-        renderState: "rendered"
-        isRendered: true
+        renderState: isRendered ? "rendered" : m.componentBufferMode
+        isRendered: isRendered
         content: rowContent
         owner: m.owner
+        index: index
         'TODO - measure the heights.
-        isInViewport: index < 5
+        isInViewport: isRendered
       })
     end function
 

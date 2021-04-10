@@ -214,7 +214,7 @@ namespace ml
 
     function stopAnimating()
       m.moveAnimation.control = "stop"
-      ? "STOP ANIMAGING TOG SCROLL FALSE"
+      ' ? "STOP ANIMAGING TOG SCROLL FALSE"
       m.toggleScrolling(false)
     end function
 
@@ -227,13 +227,13 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     function onAnimationFractionChange(fraction)
-      m.log.info("onAnimationFractionChange", fraction)
+      ' m.log.info("onAnimationFractionChange", fraction)
       position = m.container.translation[m.axes]
       index = m.viewManager.getIndexAtPosition(position, m.direction)
 
       if fraction = 1
         m.focusManager.onFocusAnimationUpdate(1)
-        ? "FRACTION 1 TOG SCROLL FALSE"
+        ' ? "FRACTION 1 TOG SCROLL FALSE"
         m.toggleScrolling(false)
 
         if index <> m.index
