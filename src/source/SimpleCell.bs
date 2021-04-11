@@ -18,9 +18,17 @@ namespace ml
     private label
     private scale
     private lastContent
-
+    private isViewCreated = false
     function new()
       super()
+      m.createViews()
+    end function
+
+    private function createViews() as void
+      if m.isViewCreated
+        return
+      end if
+      m.isViewCreated = true
       m.poster = mc.createSGNode("mv_Poster", m.top, "poster", {
         translation: [0, 0]
         scaleRotateCenter: [0, 320]
@@ -54,6 +62,7 @@ namespace ml
       if m.content = invalid or not m.content.isSamenode(m.lastContent)
         ' ? " SC 2"
         m.lastContent = m.content
+        m.createViews()
         m.poster.width = m.size[0]
         m.poster.height = m.size[1]
         m.setScale(0, true)
@@ -88,7 +97,7 @@ namespace ml
 
     private function onDidEnter(index, direction)
       ' ? "SC: onCellDidEnter " ; index ; " " ; direction
-      m.onContentChange()
+      ' m.onContentChange()
     end function
 
     private function onDidExit(index, direction)
@@ -105,10 +114,12 @@ namespace ml
 
     private function onDidGainFocus(index, direction)
       ' ? "SC: onCellDidGainFocus " ; index ; " " ; direction
+      m.setScale(1, true)
     end function
 
     private function onDidLoseFocus(index, direction)
       ' ? "SC: onCellDidLoseFocus " ; index ; " " ; direction
+      m.setScale(1, false)
     end function
 
     private function onGainingFocus(index, direction, fraction)
@@ -122,9 +133,8 @@ namespace ml
     end function
 
     private function setScale(fraction, isGaining) as void
-    return
       if isGaining
-        m.scale = fraction + 1
+        m.scale = (fraction + 1)
       else
         m.scale = 2 - (fraction + 1)
       end if

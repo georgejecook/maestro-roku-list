@@ -72,6 +72,7 @@ function getCell(cellType = invalid)
       for i = 0 to m.top.numerOfCellsToCreateWhenDry
         createCell(cellType)
       end for
+      m.top.numberOfCells += m.top.numerOfCellsToCreateWhenDry
     else
       return invalid
     end if

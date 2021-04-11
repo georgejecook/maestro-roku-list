@@ -122,6 +122,14 @@ namespace ml
       end if
     end function
 
+    public function forceUpdate()
+      m.viewManager.forceUpdateLayout()
+      m.viewManager.updateRenderedComponents(m.itemScroller.direction, m.itemScroller.index, true)
+
+      'TODO - need to ensure that the current focus and scroll position is valid after an update!
+      m.itemScroller.move(0)
+    end function
+
     public function getRowRenderer(index)
       return m.viewManager.getRenderer(index)
     end function
@@ -203,7 +211,8 @@ namespace ml
     private function onKeyPressUp() as boolean
       m.log.method("onKeyPressUp")
       if (m.isScrolling)
-        m.itemScroller.move(-2)
+        ' m.itemScroller.move(-2)
+        m.itemScroller.move(-1)
       else
         m.itemScroller.move(-1)
       end if
@@ -213,7 +222,8 @@ namespace ml
     private function onKeyPressDown() as boolean
       m.log.method("onKeyPressDown")
       if (m.isScrolling)
-        m.itemScroller.move(2)
+        m.itemScroller.move(1)
+        ' m.itemScroller.move(2)
       else
         m.itemScroller.move(1)
       end if

@@ -33,6 +33,7 @@ namespace ml
 
     private animSpeed
     private settings
+    private isMovingMultiple
 
     function new(viewManager, axes)
       super("ItemScroller")
@@ -74,6 +75,7 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     function moveToEnd(direction, screenPos = invalid, animated = true, fast = false)
+      m.isMovingMultiple = true
       if direction = -1
         index = 0
       else
@@ -90,6 +92,7 @@ namespace ml
       else
         direction = -1
       end if
+      m.isMovingMultiple = abs(offset) > 1
 
       index = m.getValidTargetIndex(index, direction)
 
@@ -120,7 +123,7 @@ namespace ml
     end function
 
     function moveToIndex(index, screenPos = invalid, animated = true, fast = false)
-      m.log.info("moveToIndex", index, screenPos, animated)
+      m.log.info("moveToIndex I", m.index, "NI", index, screenPos, animated)
 
       if index < m.index
         direction = -1
@@ -153,8 +156,6 @@ namespace ml
         return false
       end if
 
-      ' ? " VVVVVV "; screenPos
-
       m.screenPos = m.viewManager.getScreenPositionForItem(itemRect, m.direction, screenPos)
       m.targetIndex = index
 
@@ -172,15 +173,17 @@ namespace ml
         ' ? "m.settings " ; m.settings.animSpeed
 
         m.toggleScrolling(true)
+        ? "11111"
         m.setFocusIndex(m.index, true, screenPos)
         m.viewManager.updateRenderedComponents(m.direction, m.index)
-        ' ? "speed"; m.animSpeed ; " target Trans "; targetTranslation
+        ' ? "speed"; m.animSpeed ; " target Trans "; targetTranslation ; " m.moveAnimation.fraction "; m.moveAnimation.interpolator.fraction
         m.moveAnimation.animateToWithSpeed(targetTranslation, m.animSpeed)
         m.moveAnimation.start()
       else
         m.container.translation = targetTranslation
         'TODO -check if jump is bigger than a certain amount
         ' m.viewManager.updateRenderedComponents(m.direction, m.index)
+        ? "222222222222"
         m.setFocusIndex(index, false)
       end if
     end function
@@ -237,15 +240,19 @@ namespace ml
         m.toggleScrolling(false)
 
         if index <> m.index
+          ? "333333333333"
           m.setFocusIndex(index, false)
         end if
         m.targetIndex = -1
-      else
+      else if m.isMovingMultiple
         m.focusManager.onContainerPositionChange(position)
-        if index <> m.index
+        if index <> m.index and index <> m.targetIndex
           m.focusManager.onFocusAnimationUpdate(1)
+          ? "444444"
           m.setFocusIndex(index, true)
         end if
+      else
+        m.focusManager.onFocusAnimationUpdate(fraction)
       end if
 
     end function
@@ -261,6 +268,7 @@ namespace ml
     '  * @param {boolean} isMoving - if true, then deltas are calculated for next position, and observers fired if their screen status will change
     '  */
     function setFocusIndex(index, isMoving, screenPos = invalid)
+      ? "setFocusIndex "; index ; "isMoving" ; isMoving
       'This MUST be called infrequently
       if index = -1
         m.index = 0

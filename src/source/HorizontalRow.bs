@@ -207,53 +207,53 @@ namespace ml
     '++ delegate
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    ' function onWillEnter(index, direction)
-    '   ' ? "onWillEnter " ; index ; " " ; direction
-    '   ' m.opacity = 1
-    '   ' if direction = 1
-    '   ' else
-    '   '   m.opacity = 0
-    '   ' end if
-    ' end function
+    function onWillEnter(index, direction)
+      ' ? "onWillEnter " ; index ; " " ; direction
+      ' m.opacity = 1
+      ' if direction = 1
+      ' else
+      '   m.opacity = 0
+      ' end if
+    end function
 
-    ' function onWillExit(index, direction)
-    '   ? "onWillExit " ; index ; " " ; direction
-    ' end function
+    function onWillExit(index, direction)
+      ? "onWillExit " ; index ; " " ; direction
+    end function
 
-    ' function onDidEnter(index, direction)
-    '   ? "onDidEnter " ; index ; " " ; direction
-    ' end function
+    function onDidEnter(index, direction)
+      ? "onDidEnter " ; index ; " " ; direction
+    end function
 
-    ' function onDidExit(index, direction)
-    '   ? "onDidExit " ; index ; " " ; direction
-    ' end function
+    function onDidExit(index, direction)
+      ? "onDidExit " ; index ; " " ; direction
+    end function
 
-    ' function onWillGainFocus(index, direction)
-    '   ? "onWillGainFocus " ; index ; " " ; direction
-    ' end function
+    function onWillGainFocus(index, direction)
+      ? "onWillGainFocus " ; index ; " " ; direction
+    end function
 
-    ' function onWillLoseFocus(index, direction)
-    '   ? "onWillLoseFocus " ; index ; " " ; direction
-    ' end function
+    function onWillLoseFocus(index, direction)
+      ? "onWillLoseFocus " ; index ; " " ; direction
+    end function
 
-    ' private function onDidGainFocus(index, direction)
-    '   '   ? "onDidGainFocus " ; index ; " " ; direction
-    '   '   ' m.opacity = 1
-    '   m.bgRect.opacity = 1
-    ' end function
+    private function onDidGainFocus(index, direction)
+      '   ? "onDidGainFocus " ; index ; " " ; direction
+      '   ' m.opacity = 1
+      m.bgRect.opacity = 1
+    end function
 
-    ' private function onDidLoseFocus(index, direction)
-    '   '   ? "onDidLoseFocus " ; index ; " " ; direction
-    '   '   ' m.opacity = 0
-    '   m.bgRect.opacity = 0
-    ' end function
+    private function onDidLoseFocus(index, direction)
+      '   ? "onDidLoseFocus " ; index ; " " ; direction
+      '   ' m.opacity = 0
+      m.bgRect.opacity = 0
+    end function
 
-    ' private function onGainingFocus(index, direction, fraction)
-    '   m.bgRect.opacity = fraction
-    ' end function
+    private function onGainingFocus(index, direction, fraction)
+      m.bgRect.opacity = fraction
+    end function
 
-    ' private function onLosingFocus(index, direction, fraction)
-    '   m.bgRect.opacity = 1 - fraction
-    ' end function
+    private function onLosingFocus(index, direction, fraction)
+      m.bgRect.opacity = 1 - fraction
+    end function
   end class
 end namespace

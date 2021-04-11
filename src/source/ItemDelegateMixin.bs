@@ -47,11 +47,11 @@ namespace ml.itemDelegateMixin
   function onListEventBridge(sgEvent) as void
     event = sgEvent.getData()
     eventName = event.name
-    ' ? eventName
     if not m.isObservingListEvents or m.listEventMap[eventName] = invalid
       ' ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
       return
     end if
+    ' ? "LEB" ; eventName
 
     if eventName = "gainingFocus" or eventName = "losingFocus"
       m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction, event.fraction)

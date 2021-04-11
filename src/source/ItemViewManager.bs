@@ -55,6 +55,10 @@ namespace ml
       m.screenRect = { translation: m.owner.translation, size: [m.owner.width, m.owner.height] }
     end function
 
+    function forceUpdateLayout()
+      m._updateLayout()
+    end function
+
     function setContent(content)
       m.log.info("setContent")
       m.content = content
@@ -111,12 +115,14 @@ namespace ml
       ' for each comp in m.visibleComponents
       for each comp in m.renderedComponents
         cRect = m.rects[comp.index]
-        cStart = cRect.translation[m.axes]
-        cEnd = cStart + cRect.size[m.axes]
-        if (cStart >= sStart and cStart <= sEnd) or (cEnd >= sStart and cEnd <= sEnd)
-          compStates[comp.id] = true
-        else
-          compStates[comp.id] = false
+        if cRect <> invalid
+          cStart = cRect.translation[m.axes]
+          cEnd = cStart + cRect.size[m.axes]
+          if (cStart >= sStart and cStart <= sEnd) or (cEnd >= sStart and cEnd <= sEnd)
+            compStates[comp.id] = true
+          else
+            compStates[comp.id] = false
+          end if
         end if
         ' m.log.info(compStates[comp.id], "sStart", sStart, "sEnd", sENd, "cStart", cStart, "cEnd", cENd)
       end for
@@ -140,8 +146,8 @@ namespace ml
     '++ visibility state management
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    function updateRenderedComponents(direction, index) as void
-      if not m.shouldUpdateRenderedIndexes(direction, index)
+    function updateRenderedComponents(direction, index, force = false) as void
+      if not force and not m.shouldUpdateRenderedIndexes(direction, index)
         ' ? "not updating rendered indexes - shouldUpdateRenderedIndexes: false"
         return
       end if

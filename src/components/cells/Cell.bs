@@ -100,7 +100,7 @@ function onDidGainFocus(index, direction)
 end function
 
 function onDidLoseFocus(index, direction)
-  ? "onCellDidLoseFocus " ; index ; " " ; direction
+  ? "CELL onCellDidLoseFocus " ; index ; " " ; direction
 end function
 
 function onGainingFocus(index, direction, fraction)

@@ -84,8 +84,8 @@ class ListScreen extends mv.BaseScreen
         end if
 
         if i = 1
-          ' row.settings.screenPos = 650
-          row.title += " post hero"
+          ' row.settings.screenPos = 200
+          row.title += " 200"
         else if i mod 5 = 0
           ' row.settings.screenPos = 400
           row.title += " 400"
@@ -146,7 +146,7 @@ class ListScreen extends mv.BaseScreen
       child.id = str(m.contentId).trim()
       child.description = "some really long " + child.id + "text in here " + child.id
       ' child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(230).trim() + "/360/300?n=" + nonce
-      child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/360/360?n=" + nonce
+      child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/340/340?n=" + nonce
       ' child.HDGRIDPOSTERURL = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
       child.title = "Item " + child.id.tostr()
 
@@ -189,14 +189,24 @@ class ListScreen extends mv.BaseScreen
   end function
 
   private function onHideRows(rows)
-    row = m.list.content.getChild(focusedRow)
-    m.toggleCellState(m.getRowItems(row, rows), "hidden")
+    for i = 0 to rows
+      rowContent = m.list.content.getChild(i + m.list.rowFocused)
+      if rowContent <> invalid
+        rowContent.isHidden = true
+      end if
+    end for
+    m.list@.forceUpdate()
   end function
 
 
   private function onShowRows(rows)
-    row = m.list.content.getChild(focusedRow)
-    m.toggleCellState(m.getRowItems(row, rows), "show")
+    for i = 0 to rows
+      rowContent = m.list.content.getChild(i + m.list.rowFocused)
+      if rowContent <> invalid
+        rowContent.isHidden = false
+      end if
+    end for
+    m.list@.forceUpdate()
   end function
 
   private function getRowItems(row, number)
@@ -278,11 +288,11 @@ class ListScreen extends mv.BaseScreen
   '++ list delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   private function onCellDidGainFocus(rowIndex, itemIndex, direction)
-    ? "onCellDidGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
+    ? "SCREEN onCellDidGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
   end function
 
   private function onCellDidLoseFocus(rowIndex, itemIndex, direction)
-    ? "onCellDidLoseFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
+    ? "SCREEN onCellDidLoseFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
   end function
 
 
