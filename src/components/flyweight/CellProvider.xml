@@ -15,7 +15,7 @@
     <field
         id='isCreateMoreEnabled'
         type='boolean'
-        value='false' />
+        value='true' />
     <field
         id='numerOfCellsToCreateWhenDry'
         type='integer'

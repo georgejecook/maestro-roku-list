@@ -60,7 +60,7 @@ function addPreBakedCells(number, cellType = invalid)
 end function
 
 function getCell(cellType = invalid)
-  ' ? "asked for cell of "; cellType
+  ? "asked for cell of "; cellType
 
   trackers = getTrackers(cellType)
 
@@ -70,23 +70,26 @@ function getCell(cellType = invalid)
     if m.top.isCreateMoreEnabled
       m.log.warn("creating", m.top.numerOfCellsToCreateWhenDry, "more", cellType, "cells")
       for i = 0 to m.top.numerOfCellsToCreateWhenDry
-        createCell(cellType)
+        cell = createCell(cellType)
+        trackers.freeCellsById[cell.id] = cell
+        trackers.numberOfCellsInPool++
+        trackers.allCells.push(cell)
       end for
       m.top.numberOfCells += m.top.numerOfCellsToCreateWhenDry
     else
       return invalid
     end if
-  else
-    for each id in trackers.freeCellsById
-      exit for
-    end for
   end if
+
+  for each id in trackers.freeCellsById
+    exit for
+  end for
 
   cell = trackers.freeCellsById[id]
   trackers.freeCellsById.delete(id)
   trackers.usedCellsById[id] = cell
   m.top.numberOfCellsInUse++
-  ' ? "returning cell with id"; id
+  ? "returning cell with id"; id
   return cell
 end function
 
