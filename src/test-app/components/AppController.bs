@@ -43,7 +43,7 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onInfoChange()
-  m.infoLabel.text = " Light cells (" + str(m.cellTracker.numberOfCellsInUse) + "/" + str(m.cellTracker.numberOfCells) + ") - Real cells (" + str(m.cellProvider.numberOfCellsInUse) + "/" + str(m.cellProvider.numberOfCells) + ")"
+  m.infoLabel.text = " Cell Pressure: " + str(m.cellProvider.numberOfCellsInUse) + "/" + str(m.cellProvider.numberOfCells) + ""
 end function
 
 

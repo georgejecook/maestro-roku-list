@@ -146,16 +146,18 @@ namespace ml
       return index
     end function
 
-    function moveToIndex(index, screenPos = invalid, animated = true, fast = false)
+    function moveToIndex(index, screenPos = invalid, animated = true, fast = false, useCurrentDirection = false)
       m.log.info("moveToIndex I", m.index, "NI", index, screenPos, animated)
 
-      if index < m.index
-        direction = -1
-      else
-        direction = 1
+      if not useCurrentDirection
+        if index < m.index
+          direction = -1
+        else
+          direction = 1
+        end if
+        m.direction = direction
       end if
 
-      m.direction = direction
 
       if m.isFloatingFocus
         m.log.error("floating focus is not supported yet")
@@ -194,10 +196,10 @@ namespace ml
           m.animSpeed = m.settings.animSpeed
         end if
 
-        ' ? "m.settings " ; m.settings.animSpeed
+        ? "m.settings.animspeed " ; m.settings.animSpeed
 
         m.toggleScrolling(true)
-        ? "11111"
+        ' ? "11111"
         m.setFocusIndex(m.index, true, screenPos)
         m.viewManager.updateRenderedComponents(m.direction, m.index)
         ' ? "speed"; m.animSpeed ; " target Trans "; targetTranslation ; " m.moveAnimation.fraction "; m.moveAnimation.interpolator.fraction
@@ -207,23 +209,30 @@ namespace ml
         m.container.translation = targetTranslation
         'TODO -check if jump is bigger than a certain amount
         ' m.viewManager.updateRenderedComponents(m.direction, m.index)
-        ? "222222222222"
+        ' ? "222222222222"
         m.setFocusIndex(index, false)
       end if
     end function
 
 
-    function finishAnimating()
+    function finishAnimating() as void
       ' ? "stop ci " ; m.index ; " ni " ; m.nextIndex
-      ' if m.direction = -1
-      '   nextIndex = m.nextIndex + 1
-      ' else
-      '   nextIndex = m.nextIndex
-      ' end if
+      if m.direction = -1
+        position = m.container.translation[m.axes]
+        index = m.viewManager.getIndexAtPosition(position - 1, m.direction)
+        ? "+++++++++++++++ going up"
+        ? ">>>index" ; index; m.nextIndex
+        ? "+++++++++++++++ going up"
+        m.moveToIndex(index, invalid, true, false, true)
+        return
+        '   nextIndex = m.nextIndex + 1
+        ' else
+        '   nextIndex = m.nextIndex
+      end if
       nextIndex = m.nextIndex
       if (nextIndex > -1 and nextIndex < m.viewManager.numberOfItems) and m.index <> nextIndex
         ' ? "+2Moving to index"
-        m.moveToIndex(nextIndex, invalid, true, true)
+        m.moveToIndex(nextIndex, invalid, true)
       else
         ' ? "Already in place "; m.index ; " ni "; nextIndex ; " " ; m.viewManager.numberOfItems
       end if
@@ -244,7 +253,7 @@ namespace ml
       screenPos = m.viewManager.getScreenPositionForItem(nextRect, m.direction, screenPos)
       nextTranslation = m.viewManager.getTargetTranslation(index, m.index, screenPos)
 
-      ? "+++  nextTranslation" ; nextTranslation
+      ' ? "+++  nextTranslation" ; nextTranslation
       if nextTranslation <> invalid
         m.nextPosition = nextTranslation[m.axes]
       else
@@ -273,11 +282,11 @@ namespace ml
 
       if fraction = 1
         m.focusManager.onFocusAnimationUpdate(1)
-        ? "===FRACTION 1 TOG SCROLL FALSE"
+        ' ? "===FRACTION 1 TOG SCROLL FALSE"
         m.toggleScrolling(false)
 
         if index <> m.index
-          ? "333333333333"
+          ' ? "333333333333"
           m.setFocusIndex(index, false)
         end if
         m.targetIndex = -1
@@ -285,7 +294,7 @@ namespace ml
         m.focusManager.onContainerPositionChange(position)
         if index <> m.index and index <> m.targetIndex
           m.focusManager.onFocusAnimationUpdate(1)
-          ? "444444"
+          ' ? "444444"
           m.setFocusIndex(index, true)
         end if
       else
@@ -305,7 +314,7 @@ namespace ml
     '  * @param {boolean} isMoving - if true, then deltas are calculated for next position, and observers fired if their screen status will change
     '  */
     function setFocusIndex(index, isMoving, screenPos = invalid)
-      ? "setFocusIndex "; index ; "isMoving" ; isMoving
+      ' ? "setFocusIndex "; index ; "isMoving" ; isMoving
       'This MUST be called infrequently
       ' TODO - check if index is actually changed
       if index = -1

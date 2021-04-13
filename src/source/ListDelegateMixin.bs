@@ -163,12 +163,14 @@ namespace ml.delegateMixin
       ' ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
       return
     end if
-    ' ? "o  ListEventBridge OBSERVED " ; eventName
+    ? "o  ListEventBridge OBSERVED " ; eventName
+    ? ">>>>>>1111111111111"
 
     if eventName = "gainingFocus" or eventName = "losingFocus"
-      m.listDelegate[m.listEventMap[eventName]](event.index, event.direction, event.fraction)
+      ? ">>>>>2222222222"
+      m.listDelegate[m.listRowEventMap[eventName]](event.index, event.direction, event.fraction)
     else
-      m.listDelegate[m.listEventMap[eventName]](event.index, event.direction)
+      m.listDelegate[m.listRowEventMap[eventName]](event.index, event.direction)
     end if
 
   end function

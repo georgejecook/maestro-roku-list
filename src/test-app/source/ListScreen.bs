@@ -40,24 +40,34 @@ class ListScreen extends mv.BaseScreen
   public cellTracker as mc.types.Node
   private contentId = 0
   private rowSettings
+  private focusSettings
   private cellSettings
 
+  private isSmall = false
   private function new()
     super("ListScreen")
     m.log = new log.Logger("ListScreen")
+    if m.isSmall
+      translation = [300, 300]
+      size = [600, 500]
+    else
+      translation = [0, 0]
+      size = [1920, 1080]
+    end if
+
     m.bgRect = m.createSGNode("mv_Rectangle", m.top, "bgRect", {
-      translation: [300, 300]
-      size: [600, 500]
+      translation: translation
+      size: size
       color: "#b286f0"
     })
     m.listHolder = m.createSGNode("Group", m.top, "listHolder")
     m.cellProvider = m.global.cellProvider
     m.cellTracker = m.global.cellTracker
 
-    m.list = m.createSGNode("ml_List", m.listHolder, "list",{
-      translation: [300, 300]
-      width: 600
-      height: 500
+    m.list = m.createSGNode("ml_List", m.listHolder, "list", {
+      translation: translation
+      width: size[0]
+      height: size[1]
     })
     ml.delegateMixin.setListDelegate(m.list)
     m.onResetChange()
@@ -66,9 +76,16 @@ class ListScreen extends mv.BaseScreen
   private function onResetChange()
     m.list.content = invalid
     ' m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [480, 50], 30)
-    m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [80, 50], 30)
+    if m.isSmall
+      m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [80, 50], 30)
+    else
+      m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [480, 820], 30)
+    end if
+
     m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30, invalid)
-    content = ml.listMixin.createListContent(m.createData(), invalid, m.rowSettings)
+    m.rowSettings.contentOffset = [500, 0]
+    m.focusSettings = ml.listMixin.createFocusSettings(0.05, 0.01)
+    content = ml.listMixin.createListContent(m.createData(), m.focusSettings, m.rowSettings)
     m.list.content = content
   end function
 
@@ -76,7 +93,8 @@ class ListScreen extends mv.BaseScreen
     content = []
     for i = 0 to m.numberOfRows - 1
       row = createObject("roSGNode", "ml_RowContent")
-      row.settings = ml.listMixin.createRowSettings(m.cellSettings, invalid)
+      rowFocusSettings = ml.listMixin.createFocusSettings(0.01, 0.005)
+      row.settings = ml.listMixin.createRowSettings(m.cellSettings, rowFocusSettings)
       row.title = "ROW " + str(i)
       content.push(row)
       if i <> 0
@@ -88,19 +106,19 @@ class ListScreen extends mv.BaseScreen
           row.title += " fixed"
         end if
 
-        if i = 1
-          ' row.settings.screenPos = 200
-          row.title += " 200"
-        else if i mod 5 = 0
-          ' row.settings.screenPos = 400
-          row.title += " 400"
-        else if i mod 5 = 3
-          ' row.settings.screenPos = 700
-          row.title += " 700"
-        else
-          row.settings.screenPos = 0
-          row.title += " 0"
-        end if
+        ' if i = 1
+        '   row.settings.screenPos = 100
+        '   row.title += " 100"
+        ' else if i mod 5 = 0
+        '   row.settings.screenPos = 200
+        '   row.title += " 200"
+        ' else if i mod 5 = 3
+        '   row.settings.screenPos = 400
+        '   row.title += " 400"
+        ' else
+        '   row.settings.screenPos = 0
+        '   row.title += " 0"
+        ' end if
       end if
 
       if i = 10 or i = 14 or i = 19 or i = 22 or i = 23 or i = 28
@@ -293,12 +311,46 @@ class ListScreen extends mv.BaseScreen
   '++ list delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   private function onCellDidGainFocus(rowIndex, itemIndex, direction)
-    ? "SCREEN onCellDidGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
+    ? "+SCREEN onCellDidGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
   end function
 
   private function onCellDidLoseFocus(rowIndex, itemIndex, direction)
-    ? "SCREEN onCellDidLoseFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
+    ? "+SCREEN onCellDidLoseFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
   end function
 
+  private function onRowDidGainFocus(rowIndex, direction)
+    ? "+SCREEN onRowDidGainFocus : R: "; rowIndex ; " D:" ; direction
+    if direction = -1
+      row = m.list@.getRowRenderer(rowIndex)
+      row.opacity = 1
+    end if
+
+  end function
+
+  private function onRowDidLoseFocus(rowIndex, direction)
+    row = m.list@.getRowRenderer(rowIndex)
+    if direction = 1
+      row.opacity = 0
+    end if
+
+    ? "+SCREEN onRowDidLoseFocus : R: "; rowIndex ; " D:" ; direction
+  end function
+
+  private function onRowGainingFocus(rowIndex, direction, fraction)
+    if direction = -1
+      row = m.list@.getRowRenderer(rowIndex)
+      row.opacity = fraction
+    end if
+    ? "+SCREEN onRowGainingFocus : R: "; rowIndex ; " D:" ; direction ; " F: " ; fraction
+  end function
+
+  private function onRowLosingFocus(rowIndex, direction, fraction)
+    ? "+SCREEN onRowLosingFocus : R: "; rowIndex ; " D:" ; direction ; " F: " ; fraction
+    if direction = 1
+      row = m.list@.getRowRenderer(rowIndex)
+      row.opacity = 1 - fraction
+    end if
+
+  end function
 
 end class

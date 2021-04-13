@@ -240,10 +240,11 @@ namespace ml
       m.log.method(">>>>onLongPressStart", key)
 
       if (key = "up" and m.itemScroller.index > 0) or (key = "down" and m.itemScroller.index < m.viewManager.numberOfItems)
-        m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
         if key = "up"
+          m.log.verbose("long press started on key", key, "going to animate to start of list")
           return m.itemScroller.moveToEnd(-1)
         else
+          m.log.verbose("long press started on key", key, "going to animate to end of list")
           return m.itemScroller.moveToEnd(1)
         end if
       end if

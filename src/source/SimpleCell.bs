@@ -20,7 +20,7 @@ namespace ml
 
     private lastContent
     private isViewCreated = false
-    private posterSize = [80.0, 50.0]
+    private posterSize = [480.0, 320.0]
     function new()
       super()
       m.createViews()
@@ -32,9 +32,10 @@ namespace ml
       end if
       m.isViewCreated = true
       ' scaleRotateCenter: [0, m.posterSize[1]]
-      ' m.bgRect = mc.createSGNode("mv_Rectangle", m.top, "bgRect", {
-      '   width:
-      ' })
+      m.bgRect = mc.createSGNode("mv_Rectangle", m.top, "bgRect", {
+        size: m.posterSize
+        color: "#2222aa"
+      })
       m.poster = mc.createSGNode("mv_Poster", m.top, "poster", {
         translation: [0, 0]
         scaleRotateCenter: [0, 0]
@@ -124,7 +125,9 @@ namespace ml
 
     private function onDidLoseFocus(index, direction)
       ' ? "SC: onCellDidLoseFocus " ; index ; " " ; direction
-      m.setScale(1, false)
+      if direction = 1
+        m.setScale(1, false)
+      end if
     end function
 
     private function onGainingFocus(index, direction, fraction)
@@ -134,18 +137,25 @@ namespace ml
 
     private function onLosingFocus(index, direction, fraction)
       ' ? "SC: onLosingFocus " ; index ; " " ; direction ; " " ; fraction
-      m.setScale(fraction, false)
+      if direction = 1
+        m.setScale(fraction, false)
+      end if
     end function
 
     private function setScale(fraction, isGaining) as void
-      if isGaining
-        m.scale = (fraction + 1)
-      else
-        m.scale = 2 - (fraction + 1)
-      end if
-      m.poster.width = m.posterSize[0] * m.scale
-      m.poster.height = m.posterSize[1] * m.scale
+      ' if isGaining
+      '   m.scale = (fraction + 1)
+      ' else
+      '   m.scale = 2 - (fraction + 1)
+      ' end if
+      ' m.poster.width = m.posterSize[0] * m.scale
+      ' m.poster.height = m.posterSize[1] * m.scale
 
+      if isGaining
+        m.poster.opacity = 0.3 + fraction
+      else
+        m.poster.opacity = 0.3 + (1 - fraction)
+      end if
     end function
   end class
 end namespace
