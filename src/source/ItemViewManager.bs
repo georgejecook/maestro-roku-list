@@ -21,7 +21,7 @@ namespace ml
     public settings = invalid
 
     'tracking
-    public direction
+    public direction = 0
     public visibleItems = []
     public visibleComponents = []
     public hiddenComponents = []
@@ -35,7 +35,7 @@ namespace ml
     public lastScrollIndex = 0
     public lastScrollDirection = 0
     public renderedComponents = []
-    public isScrolling
+    public isScrolling = false
 
     function new(name, owner, container, axes, minPos, maxPos)
       super(name)
@@ -321,17 +321,25 @@ namespace ml
     function getIndexAtPosition(position, direction)
       'TODO - this will get fiddly when we have wrapping
 
+      ? " getIndexAtPosition " ; position
+      if position >= 0
+        ? "position is before start - index 0"
+        return 0
+      end if
+      p = abs(position)
       for i = 0 to m.numberOfItems
         itemRect = m.rects[i]
         screenPos = m.getScreenPositionForItem(itemRect, direction)
         itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
-        ' ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
-        if itemPos > abs(position)
+        ' ? "i "; i ; " pos "; p ; " ip " ; itemPos ; " sp " ; screenPos
+        if itemPos > p
           return i - 1
         end if
       end for
 
-      return -1
+      ? " GOT TO END!!!!" ; i -1
+      'we must be at the end! -return last item
+      return i - 1
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -66,10 +66,10 @@ namespace ml
 
     private function createViews()
       m.bgRect = m.createSGNode("mv_Rectangle", m.top, "bgRect", {
-        width: 1920
+        width: 0
         color: "#000000"
         opacity: 0
-        height: 500
+        height: 0
       })
       m.contentGroup = m.createSGNode("Group", m.top, "contentGroup")
       m.cellsGroup = m.createSGNode("Group", m.top, "cellsGroup")
@@ -81,7 +81,7 @@ namespace ml
 
     private function createManagers()
       m.log.info("createManagers")
-      m.viewManager = new ml.RowItemViewManager(m.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
+      m.viewManager = new ml.RowItemViewManager(m.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker, 0, m.width)
       m.itemScroller = new ml.RowItemScroller(m.viewManager)
       m.focusManager = new ml.ItemFocusManager(m.viewManager, m.itemScroller, m.owner.cellEvents, m.index)
       m.focusManager.name = "ROW FM "
@@ -110,6 +110,7 @@ namespace ml
       else
         m.height = settings.cellSettings.size[1] + settings.contentOffset[1]
       end if
+      m.bgRect.size = [m.owner.width, m.height]
     end function
 
     private function onIsRenderedChange()

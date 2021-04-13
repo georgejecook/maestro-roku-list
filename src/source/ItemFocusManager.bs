@@ -7,8 +7,8 @@ namespace ml
 
     public viewManager = invalid
     public itemScroller = invalid
-    public nextComponent = invalid
-    public component = invalid
+    public nextCell = invalid
+    public cell = invalid
     public index = 0
     public indexPosition = 0
     public nextIndex = 0
@@ -54,8 +54,8 @@ namespace ml
       m.nextIndex = nextIndex
       m.nextPosition = nextPosition
       m.direction = direction
-      m.component = m.viewManager.getRenderer(m.index)
-      m.nextComponent = m.viewManager.getRenderer(m.nextIndex)
+      m.cell = m.viewManager.getRenderer(m.index)
+      m.nextCell = m.viewManager.getRenderer(m.nextIndex)
       m.didStart = false
       m.didFinish = false
       m.onFocusUpdate(0)
@@ -141,12 +141,12 @@ namespace ml
       nextEvent.rowIndex = m.rowIndex
 
       'let components know, so they can react
-      if m.component <> invalid
-        m.component.listEvent = event
+      if m.cell <> invalid
+        m.cell.listEvent = event
       end if
 
-      if m.nextComponent <> invalid
-        m.nextComponent.listEvent = nextEvent
+      if m.nextCell <> invalid
+        m.nextCell.listEvent = nextEvent
       end if
 
       for each delegate in m.delegates

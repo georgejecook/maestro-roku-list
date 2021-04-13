@@ -4,7 +4,7 @@ import "pkg:/source/ListMixin.bs"
 namespace ml
   class ListItemViewManager extends ml.ItemViewManager
 
-    function new(list, container, minPos = 0, maxPos = 1080)
+    function new(list, container, minPos, maxPos)
       super("ListItemViewManager", list, container, 1, minPos, maxPos)
       m.delegate = list.rowEvents
       m.lookAheadDistance = maxPos * 5
@@ -51,6 +51,7 @@ namespace ml
         content: rowContent
         owner: m.owner
         index: index
+        width: m.owner.width
         'TODO - measure the heights.
         isInViewport: isRendered
       })

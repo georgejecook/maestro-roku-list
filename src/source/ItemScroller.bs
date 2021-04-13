@@ -29,11 +29,11 @@ namespace ml
     public screenPos = 0
     public isFloatingFocus = false
     public isWrapped = false
-    public delegates
+    public delegates = []
 
-    private animSpeed
+    private animSpeed = 0
     private settings
-    private isMovingMultiple
+    private isMovingMultiple = false
 
     function new(viewManager, axes)
       super("ItemScroller")
@@ -42,7 +42,7 @@ namespace ml
       m.axes = axes
       m.moveAnimation = new mv.animations.Move(m.container, 1, m.container.translation, m.container.translation)
       'need to move the animation node out of the container
-      ' m.viewManager.owner.appendChild(m.moveAnimation.node)
+      m.viewManager.owner.appendChild(m.moveAnimation.node)
       m.moveAnimation.observeFraction(m.onAnimationFractionChange, m)
     end function
 
@@ -74,7 +74,12 @@ namespace ml
     '++ collection movement
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    function moveToEnd(direction, screenPos = invalid, animated = true, fast = false)
+    function moveToEnd(direction, screenPos = invalid, animated = true, fast = false) as boolean
+      if (m.index >= m.viewManager.numberOfItems - 1 and direction = 1) or m.index = 0 and direction = -1
+        m.log.info("already at end - ignoring")
+        return false
+      end if
+
       m.isMovingMultiple = true
       if direction = -1
         index = 0
@@ -82,16 +87,33 @@ namespace ml
         index = m.viewManager.numberOfItems - 1
       end if
       m.moveToIndex(index, screenPos, animated, fast)
+      return true
     end function
 
-    function move(offset, screenPos = invalid, animated = true, fast = false)
+    function move(offset, screenPos = invalid, animated = true, fast = false) as boolean
       index = m.index + offset
 
       if offset > 0
+        if m.index = m.viewManager.numberOfItems - 1
+          m.log.info("already at end")
+          return false
+        end if
         direction = 1
       else
+        if m.index = 0
+          m.log.info("already at start")
+          return false
+        end if
         direction = -1
       end if
+
+
+      if m.direction = direction and abs(offset) = 1 and m.viewManager.isScrolling
+        'TODO - we might want to detect this at the list, and have a cache of next move there
+        m.log.info("was already scrolling - ignoring", m.viewManager.isScrolling)
+        return false
+      end if
+
       m.isMovingMultiple = abs(offset) > 1
 
       index = m.getValidTargetIndex(index, direction)
@@ -101,6 +123,8 @@ namespace ml
       if index <> -1
         m.moveToIndex(index, screenPos, animated, fast)
       end if
+
+      return true
     end function
 
     function getValidTargetIndex(index, direction)
@@ -108,8 +132,8 @@ namespace ml
         return 0
       end if
 
-      if index > m.viewManager.numberOfItems - 1
-        return m.getValidTargetIndex(m.viewManager.numberOfItems - 1, -1)
+      if index >= m.viewManager.numberOfItems - 1
+        return m.viewManager.numberOfItems - 1
       end if
       'TODO - check if the item is focusable..
       'this logic below is broken
@@ -190,16 +214,28 @@ namespace ml
 
 
     function finishAnimating()
-      ' ? "stop ci " ; m.index ; " ni " ; m.nextIndex
-      if m.direction = -1
-        nextIndex = m.nextIndex + 1
+      ? "stop ci " ; m.index ; " ni " ; m.nextIndex
+      ' if m.direction = -1
+      '   nextIndex = m.nextIndex + 1
+      ' else
+      '   nextIndex = m.nextIndex
+      ' end if
+      nextIndex = m.nextIndex
+      if (nextIndex > -1 and nextIndex < m.viewManager.numberOfItems) and m.index <> nextIndex
+        ? "+2Moving to index"
+        m.moveToIndex(nextIndex, invalid, true, true)
       else
-        nextIndex = m.nextIndex
+        ? "Already in place "; m.index ; " ni "; nextIndex ; " " ; m.viewManager.numberOfItems
       end if
-      m.moveToIndex(nextIndex, invalid, true, true)
     end function
 
-    function setNextIndex(index, screenPos = invalid)
+    function setNextIndex(index, screenPos = invalid) as void
+      if index >= m.viewManager.numberOfItems
+        m.log.info("cannot set index to ", index, "beyond number of vis items")
+        return
+      end if
+
+      m.log.debug("setNextIndex", index)
       if index < 0
         index = 0
       end if
@@ -208,6 +244,7 @@ namespace ml
       screenPos = m.viewManager.getScreenPositionForItem(nextRect, m.direction, screenPos)
       nextTranslation = m.viewManager.getTargetTranslation(index, m.index, screenPos)
 
+      ? "+++  nextTranslation" ; nextTranslation
       if nextTranslation <> invalid
         m.nextPosition = nextTranslation[m.axes]
       else
@@ -230,13 +267,13 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     function onAnimationFractionChange(fraction)
-      ' m.log.info("onAnimationFractionChange", fraction)
+      m.log.info("onAnimationFractionChange", fraction)
       position = m.container.translation[m.axes]
       index = m.viewManager.getIndexAtPosition(position, m.direction)
 
       if fraction = 1
         m.focusManager.onFocusAnimationUpdate(1)
-        ' ? "FRACTION 1 TOG SCROLL FALSE"
+        ? "===FRACTION 1 TOG SCROLL FALSE"
         m.toggleScrolling(false)
 
         if index <> m.index
@@ -270,13 +307,18 @@ namespace ml
     function setFocusIndex(index, isMoving, screenPos = invalid)
       ? "setFocusIndex "; index ; "isMoving" ; isMoving
       'This MUST be called infrequently
+      ' TODO - check if index is actually changed
       if index = -1
         m.index = 0
         m.setNextIndex(0, screenPos)
       else
+        if index >= m.viewManager.numberOfItems - 1
+          index = m.viewManager.numberOfItems - 1
+        end if
         m.index = index
         m.setNextIndex(m.index + m.direction)
       end if
+
 
       'TODO -note - we need to know what screenPos WAS in a floating scenario!!
       m.indexPosition = m.viewManager.getTargetTranslation(m.index, m.direction, screenPos)[m.axes]

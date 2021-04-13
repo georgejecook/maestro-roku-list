@@ -1,5 +1,4 @@
 import "pkg:/source/roku_modules/maestro/core/Utils.brs"
-import "pkg:/source/ItemDelegateMixin.bs"
 import "pkg:/source/ListMixin.bs"
 import "pkg:/source/ItemDelegateMixin.bs"
 import "pkg:/source/RowItemScroller.bs"
@@ -19,6 +18,7 @@ namespace ml
     private scale
     private lastContent
     private isViewCreated = false
+    private posterSize = [480.0, 50.0]
     function new()
       super()
       m.createViews()
@@ -31,29 +31,28 @@ namespace ml
       m.isViewCreated = true
       m.poster = mc.createSGNode("mv_Poster", m.top, "poster", {
         translation: [0, 0]
-        scaleRotateCenter: [0, 320]
+        scaleRotateCenter: [0, m.posterSize[1]]
         loadingBitmapUri: "http://via.placeholder.com/370x300"
         failedBitmapUri: "http://via.placeholder.com/370x300"
         uri: "http://via.placeholder.com/370x300"
-        loadWidth: 480
-        loadHeight: 320
-        width: 480
-        height: 320
+        loadWidth: m.posterSize[0]
+        loadHeight: m.posterSize[1]
+        size: m.posterSize
         loadDisplayMode: "scaleToFit"
       })
       m.rectangle = mc.createSGNode("mv_Rectangle", m.top, "rectangle", {
         opacity: 0.4
         color: "#000000"
-        width: 480
-        height: 70
+        width: m.posterSize[0]
+        height: 20
       })
       m.label = mc.createSGNode("mv_Label", m.top, "label", {
-        width: 460
+        width: m.posterSize[0]
         horizAlign: "center"
         translation: [10, 100]
       })
       m.label = m.top.findNode("label")
-      m.size = [480, 320]
+      m.size = m.posterSize
       m.scale = 1
     end function
 
@@ -138,8 +137,8 @@ namespace ml
       else
         m.scale = 2 - (fraction + 1)
       end if
-      m.poster.height = 480 * m.scale
-      m.poster.width = 320 * m.scale
+      m.poster.width = m.posterSize[0] * m.scale
+      m.poster.height = m.posterSize[1] * m.scale
 
     end function
   end class

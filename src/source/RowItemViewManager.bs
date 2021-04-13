@@ -9,11 +9,12 @@ namespace ml
     public lastRowIsRendered = "none"
     public isFlowSupported = false
 
-    function new(list, row, container, cellProvider, cellTracker, minPos = 0, maxPos = 1920)
+    function new(list, row, container, cellProvider, cellTracker, minPos, maxPos)
       super("RowItemViewManager", list, container, 0, minPos, maxPos)
       m.cellProvider = cellProvider
       m.cellTracker = cellTracker
       m.row = row
+
       m.lookAheadDistance = maxPos * 1.5
       m.lookBehindDistance = maxPos * 1.5
 

@@ -86,7 +86,7 @@ namespace ml
       m.rowEvents = m.createEventsBroker("rows")
       m.rowsGroup = m.top.findNode("rowsGroup")
 
-      m.viewManager = new ml.ListItemViewManager(m.top, m.rowsGroup)
+      m.viewManager = new ml.ListItemViewManager(m.top, m.rowsGroup, 0, m.height)
       m.itemScroller = new ml.ListItemScroller(m.viewManager)
       m.focusManager = new ml.ItemFocusManager(m.viewManager, m.itemScroller, m.rowEvents)
       m.focusManager.name = "LIST FM "
@@ -210,29 +210,25 @@ namespace ml
 
     private function onKeyPressUp() as boolean
       m.log.method("onKeyPressUp")
-      if (m.isScrolling)
-        ' m.itemScroller.move(-2)
-        m.itemScroller.move(-1)
+      if m.itemScroller.index > 0
+        return m.itemScroller.move(-1)
       else
-        m.itemScroller.move(-1)
+        return false
       end if
-      return true
     end function
 
     private function onKeyPressDown() as boolean
       m.log.method("onKeyPressDown")
-      if (m.isScrolling)
-        m.itemScroller.move(1)
-        ' m.itemScroller.move(2)
+      if m.itemScroller.index < m.viewManager.numberOfItems
+        return m.itemScroller.move(1)
       else
-        m.itemScroller.move(1)
+        return false
       end if
-      return true
     end function
 
     private function getLongPressIntervalForKey(key) as float
       m.log.method("getLongPressIntervalForKey", key)
-      if key = "up" or key = "down"
+      if (key = "up" and m.itemScroller.index > 0) or (key = "down" and m.itemScroller.index < m.viewManager.numberOfItems)
         return 0.2
       else
         return 0
@@ -242,15 +238,13 @@ namespace ml
     private function onLongPressStart(key) as boolean
       m.log.method(">>>>onLongPressStart", key)
 
-      if key = "up" or key = "down"
+      if (key = "up" and m.itemScroller.index > 0) or (key = "down" and m.itemScroller.index < m.viewManager.numberOfItems)
         m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
         if key = "up"
-          m.itemScroller.moveToEnd(-1)
+          return m.itemScroller.moveToEnd(-1)
         else
-          m.itemScroller.moveToEnd(1)
+          return m.itemScroller.moveToEnd(1)
         end if
-
-        return true
       end if
 
       return false
