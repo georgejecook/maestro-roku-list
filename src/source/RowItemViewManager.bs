@@ -80,7 +80,7 @@ namespace ml
     end function
 
     function applyrenderStateForCell(id, renderState)
-      ' m.log.info("applyrenderStateForCell", id, renderState)
+      m.log.info("+RIVM applyrenderStateForCell", id, renderState)
       index = id.toInt()
       isrendered = m.row.isrendered
       item = m.content.getChild(index)

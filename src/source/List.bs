@@ -106,6 +106,7 @@ namespace ml
       m.log.info("resetState")
       m.viewManager.setContent(m.content)
       m.itemScroller.reset()
+      m.top.clippingrect = [0, 0, m.width, m.height]
     end function
 
     private function onContentChange()

@@ -16,9 +16,11 @@ namespace ml
     private rectangle
     private label
     private scale
+    private bgRect
+
     private lastContent
     private isViewCreated = false
-    private posterSize = [480.0, 50.0]
+    private posterSize = [80.0, 50.0]
     function new()
       super()
       m.createViews()
@@ -29,9 +31,13 @@ namespace ml
         return
       end if
       m.isViewCreated = true
+      ' scaleRotateCenter: [0, m.posterSize[1]]
+      ' m.bgRect = mc.createSGNode("mv_Rectangle", m.top, "bgRect", {
+      '   width:
+      ' })
       m.poster = mc.createSGNode("mv_Poster", m.top, "poster", {
         translation: [0, 0]
-        scaleRotateCenter: [0, m.posterSize[1]]
+        scaleRotateCenter: [0, 0]
         loadingBitmapUri: "http://via.placeholder.com/370x300"
         failedBitmapUri: "http://via.placeholder.com/370x300"
         uri: "http://via.placeholder.com/370x300"
@@ -49,7 +55,7 @@ namespace ml
       m.label = mc.createSGNode("mv_Label", m.top, "label", {
         width: m.posterSize[0]
         horizAlign: "center"
-        translation: [10, 100]
+        translation: [10, 10]
       })
       m.label = m.top.findNode("label")
       m.size = m.posterSize

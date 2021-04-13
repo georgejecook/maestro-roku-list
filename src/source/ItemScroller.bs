@@ -42,7 +42,7 @@ namespace ml
       m.axes = axes
       m.moveAnimation = new mv.animations.Move(m.container, 1, m.container.translation, m.container.translation)
       'need to move the animation node out of the container
-      m.viewManager.owner.appendChild(m.moveAnimation.node)
+      ' m.viewManager.owner.appendChild(m.moveAnimation.node)
       m.moveAnimation.observeFraction(m.onAnimationFractionChange, m)
     end function
 
@@ -214,7 +214,7 @@ namespace ml
 
 
     function finishAnimating()
-      ? "stop ci " ; m.index ; " ni " ; m.nextIndex
+      ' ? "stop ci " ; m.index ; " ni " ; m.nextIndex
       ' if m.direction = -1
       '   nextIndex = m.nextIndex + 1
       ' else
@@ -222,10 +222,10 @@ namespace ml
       ' end if
       nextIndex = m.nextIndex
       if (nextIndex > -1 and nextIndex < m.viewManager.numberOfItems) and m.index <> nextIndex
-        ? "+2Moving to index"
+        ' ? "+2Moving to index"
         m.moveToIndex(nextIndex, invalid, true, true)
       else
-        ? "Already in place "; m.index ; " ni "; nextIndex ; " " ; m.viewManager.numberOfItems
+        ' ? "Already in place "; m.index ; " ni "; nextIndex ; " " ; m.viewManager.numberOfItems
       end if
     end function
 

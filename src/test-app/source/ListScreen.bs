@@ -46,8 +46,8 @@ class ListScreen extends mv.BaseScreen
     super("ListScreen")
     m.log = new log.Logger("ListScreen")
     m.bgRect = m.createSGNode("mv_Rectangle", m.top, "bgRect", {
-      translation: [0, 300]
-      size: [1920, 500]
+      translation: [300, 300]
+      size: [600, 500]
       color: "#b286f0"
     })
     m.listHolder = m.createSGNode("Group", m.top, "listHolder")
@@ -55,8 +55,8 @@ class ListScreen extends mv.BaseScreen
     m.cellTracker = m.global.cellTracker
 
     m.list = m.createSGNode("ml_List", m.listHolder, "list",{
-      translation: [0, 300]
-      width: 1920
+      translation: [300, 300]
+      width: 600
       height: 500
     })
     ml.delegateMixin.setListDelegate(m.list)
@@ -65,7 +65,8 @@ class ListScreen extends mv.BaseScreen
 
   private function onResetChange()
     m.list.content = invalid
-    m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [480, 50], 30)
+    ' m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [480, 50], 30)
+    m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [80, 50], 30)
     m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30, invalid)
     content = ml.listMixin.createListContent(m.createData(), invalid, m.rowSettings)
     m.list.content = content

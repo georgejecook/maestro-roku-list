@@ -162,11 +162,12 @@ namespace ml
         end if
       end if
 
-      ' if m.row = invalid
+      ' 'bs:disable-next-line
+      ' if m.row <> invalid
       '   ? " RI " ; renderedIndexes
       '   ? " LRI " ; m.lastRenderedIndexes
       ' end if
-      m.log.info("renderedIndexes index", index, renderedIndexes)
+      m.log.info("+-renderedIndexes index", index, renderedIndexes)
       renderedStateMap = m.createRenderedStateMap(direction, index, renderedIndexes)
       m.renderedComponents = []
       m.applyRenderStateMap(renderedStateMap)
@@ -203,6 +204,10 @@ namespace ml
         afterPos = 0
       end if
 
+      ' 'bs:disable-next-line
+      ' if m.row <> invalid
+      '   ? "++ROW "; m.lookAheadDistance ; "  " ; m.lookBehindDistance
+      ' end if
       return {
         startIndex: m.getIndexAtPosition(beforePos, direction)
         endIndex: m.getIndexAtPosition(afterPos, direction)
@@ -321,11 +326,11 @@ namespace ml
     function getIndexAtPosition(position, direction)
       'TODO - this will get fiddly when we have wrapping
 
-      ? " getIndexAtPosition " ; position
-      if position >= 0
-        ? "position is before start - index 0"
-        return 0
-      end if
+      ' ? " getIndexAtPosition " ; position
+      ' if position >= 0
+      '   ? "position is before start - index 0"
+      '   return 0
+      ' end if
       p = abs(position)
       for i = 0 to m.numberOfItems
         itemRect = m.rects[i]
@@ -337,7 +342,7 @@ namespace ml
         end if
       end for
 
-      ? " GOT TO END!!!!" ; i -1
+      ? " GOT TO END!!!!" ; i - 1
       'we must be at the end! -return last item
       return i - 1
     end function
