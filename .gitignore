@@ -12,3 +12,7 @@ package-lock.json
 *.orig
 lcov*.info
 **/node_modules/*
+build
+dist
+out
+
