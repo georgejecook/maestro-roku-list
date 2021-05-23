@@ -5,7 +5,7 @@
     "source/**/*.*",
     "components/**/*.*",
     {
-      "src": "test-app/**/*.*",
+      "src": "../test-app/**/*.*",
       "dest": ""
     }
   ],
@@ -15,6 +15,12 @@
   "diagnosticFilters": [
     {
       "src": "**/roku_modules/**/*.*"
+    },
+    {
+      "src": "**/rooibos/**/*.*"
+    },
+    {
+      "src": "**/rooibos-roku/**/*.*"
     }
   ],
   "emitDefinitions": true,
@@ -29,7 +35,7 @@
   },
   "sourceMap": true,
   "maestro": {
-    "excludeFilters": ["**/roku_modules/**/*", "**/rooibos/**/*"],
+    "excludeFilters": ["**/roku_modules/**/*", "**/rooibos/**/*", "**/rooibos-roku/**/*"],
     "buildForIDE": true
   }
 }

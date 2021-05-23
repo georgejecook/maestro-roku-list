@@ -5,7 +5,7 @@
     "source/**/*.*",
     "components/**/*.*",
     {
-      "src": "test-app/**/*.*",
+      "src": "../src-test-app/**/*.*",
       "dest": ""
     },
     "!**/*.spec.bs"

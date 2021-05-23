@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "bslib": "npm:@rokucommunity/bslib@^0.1.1",
-    "log": "npm:roku-log@^0.4.1",
+    "log": "npm:roku-log@^0.4.2",
     "maestro": "file:/home/george/hope/open-source/maestro/maestro-roku"
   },
   "files": [
@@ -25,7 +25,7 @@
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "@typescript-eslint/parser": "^4.14.1",
     "adm-zip": "^0.4.13",
-    "brighterscript": "^0.33.0",
+    "brighterscript": "^0.39.0",
     "chai": "^4.2.0",
     "chai-subset": "^1.6.0",
     "commander": "^3.0.2",
@@ -92,13 +92,9 @@
     ]
   },
   "scripts": {
-    "local": "ts-node scripts/install-maestro-local.js",
-    "remote": "ts-node scripts/install-maestro-npm.js",
     "build": "node scripts/run.js && ts-node scripts/move-generated-files.js",
-    "build-remote": "npm run remote && npm run build",
-    "build-local": "npm run local && npm run build",
     "build-app": "node scripts/run-app.js",
     "build-test": "node scripts/run-test.js",
-    "rc": "ropm copy && ts-node scripts/fix-ropm-issues.js"
+    "ropm": "ropm copy && ts-node scripts/fix-ropm-issues.js"
   }
 }

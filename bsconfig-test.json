@@ -1,11 +1,11 @@
 {
+  "extends": "bsconfig.json",
   "stagingFolderPath": "build",
   "files": [
     "manifest",
     "source/**/*.*",
     "components/**/*.*"
   ],
-  "extends": "bsconfig.json",
   "plugins": [
     "maestro-roku-bsc-plugin",
     "rooibos-roku"
@@ -27,7 +27,11 @@
     "insertPkgPath": true
   },
   "maestro": {
-    "excludeFilters": ["**/roku_modules/**/*", "**/rooibos/**/*"],
-    "buildForIDE": false
+    "excludeFilters": [
+      "**/roku_modules/**/*",
+      "**/rooibos/**/*",
+      "**/rooibos-roku/**/*"
+    ],
+    "buildForIDE": true
   }
 }
