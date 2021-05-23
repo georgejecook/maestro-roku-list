@@ -4,14 +4,14 @@ namespace ml
   class RowItemViewManager extends ml.ItemViewManager
     public row = invalid
     public cellsById = {}
-    public cellProvider
+    public componentPool
     public cellTracker
     public lastRowIsRendered = "none"
     public isFlowSupported = false
 
-    function new(list, row, container, cellProvider, cellTracker, minPos, maxPos)
+    function new(list, row, container, componentPool, cellTracker, minPos, maxPos)
       super("RowItemViewManager", list, container, 0, minPos, maxPos)
-      m.cellProvider = cellProvider
+      m.componentPool = componentPool
       m.cellTracker = cellTracker
       m.row = row
 
@@ -90,7 +90,7 @@ namespace ml
           if m.cellsById[id] = invalid
             settings = ml.listMixin.getCellSettings(m.owner.content, m.content, item)
             ' ? "GETTING CELL " ; id
-            cell = m.cellProvider@.getCell(settings.compName)
+            cell = m.componentPool@.getComponent(settings.compName)
 
             if cell <> invalid
               'TODO - work out what to do around setting content etc here
@@ -124,7 +124,7 @@ namespace ml
           cell = m.cellsById[id]
           if cell <> invalid
             ? "RELEASING " ; id
-            m.cellProvider@.releaseCell(cell)
+            m.componentPool@.releaseComponent(cell)
             m.cellsById.delete(id)
           else
             ? " COULD NOT FIND CELL TO RELEASE" ; id

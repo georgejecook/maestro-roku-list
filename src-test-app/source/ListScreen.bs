@@ -2,7 +2,6 @@ import "pkg:/source/ListMixin.bs"
 import "pkg:/source/roku_modules/maestro/view/BaseScreen.brs"
 import "pkg:/source/ListDelegateMixin.bs"
 
-@strict
 @node("ListScreen", "mv_BaseScreen")
 class ListScreen extends mv.BaseScreen
 
@@ -36,7 +35,7 @@ class ListScreen extends mv.BaseScreen
   private defaultCellType = "ml_SimpleCell"
 
   'state
-  public cellProvider as mc.types.Node
+  public componentPool as mc.types.Node
   public cellTracker as mc.types.Node
   private contentId = 0
   private rowSettings
@@ -44,7 +43,7 @@ class ListScreen extends mv.BaseScreen
   private cellSettings
 
   private isSmall = false
-  private function new()
+  function new()
     super("ListScreen")
     m.log = new log.Logger("ListScreen")
     if m.isSmall
@@ -61,7 +60,7 @@ class ListScreen extends mv.BaseScreen
       color: "#b286f0"
     })
     m.listHolder = m.createSGNode("Group", m.top, "listHolder")
-    m.cellProvider = m.global.cellProvider
+    m.componentPool = m.global.componentPool
     m.cellTracker = m.global.cellTracker
 
     m.list = m.createSGNode("ml_List", m.listHolder, "list", {
@@ -106,19 +105,22 @@ class ListScreen extends mv.BaseScreen
           row.title += " fixed"
         end if
 
-        ' if i = 1
-        '   row.settings.screenPos = 100
-        '   row.title += " 100"
-        ' else if i mod 5 = 0
-        '   row.settings.screenPos = 200
-        '   row.title += " 200"
-        ' else if i mod 5 = 3
-        '   row.settings.screenPos = 400
-        '   row.title += " 400"
-        ' else
-        '   row.settings.screenPos = 0
-        '   row.title += " 0"
-        ' end if
+        if i = 1
+          row.settings.screenPos = 100
+          row.title += " 100"
+        else if i mod 5 = 0
+          row.settings.screenPos = 200
+          row.title += " 200"
+        else if i mod 5 = 3
+          row.settings.screenPos = 400
+          row.title += " 400"
+        else if i mod 5 = 2
+          row.settings.screenPos = 800
+          row.title += " 800"
+        else
+          row.settings.screenPos = 0
+          row.title += " 0"
+        end if
       end if
 
       if i = 10 or i = 14 or i = 19 or i = 22 or i = 23 or i = 28
@@ -132,27 +134,18 @@ class ListScreen extends mv.BaseScreen
     return content
   end function
 
-  private function itemFocusedChanged()
-    print "itemFocused changed to: "; m.list.itemFocused
-  end function
-
-  private function itemSelcetedChanged()
+  private function onItemFocused()
     print "itemFocused changed to: "; m.list.itemFocused
     newScreen = createObject("roSGNode", "ListScreen")
     m.push(newScreen)
     mv.setFocus(newScreen)
   end function
 
-  private function itemUnfocusedChanged()
+  private function itemUnfocused()
     print "itemUnfocused changed to: "; m.list.itemUnfocused
   end function
 
-  private function itemSelectedChanged()
-    print "itemSelected changed to: "; m.list.itemSelected
-  end function
-
-
-  private function currFocusItemIndexChanged()
+  private function currFocusItemIndex()
   end function
 
   private function addItems(cellType, number)
@@ -171,7 +164,7 @@ class ListScreen extends mv.BaseScreen
       ' child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(230).trim() + "/360/300?n=" + nonce
       child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/340/340?n=" + nonce
       ' child.HDGRIDPOSTERURL = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
-      child.title = "Item " + child.id.tostr()
+      child.title = `Item ${child.id}`
 
       ' if m.contentId mod 5 = 0
       '   cellType = "SimpleCell"
@@ -287,18 +280,18 @@ class ListScreen extends mv.BaseScreen
   '++ lifecycle
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  override function onShow()
+  protected override function onShow()
     super.onShow()
     m.list.isHidden = false
     mv.setFocus(m.list)
   end function
 
-  override function onHide()
+  protected override function onHide()
     super.onHide()
     m.list.isHidden = true
   end function
 
-  override function onGainedFocus(isSelfFocused)
+  protected override function onGainedFocus(isSelfFocused)
     super.onGainedFocus(isSelfFocused)
     m.log.info("onGainedFocus", isSelfFocused)
 
@@ -320,36 +313,36 @@ class ListScreen extends mv.BaseScreen
 
   private function onRowDidGainFocus(rowIndex, direction)
     ? "+SCREEN onRowDidGainFocus : R: "; rowIndex ; " D:" ; direction
-    if direction = -1
-      row = m.list@.getRowRenderer(rowIndex)
-      row.opacity = 1
-    end if
+    ' if direction = -1
+    '   row = m.list@.getRowRenderer(rowIndex)
+    '   row.opacity = 1
+    ' end if
 
   end function
 
   private function onRowDidLoseFocus(rowIndex, direction)
     row = m.list@.getRowRenderer(rowIndex)
-    if direction = 1
-      row.opacity = 0
-    end if
+    ' if direction = 1
+    '   row.opacity = 0
+    ' end if
 
     ? "+SCREEN onRowDidLoseFocus : R: "; rowIndex ; " D:" ; direction
   end function
 
   private function onRowGainingFocus(rowIndex, direction, fraction)
-    if direction = -1
-      row = m.list@.getRowRenderer(rowIndex)
-      row.opacity = fraction
-    end if
+    ' if direction = -1
+    '   row = m.list@.getRowRenderer(rowIndex)
+    '   row.opacity = fraction
+    ' end if
     ? "+SCREEN onRowGainingFocus : R: "; rowIndex ; " D:" ; direction ; " F: " ; fraction
   end function
 
   private function onRowLosingFocus(rowIndex, direction, fraction)
     ? "+SCREEN onRowLosingFocus : R: "; rowIndex ; " D:" ; direction ; " F: " ; fraction
-    if direction = 1
-      row = m.list@.getRowRenderer(rowIndex)
-      row.opacity = 1 - fraction
-    end if
+    ' if direction = 1
+    '   row = m.list@.getRowRenderer(rowIndex)
+    '   row.opacity = 1 - fraction
+    ' end if
 
   end function
 

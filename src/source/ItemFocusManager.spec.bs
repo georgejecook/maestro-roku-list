@@ -8,13 +8,14 @@ namespace tests
     public viewManager
     public focusManager
     public scrollerAnimation
-    public scrollerInterplator
+    public scrollerInterpolator
     public scroller
     public animation
     public delegate
     public ownerDelegate
 
-    override function beforeEach()
+    protected override function beforeEach()
+      super.beforeEach()
       m.owner = new rooibos.utils.MockNode("owner")
       m.owner.translation = [0, 0]
       m.owner.width = 1920
@@ -62,7 +63,7 @@ namespace tests
     @params(2)
     @params(3)
     function _(index)
-      m.focusManager = new ml.ItemFocusManager(m.viewManager, m.scroller, invalid,  index)
+      m.focusManager = new ml.ItemFocusManager(m.viewManager, m.scroller, invalid, index)
       m.assertEqual(m.focusManager.delegates[0].id, "owner")
       m.assertArrayCount(m.focusManager.delegates, 1)
       m.assertEqual(m.focusManager.rowIndex, index)

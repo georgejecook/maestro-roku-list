@@ -1,14 +1,15 @@
 namespace tests
-  @suite("ItemSCroller tests")
+  @suite("ItemScroller tests")
   class ItemScrollerTests extends tests.BaseTestSuite
-    public owner
-    public container
-    public animation
-    public viewManager
-    public scroller
+    private owner
+    private container
+    private animation
+    private viewManager
+    private scroller
+    private focusManager
 
-    override function beforeEach()
-
+    protected override function beforeEach()
+      super.beforeEach()
       m.owner = new rooibos.utils.MockNode("owner")
       m.owner.content = ml.listMixin.createListContent()
       m.owner.translation = [0, 0]
@@ -214,27 +215,27 @@ namespace tests
     function checkViewportEvent(testIndex, comps, willEnterIds = [], enterIds = [], willExitIds = [], exitIds = [])
 
       for each id in enterIds
-        m.assertNotInvalid(comps[id], `offnterId ScreenIds comp was invalid: ${id}`)
+        m.assertNotInvalid(comps[id], `ScreenIds comp was invalid: ${id}`)
         eventName = comps[id] <> invalid ? comps[id].listEvent.name : ""
-        m.assertEqual(eventName, "didEnter", `T: ${testIndex} - exepcted didEnter on ${id} got ${eventName}`)
+        m.assertEqual(eventName, "didEnter", `T: ${testIndex} - expected didEnter on ${id} got ${eventName}`)
       end for
 
       for each id in exitIds
         m.assertNotInvalid(comps[id], `didExit ScreenIds comp was invalid: ${id}`)
         eventName = comps[id] <> invalid ? comps[id].listEvent.name : ""
-        m.assertEqual(eventName, "didExit", `T: ${testIndex} - exepcted didExit on ${id} got ${eventName}`)
+        m.assertEqual(eventName, "didExit", `T: ${testIndex} - expected didExit on ${id} got ${eventName}`)
       end for
 
       for each id in willEnterIds
         m.assertNotInvalid(comps[id], `willEnter ScreenIds comp was invalid: ${id}`)
         eventName = comps[id] <> invalid ? comps[id].listEvent.name : ""
-        m.assertEqual(eventName, "willEnter", `T: ${testIndex} - exepcted willEnter on ${id} got ${eventName}`)
+        m.assertEqual(eventName, "willEnter", `T: ${testIndex} - expected willEnter on ${id} got ${eventName}`)
       end for
 
       for each id in willExitIds
         m.assertNotInvalid(comps[id], `willExit ScreenIds comp was invalid: ${id}`)
         eventName = comps[id] <> invalid ? comps[id].listEvent.name : ""
-        m.assertEqual(eventName, "willExit", `T: ${testIndex} - exepcted willExit on ${id} got ${eventName}`)
+        m.assertEqual(eventName, "willExit", `T: ${testIndex} - expected willExit on ${id} got ${eventName}`)
       end for
 
     end function

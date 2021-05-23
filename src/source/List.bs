@@ -44,7 +44,7 @@ namespace ml
     private itemScroller
     private sourceFocusRect
     private targetFocusRect
-    private isInitizlied = false
+    private isInitialized = false
 
     'views
     private focusTimer
@@ -57,11 +57,11 @@ namespace ml
       super("mv_List")
     end function
 
-    override function initialize()
+    protected override function initialize()
       super.initialize()
       m.createViews()
       m.initManagers()
-      m.isInitizlied = true
+      m.isInitialized = true
       m.onContentChange()
     end function
 
@@ -111,7 +111,7 @@ namespace ml
 
     private function onContentChange()
       m.log.info("onContentChange")
-      if m.isInitizlied and (m._lastContent = invalid or not m._lastContent.isSameNode(m.content))
+      if m.isInitialized and (m._lastContent = invalid or not m._lastContent.isSameNode(m.content))
         m._lastContent = m.content
         m.resetState()
       end if
@@ -211,7 +211,7 @@ namespace ml
 
     private function onKeyPressUp() as boolean
       m.log.method("onKeyPressUp")
-      if m.itemScroller.index > 0
+      if m.itemScroller.index > -1
         return m.itemScroller.move(-1)
       else
         return false

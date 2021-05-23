@@ -4,7 +4,6 @@ import "pkg:/source/ListMixin.bs"
 
 namespace ml
 
-  @strict
   class ItemScroller extends mc.BaseClass
 
     public rects = []
@@ -34,6 +33,7 @@ namespace ml
     private animSpeed = 0
     private settings
     private isMovingMultiple = false
+    private activeOffset = 0
 
     function new(viewManager, axes)
       super("ItemScroller")
@@ -100,7 +100,7 @@ namespace ml
         end if
         direction = 1
       else
-        if m.index = 0
+        if m.index = -1
           m.log.info("already at start")
           return false
         end if
@@ -108,11 +108,11 @@ namespace ml
       end if
 
 
-      if m.direction = direction and abs(offset) = 1 and m.viewManager.isScrolling
-        'TODO - we might want to detect this at the list, and have a cache of next move there
-        m.log.info("was already scrolling - ignoring", m.viewManager.isScrolling)
-        return false
-      end if
+      ' if m.direction = direction and abs(offset) = 1 and m.viewManager.isScrolling
+      '   'TODO - we might want to detect this at the list, and have a cache of next move there
+      '   m.log.info("was already scrolling - ignoring", m.viewManager.isScrolling)
+      '   return false
+      ' end if
 
       m.isMovingMultiple = abs(offset) > 1
 
@@ -187,7 +187,7 @@ namespace ml
 
       m.setNextIndex(m.index + m.direction)
 
-      m.log.info("moving to ", targetTranslation[m.axes], animated)
+      m.log.info("moving to POS:", targetTranslation[m.axes], animated)
       if animated
 
         if fast
@@ -218,7 +218,7 @@ namespace ml
     function finishAnimating() as void
       ' ? "stop ci " ; m.index ; " ni " ; m.nextIndex
       if m.direction = -1
-        position = m.container.translation[m.axes]
+        position = m.container.translation[m.axes] - m.activeOffset
         index = m.viewManager.getIndexAtPosition(position - 1, m.direction)
         ? "+++++++++++++++ going up"
         ? ">>>index" ; index; m.nextIndex
@@ -251,9 +251,10 @@ namespace ml
       m.nextIndex = index
       nextRect = m.viewManager.rects[m.nextIndex]
       screenPos = m.viewManager.getScreenPositionForItem(nextRect, m.direction, screenPos)
+      m.activeOffset = screenPos
       nextTranslation = m.viewManager.getTargetTranslation(index, m.index, screenPos)
 
-      ' ? "+++  nextTranslation" ; nextTranslation
+      ? "+++  nextTranslation" ; nextTranslation ; " m.activeOffset" ; m.activeOffset
       if nextTranslation <> invalid
         m.nextPosition = nextTranslation[m.axes]
       else
@@ -276,17 +277,17 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     function onAnimationFractionChange(fraction)
-      m.log.info("onAnimationFractionChange", fraction)
-      position = m.container.translation[m.axes]
+      m.log.info("onAnimationFractionChange", fraction, "multiple", m.isMovingMultiple)
+      position = m.container.translation[m.axes] - m.activeOffset
       index = m.viewManager.getIndexAtPosition(position, m.direction)
 
       if fraction = 1
         m.focusManager.onFocusAnimationUpdate(1)
-        ' ? "===FRACTION 1 TOG SCROLL FALSE"
+        ? "===FRACTION 1 TOG SCROLL FALSE" ; index
         m.toggleScrolling(false)
 
         if index <> m.index
-          ' ? "333333333333"
+          ? "333333333333"
           m.setFocusIndex(index, false)
         end if
         m.targetIndex = -1
@@ -314,16 +315,22 @@ namespace ml
     '  * @param {boolean} isMoving - if true, then deltas are calculated for next position, and observers fired if their screen status will change
     '  */
     function setFocusIndex(index, isMoving, screenPos = invalid)
-      ' ? "setFocusIndex "; index ; "isMoving" ; isMoving
+      ? ">>>>>>>setFocusIndex "; index ; "isMoving" ; isMoving ; "sp "; screenPos
       'This MUST be called infrequently
       ' TODO - check if index is actually changed
       if index = -1
+        ? "aaaaa"
         m.index = 0
         m.setNextIndex(0, screenPos)
       else
         if index >= m.viewManager.numberOfItems - 1
           index = m.viewManager.numberOfItems - 1
         end if
+        ? ">>>>>>>>>>>>>>> SETTING m.index to" ; index
+        ? ">>>>>>>>>>>>>>> SETTING m.index to" ; index
+        ? ">>>>>>>>>>>>>>> SETTING m.index to" ; index
+        ? ">>>>>>>>>>>>>>> SETTING m.index to" ; index
+        ? ">>>>>>>>>>>>>>> SETTING m.index to" ; index
         m.index = index
         m.setNextIndex(m.index + m.direction)
       end if
@@ -345,11 +352,11 @@ namespace ml
 
     function notifyViewportEvents(isMoving)
       'maintain a collection of controls that are in bounds right now:
-      m.RCMap = m.viewManager.getComoponentsInViewPort(- m.container.translation[m.axes])
+      m.RCMap = m.viewManager.getComponentsInViewPort(- m.container.translation[m.axes])
 
       if isMoving and m.nextIndex <> m.index
         nextTranslation = m.viewManager.getTargetTranslation(m.nextIndex, m.direction, m.screenPos)
-        m.nextRCMap = m.viewManager.getComoponentsInViewPort(- nextTranslation[m.axes])
+        m.nextRCMap = m.viewManager.getComponentsInViewPort(- nextTranslation[m.axes])
       else
         m.nextRCMap = {}
       end if

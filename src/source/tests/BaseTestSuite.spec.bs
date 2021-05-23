@@ -2,7 +2,8 @@ import "pkg:/source/roku_modules/log/LogMixin.brs"
 
 namespace tests
   class BaseTestSuite extends rooibos.BaseTestSuite
-    override function setUp()
+    private log
+    protected override function setUp()
       super.setUp()
       tests.setUpMScope()
       m.log = new log.Logger(m.name)

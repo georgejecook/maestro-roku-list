@@ -22,10 +22,10 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function initFlyweight()
-  m.cellProvider = createObject("roSGNode", "CellProvider")
-  m.global.addFields({ "cellProvider": m.cellProvider })
+  m.componentPool = createObject("roSGNode", "mc_ComponentPool")
+  m.global.addFields({ "componentPool": m.componentPool })
 
-  m.cellTracker = createObject("roSGNode", "CellTracker")
+  m.cellTracker = createObject("roSGNode", "mv_CellTracker")
   m.global.addFields({ "cellTracker": m.cellTracker })
   m.top.addFields({ "_global": m.global })
 
@@ -34,7 +34,7 @@ function initFlyweight()
 end function
 
 function prebakeCells()
-  m.cellProvider@.addPreBakedCells(200, "ml_SimpleCell")
+  m.componentPool@.addPreBakedCells(200, "ml_SimpleCell")
 end function
 
 
@@ -43,7 +43,7 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onInfoChange()
-  m.infoLabel.text = " Cell Pressure: " + str(m.cellProvider.numberOfCellsInUse) + "/" + str(m.cellProvider.numberOfCells) + ""
+  m.infoLabel.text = ` Cell Pressure: ${m.componentPool.numberOfComponentsInUse} / ${m.componentPool.numberOfComponents}`
 end function
 
 
