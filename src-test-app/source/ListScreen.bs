@@ -31,7 +31,7 @@ class ListScreen extends mv.BaseScreen
   private bgRect
 
   'style
-  private numberOfRows = 20
+  private numberOfRows = 50
   private defaultCellType = "ml_SimpleCell"
 
   'state
@@ -45,7 +45,6 @@ class ListScreen extends mv.BaseScreen
   private isSmall = false
   function new()
     super("ListScreen")
-    m.log = new log.Logger("ListScreen")
     if m.isSmall
       translation = [300, 300]
       size = [600, 500]

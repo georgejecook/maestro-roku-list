@@ -43,7 +43,7 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onInfoChange()
-  m.infoLabel.text = ` Cell Pressure: ${m.componentPool.numberOfComponentsInUse} / ${m.componentPool.numberOfComponents}`
+  m.infoLabel.text = ` Cell Pressure - mList: ${m.componentPool.numberOfComponentsInUse} / ${m.componentPool.numberOfComponents} - sg ${m.cellTracker.numberOfCellsInUse} / ${m.cellTracker.numberOfCells}`
 end function
 
 
@@ -55,5 +55,6 @@ function onFirstShow()
   m.log.info("onFirstShow")
   prebakeCells()
   screen = mc.createSGNode("ListScreen", m.top.findNode("contentGroup"), "listScreen")
+  ' screen = mc.createSGNode("RowListScreen", m.top.findNode("contentGroup"), "listScreen")
   mv.setFocus(screen)
 end function
