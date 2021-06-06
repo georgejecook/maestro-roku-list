@@ -156,7 +156,7 @@ namespace ml
       if (m.lastRenderedIndexes <> invalid) and m.lastRenderedIndexes.startIndex = renderedIndexes.startIndex and m.lastRenderedIndexes.endIndex = renderedIndexes.endIndex
         ' this is the same set of comps as last time
         if m.renderedComponents.count() > 0
-          ' and we have seemingly done our inital render; so we can bail.
+          ' and we have seemingly done our initial render; so we can bail.
           return
         end if
       end if
@@ -342,7 +342,6 @@ namespace ml
         end if
       end for
 
-      ? " GOT TO END!!!!" ; i - 1
       'we must be at the end! -return last item
       return i - 1
     end function

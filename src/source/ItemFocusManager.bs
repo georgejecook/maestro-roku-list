@@ -16,6 +16,7 @@ namespace ml
     public didStart = false
     public didFinish = false
     public isRow = false
+    public isNotifying = false
 
     private container
     private moveAnimation
@@ -45,9 +46,7 @@ namespace ml
     end function
 
     function setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
-      ? ">>>>>>>>>>>>>>>>>>>>>"
       m.log.info(index, indexPosition, nextIndex, nextPosition, direction)
-      ? ">>>>>>>>>>>>>>>>>>>>>"
       m.index = index
       m.indexPosition = indexPosition
       m.nextIndex = nextIndex
@@ -62,7 +61,6 @@ namespace ml
 
     function onFocusAnimationUpdate(fraction) as void
       if m.didStart and not m.didFinish
-        ' ? "FOCUS ANIM UPDATE "; fraction
         m.onFocusUpdate(fraction)
       end if
     end function
@@ -70,8 +68,8 @@ namespace ml
     function onContainerPositionChange(offset)
       distance = abs(m.nextPosition - m.indexPosition)
       currentPos = abs(m.indexPosition - offset)
-      ? ">>>>>> I:" ; m.index ; " NI:"; m.nextIndex
-      ? "offset:" ; offset ; " IP:" ; m.indexPosition ; " D:" ; distance ; " C:" ; currentPos ; " DIR:"; m.direction
+      ' ? ">>>>>> I:" ; m.index ; " NI:"; m.nextIndex
+      ' ? "offset:" ; offset ; " IP:" ; m.indexPosition ; " D:" ; distance ; " C:" ; currentPos ; " DIR:"; m.direction
       if distance <> 0
         fraction = currentPos / distance
         ' if m.direction = -1
@@ -83,27 +81,24 @@ namespace ml
         fraction = 0
       end if
 
-      ? m.name + " UPDATE: " ; fraction
       m.onFocusUpdate(fraction)
     end function
 
     function onFocusUpdate(fraction) as void
+      if not m.isNotifying
+        return
+      end if
       if not m.didStart
-        ? "DID START"
         name = "willLoseFocus"
         nextName = "willGainFocus"
         m.didStart = true
         m.setOwnerNextFocusIndex()
       else if fraction = 0
-        ? "FRACTION 0"
         return
       else if fraction = 1
-        ? "FRACTION 1"
-        ? ""
         if m.didFinish
           return
         end if
-        ? "SETTING INDEXES"
         m.didFinish = true
         name = "didLoseFocus"
         nextName = "didGainFocus"
@@ -168,14 +163,11 @@ namespace ml
 
     function setOwnerIndexes()
       if m.isRow
-        ? "setting ROW focused index to cell" ; m.nextIndex
         m.viewManager.owner.focusedCellIndex = m.nextIndex
       else
-        ? "setting LIST row index to" ; m.nextIndex
         m.viewManager.owner.focusedRowIndex = m.nextIndex
         comp = m.viewManager.getRenderer(m.nextIndex)
         if comp <> invalid
-          ? "setting LIST CELL index " ; comp.focusedCellIndex
           m.viewManager.owner.focusedCellIndex = comp.focusedCellIndex
         end if
       end if

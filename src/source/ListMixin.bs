@@ -145,13 +145,10 @@ namespace ml.listMixin
 
   function getFocusSettings(listContent, rowContent = invalid)
     if rowContent <> invalid and rowContent.settings <> invalid and rowContent.settings.focusSettings <> invalid
-      ? "use row content FOCUS SETTINGS"
       return rowContent.settings.focusSettings
     else if listContent <> invalid and listContent.rowSettings <> invalid and listContent.rowSettings.focusSettings <> invalid
-      ? "use listContent ROW FOCUS SETTINGS"
       return listContent.rowSettings.focusSettings
     else if listContent <> invalid and listContent.focusSettings <> invalid
-      ? "use listContent FOCUS SETTINGS"
       return listContent.focusSettings
       m.log.error("no listContent for list - this should not have been called!")
     end if

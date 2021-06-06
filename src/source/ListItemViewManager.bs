@@ -43,7 +43,6 @@ namespace ml
 
     function createRow(rowContent, index, settings)
       compName = rowContent.rowCompName <> invalid ? rowContent.rowCompName <> invalid : "ml_HorizontalRow"
-      ? "CREATE ROW " ;m.componentBufferMode
       isRendered = index < 4
       return m.createSGNode(compName, m.container, str(index).trim(), {
         renderState: isRendered ? "rendered" : m.componentBufferMode
@@ -71,7 +70,6 @@ namespace ml
           'TODO better handle the whole visibility
 
           y += comp.height + settings.space
-          ? ">>> " ; comp.index ;" SCREEN POS "; settings.screenPos
           m.rects.push({
             translation: comp.translation
             size: [w, comp.height]
@@ -89,7 +87,6 @@ namespace ml
     end function
 
     override function applyRenderStateMap(renderStateMap)
-      ? "LIST updating renderStateMap: " ; formatJson(renderStateMap)
       for each id in renderStateMap
         comp = m.components[id.toInt()]
 

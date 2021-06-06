@@ -98,7 +98,9 @@ namespace ml
         m.calculateHeight()
         m.createManagers()
         m.viewManager.setContent(m.content)
+        m.focusManager.isNotifying = false
         m.itemScroller.reset()
+        m.focusManager.isNotifying = true
       end if
     end function
 
@@ -156,19 +158,19 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private function onKeyPressLeft() as boolean
-      m.log.method("onKeyPressLeft")
+      m.log.verbose("onKeyPressLeft")
       m.itemScroller.move(-1)
       return true
     end function
 
     private function onKeyPressRight() as boolean
-      m.log.method("onKeyPressRight")
+      m.log.verbose("onKeyPressRight")
       m.itemScroller.move(1)
       return true
     end function
 
     private function getLongPressIntervalForKey(key) as float
-      m.log.method("getLongPressIntervalForKey", key)
+      m.log.verbose("getLongPressIntervalForKey", key)
       if key = "left" or key = "right"
         return 0.2
       else
@@ -177,7 +179,7 @@ namespace ml
     end function
 
     private function onLongPressStart(key) as boolean
-      m.log.method(">>>>onLongPressStart", key)
+      m.log.verbose(">>>>onLongPressStart", key)
 
       if key = "left" or key = "right"
         m.log.verbose("long press finished on key", key, "going to animate to final scroll position")

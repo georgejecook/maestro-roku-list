@@ -70,37 +70,37 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onWillEnter(index, direction)
-  ? "onCellWillEnter " ; index ; " " ; direction
+  ' ? "onCellWillEnter " ; index ; " " ; direction
   onContentChange()
 end function
 
 function onWillExit(index, direction)
-  ? "onCellWillExit " ; index ; " " ; direction
+  ' ? "onCellWillExit " ; index ; " " ; direction
 end function
 
 function onDidEnter(index, direction)
-  ? "onCellDidEnter " ; index ; " " ; direction
+  ' ? "onCellDidEnter " ; index ; " " ; direction
   onContentChange()
 end function
 
 function onDidExit(index, direction)
-  ? "onCellDidExit " ; index ; " " ; direction
+  ' ? "onCellDidExit " ; index ; " " ; direction
 end function
 
 function onWillGainFocus(index, direction)
-  ? "onCellWillGainFocus " ; index ; " " ; direction
+  ' ? "onCellWillGainFocus " ; index ; " " ; direction
 end function
 
 function onWillLoseFocus(index, direction)
-  ? "onCellWillLoseFocus " ; index ; " " ; direction
+  ' ? "onCellWillLoseFocus " ; index ; " " ; direction
 end function
 
 function onDidGainFocus(index, direction)
-  ? "onCellDidGainFocus " ; index ; " " ; direction
+  ' ? "onCellDidGainFocus " ; index ; " " ; direction
 end function
 
 function onDidLoseFocus(index, direction)
-  ? "CELL onCellDidLoseFocus " ; index ; " " ; direction
+  ' ? "CELL onCellDidLoseFocus " ; index ; " " ; direction
 end function
 
 function onGainingFocus(index, direction, fraction)

@@ -3,6 +3,8 @@
     name='AppController'
     extends='mv_BaseScreen'>
   <interface>
+    <field id="rowIndex" type="integer" />
+    <field id="cellIndex" type="integer" />
   </interface>
 
   <children>

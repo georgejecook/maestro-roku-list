@@ -20,11 +20,12 @@ namespace ml
     public rowHidingMode = "hidden"
     @observer("onAnimateToRowChange")
     public animateToRow = -1
+    @observer("onFocusedRowPercentChange")
     public focusedRowIndex = -1
     public focusedCellIndex = -1
-    @observer("onFocusedRowPercentChange")
     public focusedRowPercent = 0.0
     public focusedCellPercent = 0.0
+
     @observer("onNextFocusIndexChange")
     public nextFocusIndex as mc.types.Array
     public cellEvents as mc.types.Node
@@ -66,11 +67,11 @@ namespace ml
     end function
 
     private function createViews()
-      m.focusTimer = m.createSGNode("Timer", m.top, "focusTimer", {
-        duration: 0.01
-        control: "start"
-        repeat: true
-      })
+      ' m.focusTimer = m.createSGNode("Timer", m.top, "focusTimer", {
+      '   duration: 0.01
+      '   control: "start"
+      '   repeat: true
+      ' })
       m.contentGroup = m.createSGNode("Group", m.top, "contentGroup")
       m.rowsGroup = m.createSGNode("Group", m.top, "rowsGroup")
       m.focusPoint = m.createSGNode("mv_Rectangle", m.top, "focusPoint")
@@ -153,10 +154,10 @@ namespace ml
         row = m.getRowRenderer(rowIndex)
 
         if row <> invalid
-          cellScreenRect = row@.getScreenRect(cellIndex, screenPos)
+          cellScreenRect = row@.getScreenRect(cellIndex, cellScreenPos)
 
           if cellScreenRect <> invalid
-            cellScreenRect.screenPos += rowScreenRect.screenPos
+            cellScreenRect.translation[0] += rowScreenRect.screenPos
             cellScreenRect.translation[1] += rowScreenRect.screenPos
             return cellScreenRect
           end if
@@ -170,16 +171,37 @@ namespace ml
       return m.viewManager.getScreenRect(rowIndex, screenPos, direction)
     end function
 
-    private function onNextFocusIndexChange() as void
-      'TODO
+    private function onNextFocusIndexChange(index) as void
+
+      ' m.sourceFocusRect = {
+      '   translation: m.focusIndicator.translation
+      '   size: [m.focusIndicator.width, m.focusIndicator.height]
+      ' }
+      ? "NEXT FOCUS" ; formatJson(index)
+      ' m.targetFocusRect = m.getCellScreenRect(index[0], index[1])
+      renderer = m.getCellRenderer(index[0], index[1])
+
+      if renderer <> invalid
+        'bs:disable-next-line
+        rect = renderer.boundingRect()
+        ? "rect1 "; formatjson(rect)
+        ? "rect.p "; formatjson(renderer.getParent().translation)
+        'bs:disable-next-line
+        rect.x = 0 'TODO get row offset
+        rect.y += m.rowsGroup.translation[1]
+        ? "rect2 "; formatjson(rect)
+        m.focusIndicator.translation = [rect.x, rect.y]
+        m.focusIndicator.width = rect.width
+        m.focusIndicator.height = rect.height
+
+      end if
       return
-      m.sourceFocusRect = {
-        translation: m.focusIndicator.translation
-        size: [m.focusIndicator.width, m.focusIndicator.height]
-      }
-      m.targetFocusRect = m.getCellScreenRect(m.nextFocusIndex[0], m.nextFocusIndex[1])
-      ? " onNextFocusIndexChange SOURCE " ; m.sourceFocusRect
-      ? " onNextFocusIndexChange TARGET " ; m.targetFocusRect
+      if m.targetFocusRect <> invalid
+        m.focusIndicator.translation = m.targetFocusRect.translation
+        m.focusIndicator.width = m.targetFocusRect.size[0]
+        m.focusIndicator.height = m.targetFocusRect.size[1]
+      end if
+
     end function
 
     private function onFocusedRowPercentChange(fraction) as void
