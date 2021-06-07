@@ -3,6 +3,7 @@
   "files": [
     "manifest",
     "source/**/*.*",
+    "images/**/*.*",
     "components/**/*.*",
     {
       "src": "../src-test-app/**/*.*",

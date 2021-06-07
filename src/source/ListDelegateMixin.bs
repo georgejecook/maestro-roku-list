@@ -70,6 +70,8 @@ namespace ml.delegateMixin
         "onCellDidLoseFocus": "didLoseFocus"
         "onCellGainingFocus": "gainingFocus"
         "onCellLosingFocus": "losingFocus"
+        "onCellScrollChange": "scrollStart"
+        "onCellScrollChange": "scrollStop"
       }
 
       for each funcName in funcMap
@@ -104,7 +106,9 @@ namespace ml.delegateMixin
     end if
     ' ? "onListEventBridge OBSERVED " ; eventName
 
-    if eventName = "gainingFocus" or eventName = "losingFocus"
+    if eventName = "scrollStart" or eventName = "scrollStop"
+      m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction, eventName = "scrollStart")
+    else if eventName = "gainingFocus" or eventName = "losingFocus"
       m[m.listCellEventMap[eventName]](event.rowIndex, event.index, event.direction, event.fraction)
     else
       m[m.listCellEventMap[eventName]](event.rowIndex, event.index, event.direction)
@@ -131,6 +135,8 @@ namespace ml.delegateMixin
         "onRowDidLoseFocus": "didLoseFocus"
         "onRowGainingFocus": "gainingFocus"
         "onRowLosingFocus": "losingFocus"
+        "onRowScrollChange": "scrollStart"
+        "onRowScrollChange": "scrollStop"
       }
 
       for each funcName in funcMap
@@ -164,7 +170,9 @@ namespace ml.delegateMixin
       return
     end if
 
-    if eventName = "gainingFocus" or eventName = "losingFocus"
+    if eventName = "scrollStart" or eventName = "scrollStop"
+      m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction, eventName = "scrollStart")
+    else if eventName = "gainingFocus" or eventName = "losingFocus"
       m.listDelegate[m.listRowEventMap[eventName]](event.index, event.direction, event.fraction)
     else
       m.listDelegate[m.listRowEventMap[eventName]](event.index, event.direction)

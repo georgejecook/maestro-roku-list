@@ -5,7 +5,7 @@ import "pkg:/source/RowItemScroller.bs"
 import "pkg:/source/RowItemViewManager.bs"
 import "pkg:/source/ItemFocusManager.bs"
 import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
-import "pkg:/source/BaseCell.bs"
+import "pkg:/source/cells/BaseCell.bs"
 
 namespace ml
   @node("ml_SimpleCell", "mv_BaseView")
@@ -75,22 +75,23 @@ namespace ml
 
         m.label.text = "C:" + m.lastContent.title
         m.poster.uri = m.lastContent.HDGRIDPOSTERURL
-        m.onScrollChange()
+        m.onScrollChange(0, 0, m.row.isScrolling or m.list.isScrolling)
       end if
-    end function
-
-    private function onScrollChange()
-      ' ? "SC: onScrollChange " ; m.row.isScrolling ; " " ; m.list.isScrolling
-      isScrolling = m.row.isScrolling or m.list.isScrolling
-      ' ? "SC: onCellScrollChange row " ; m.row.isScrolling
-      '  ? "SC: onCellScrollChange list " ; m.list.isScrolling
-      ' m.label.visible = not isScrolling
-      ' m.label2.visible = not isScrolling
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ delegate
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onScrollChange(index, direction, isScrolling)
+      ' ? "SC: onCellWillEnter " ; index ; " " ; direction
+      m.label.visible = not isScrolling
+    end function
+
+    private function onScrollStop(index, direction)
+      ' ? "SC: onCellWillEnter " ; index ; " " ; direction
+      m.onContentChange()
+    end function
 
     private function onWillEnter(index, direction)
       ' ? "SC: onCellWillEnter " ; index ; " " ; direction

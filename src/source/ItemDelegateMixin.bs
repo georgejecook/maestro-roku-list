@@ -27,6 +27,8 @@ namespace ml.itemDelegateMixin
         "onDidLoseFocus": "didLoseFocus"
         "onGainingFocus": "gainingFocus"
         "onLosingFocus": "losingFocus"
+        "onScrollChange": "scrollStart"
+        "onScrollChange": "scrollStop"
       }
 
       for each funcName in funcMap
@@ -53,7 +55,9 @@ namespace ml.itemDelegateMixin
     end if
     ' ? "LEB" ; eventName
 
-    if eventName = "gainingFocus" or eventName = "losingFocus"
+    if eventName = "scrollStart" or eventName = "scrollStop"
+      m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction, eventName = "scrollStart")
+    else if eventName = "gainingFocus" or eventName = "losingFocus"
       m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction, event.fraction)
     else
       m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction)

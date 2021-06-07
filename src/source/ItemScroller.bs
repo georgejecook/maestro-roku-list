@@ -287,7 +287,6 @@ namespace ml
         m.focusManager.onContainerPositionChange(position)
         if index <> m.index and index <> m.targetIndex
           m.focusManager.onFocusAnimationUpdate(1)
-          ? "+++444444"
           m.setFocusIndex(index, true)
         end if
       else

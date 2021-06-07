@@ -126,7 +126,8 @@ namespace ml
             m.componentPool@.releaseComponent(cell)
             m.cellsById.delete(id)
           else
-            ? " COULD NOT FIND CELL TO RELEASE" ; id
+            'this is almost certainly due to trying to release a cell during setting content
+            ' ? " COULD NOT FIND CELL TO RELEASE" ; id
           end if
         end if
       end if

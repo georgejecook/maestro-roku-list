@@ -62,7 +62,7 @@ class RowListScreen extends mv.BaseScreen
     for i = 0 to m.numberOfRows - 1
       row = m.createSGNode("ContentNode", invalid, `row_${i}`)
       row.title = "ROW " + str(i)
-      row.appendChildren(m.makeItems(m.defaultCellType, 60))
+      row.appendChildren(m.makeItems(m.defaultCellType, 20))
       rows.push(row)
     end for
     return rows

@@ -130,7 +130,9 @@ namespace ml
     private function onListEvent(event)
       if event.name = "willEnter" or event.name = "didEnter"
         for each component in m.cellsGroup.getChildren(-1, 0)
-          component.listEvent = event
+          if component.doesExist("listEvent")
+            component.listEvent = event
+          end if
         end for
       end if
     end function

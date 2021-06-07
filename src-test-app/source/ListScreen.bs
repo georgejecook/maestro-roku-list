@@ -1,6 +1,7 @@
 import "pkg:/source/ListMixin.bs"
 import "pkg:/source/roku_modules/maestro/view/BaseScreen.brs"
 import "pkg:/source/ListDelegateMixin.bs"
+import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
 
 @node("ListScreen", "mv_BaseScreen")
 class ListScreen extends mv.BaseScreen
@@ -31,7 +32,7 @@ class ListScreen extends mv.BaseScreen
   private bgRect
 
   'style
-  private numberOfRows = 50
+  private numberOfRows = 20
   private defaultCellType = "ml_SimpleCell"
 
   'state
@@ -41,6 +42,7 @@ class ListScreen extends mv.BaseScreen
   private rowSettings
   private focusSettings
   private cellSettings
+  private loadingIndicator
 
   private isSmall = false
   function new()
@@ -67,6 +69,12 @@ class ListScreen extends mv.BaseScreen
       width: size[0]
       height: size[1]
     })
+    m.loadingIndicator = m.createSGNode("LoadingIndicator", m.top, "loadingIndicator", {
+      isActive: true
+      width: 1920
+      height: 1080
+      backgroundVisible: false
+    })
     ml.delegateMixin.setListDelegate(m.list)
     m.onResetChange()
   end function
@@ -80,28 +88,38 @@ class ListScreen extends mv.BaseScreen
       m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [480, 320], 30)
     end if
 
+    timer = new mc.utils.DebugTimer("list")
     m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30, invalid)
     m.rowSettings.contentOffset = [500, 0]
     m.focusSettings = ml.listMixin.createFocusSettings(0.05, 0.01)
     content = ml.listMixin.createListContent(m.createData(), m.focusSettings, m.rowSettings)
+    timer.log("makeData")
     m.list.content = content
+    timer.log("set content")
+    m.loadingIndicator.isActive = false
   end function
 
   private function createData()
     content = []
     for i = 0 to m.numberOfRows - 1
       row = createObject("roSGNode", "ml_RowContent")
-      rowFocusSettings = ml.listMixin.createFocusSettings(0.01, 0.005)
       if i = 0
-        cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [1700, 700], 200)
-        row.settings = ml.listMixin.createRowSettings(cellSettings, rowFocusSettings)
+        rowFocusSettings = ml.listMixin.createFocusSettings(0.02, 0.001)
       else if i = 1
-        cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [900, 320], 100)
+        rowFocusSettings = ml.listMixin.createFocusSettings(0.03, 0.01)
+      else
+        rowFocusSettings = ml.listMixin.createFocusSettings(0.05, 0.01)
+      end if
+      if i = 0
+        cellSettings = ml.listMixin.createCellSettings("HeroCell", [1700, 700], 200)
+        row.settings = ml.listMixin.createRowSettings(cellSettings, rowFocusSettings)
+        row.settings.contentOffset = [400, 0]
+      else if i = 1
+        cellSettings = ml.listMixin.createCellSettings("SubHeroCell", [900, 320], 100)
         row.settings = ml.listMixin.createRowSettings(cellSettings, rowFocusSettings)
       else
         row.settings = ml.listMixin.createRowSettings(m.cellSettings, rowFocusSettings)
       end if
-      row.settings.contentOffset = [i * 20, 0]
       row.title = "ROW " + str(i)
       content.push(row)
       if i <> 0
@@ -141,7 +159,7 @@ class ListScreen extends mv.BaseScreen
           "cellType": cellType
         })
       end if
-      row.appendChildren(m.makeItems(m.defaultCellType, 60))
+      row.appendChildren(m.makeItems(m.defaultCellType, 20))
     end for
     return content
   end function
