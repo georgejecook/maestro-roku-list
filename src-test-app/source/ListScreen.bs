@@ -112,7 +112,6 @@ class ListScreen extends mv.BaseScreen
       end if
       if i = 0
         cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 200)
-        cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 200)
         row.settings = ml.listMixin.createRowSettings(cellSettings, rowFocusSettings)
         row.settings.contentOffset = [400, 0]
       else if i = 1 or i = 4 or i = 8
@@ -336,6 +335,7 @@ class ListScreen extends mv.BaseScreen
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ list delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
   private function onCellWillGainFocus(rowIndex, itemIndex, direction)
     ' ? "+SCREEN onCellWillGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
     mioc.setInstance("focusedIndex", {

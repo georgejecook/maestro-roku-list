@@ -54,7 +54,7 @@ class ComplexRow extends mv.BaseView
 
   private function createViews()
     m.bgRect = m.createSGNode("mv_Rectangle", m.top, "bgRect", {
-      size: [1920, 700]
+      size: [1920, 1080]
       color: "#000000"
       opacity: 1
     })
@@ -148,16 +148,15 @@ class ComplexRow extends mv.BaseView
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
   protected override function onGainedFocus(isSelfFocused as boolean)
     super.onGainedFocus(isSelfFocused)
-    ? "OGF!!!!!!!!!! COMPLEX" ; isSelfFocused
     if isSelfFocused
       if m.isButton1Focused
         m.setFocus(m.button1)
       else
         m.setFocus(m.button2)
       end if
-
     end if
   end function
 end class
