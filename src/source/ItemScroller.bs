@@ -239,7 +239,7 @@ namespace ml
         return
       end if
 
-      m.log.debug("setNextIndex", index)
+      m.log.info("+++setNextIndex", index)
       if index < 0
         index = 0
       end if
@@ -351,7 +351,7 @@ namespace ml
       events = []
 
       '1. component was on screen and is going off
-      'or comonent was not on screen and will come on.
+      'or component was not on screen and will come on.
       for each comp in m.viewManager.renderedComponents
         if comp <> invalid
           id = comp.id

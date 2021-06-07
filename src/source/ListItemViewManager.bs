@@ -7,6 +7,7 @@ namespace ml
     function new(list, container, minPos, maxPos)
       super("ListItemViewManager", list, container, 1, minPos, maxPos)
       m.delegate = list.rowEvents
+      'TODO - allow api hooks to tweak this
       m.lookAheadDistance = maxPos * 5
       m.lookBehindDistance = maxPos * 2
     end function
@@ -16,8 +17,6 @@ namespace ml
     end function
 
     override function createRenderers(content)
-
-      'TODO remove/recycle views
 
       y = 0
       w = m.owner.width
@@ -43,6 +42,7 @@ namespace ml
 
     function createRow(rowContent, index, settings)
       compName = rowContent.rowCompName <> invalid ? rowContent.rowCompName <> invalid : "ml_HorizontalRow"
+      'TODO - measure height to ascertain how many
       isRendered = index < 4
       return m.createSGNode(compName, m.container, str(index).trim(), {
         renderState: isRendered ? "rendered" : m.componentBufferMode

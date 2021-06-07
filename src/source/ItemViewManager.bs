@@ -113,15 +113,19 @@ namespace ml
 
       ' for each comp in m.visibleComponents
       for each comp in m.renderedComponents
-        cRect = m.rects[comp.index]
-        if cRect <> invalid
-          cStart = cRect.translation[m.axes]
-          cEnd = cStart + cRect.size[m.axes]
-          if (cStart >= sStart and cStart <= sEnd) or (cEnd >= sStart and cEnd <= sEnd)
-            compStates[comp.id] = true
-          else
-            compStates[comp.id] = false
+        if comp.index <> invalid
+          cRect = m.rects[comp.index]
+          if cRect <> invalid
+            cStart = cRect.translation[m.axes]
+            cEnd = cStart + cRect.size[m.axes]
+            if (cStart >= sStart and cStart <= sEnd) or (cEnd >= sStart and cEnd <= sEnd)
+              compStates[comp.id] = true
+            else
+              compStates[comp.id] = false
+            end if
           end if
+        else
+          ? "comp index not set!"
         end if
         ' m.log.info(compStates[comp.id], "sStart", sStart, "sEnd", sENd, "cStart", cStart, "cEnd", cENd)
       end for
@@ -338,12 +342,12 @@ namespace ml
         itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
         ' ? "i "; i ; " pos "; p ; " ip " ; itemPos ; " sp " ; screenPos
         if itemPos > p
-          return i - 1
+          return mc.clamp(i - 1, 0, m.numberOfItems)
         end if
       end for
 
       'we must be at the end! -return last item
-      return i - 1
+      return mc.clamp(i - 1, 0, m.numberOfItems)
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

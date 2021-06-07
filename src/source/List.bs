@@ -4,6 +4,7 @@ import "pkg:/source/ItemFocusManager.bs"
 import "pkg:/source/roku_modules/maestro/core/Tasks.brs"
 import "pkg:/source/ListMixin.bs"
 import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
+import "pkg:/source/roku_modules/maestro/view/Animation.brs"
 
 namespace ml
   @node("ml_List", "mv_BaseView")
@@ -14,13 +15,15 @@ namespace ml
     private _lastContent
 
     public isScrolling = false
+    public isHidden = false
+
     public width = 1920
     public height = 1080
     'indicates what to set a row to when it's considered hidden (hidden|partial)
     public rowHidingMode = "hidden"
     @observer("onAnimateToRowChange")
     public animateToRow = -1
-    @observer("onFocusedRowPercentChange")
+    ' @observer("onFocusedRowPercentChange")
     public focusedRowIndex = -1
     public focusedCellIndex = -1
     public focusedRowPercent = 0.0
@@ -52,7 +55,12 @@ namespace ml
     private contentGroup
     private rowsGroup
     private focusPoint
+
+    'TODO make it so focusIndicator can be any view at all, or have different posters based on row settings
     private focusIndicator
+    private focusAnim
+    private focusMoveAnim
+    private focusSizeAnim
 
     function new()
       super("mv_List")
@@ -61,6 +69,7 @@ namespace ml
     protected override function initialize()
       super.initialize()
       m.createViews()
+      m.createAnims()
       m.initManagers()
       m.isInitialized = true
       m.onContentChange()
@@ -75,11 +84,20 @@ namespace ml
       m.contentGroup = m.createSGNode("Group", m.top, "contentGroup")
       m.rowsGroup = m.createSGNode("Group", m.top, "rowsGroup")
       m.focusPoint = m.createSGNode("mv_Rectangle", m.top, "focusPoint")
-      m.focusIndicator = m.createSGNode("mv_Rectangle", m.top, "focusIndicator", {
-        color: "#ff0000"
+      m.focusIndicator = m.createSGNode("mv_Poster", m.top, "focusIndicator", {
+        blendColor: "#ffffff"
+        uri: "pkg:/images/input-focusrect.9.png"
         visible: true
-        opacity: 0.5
       })
+    end function
+
+    private function createAnims()
+      m.focusMoveAnim = new mv.animations.Move(m.focusIndicator, 0.2, [0, 0], [0, 0])
+      m.focusSizeAnim = new mv.animations.Size(m.focusIndicator, 0.2, [0, 0], [0, 0])
+      m.focusAnim = new mv.animations.Parallel(m.focusIndicator, [
+        m.focusMoveAnim
+        m.focusSizeAnim
+      ])
     end function
 
     private function initManagers()
@@ -148,85 +166,41 @@ namespace ml
 
     public function getCellScreenRect(rowIndex, cellIndex, rowScreenPos = invalid, cellScreenPos = invalid)
       ' ? "+++ rowScreenPos"; rowScreenPos
-      rowScreenRect = m.getRowScreenRect(rowIndex, rowScreenPos)
-
-      if rowScreenRect <> invalid
-        row = m.getRowRenderer(rowIndex)
-
-        if row <> invalid
-          cellScreenRect = row@.getScreenRect(cellIndex, cellScreenPos)
-
-          if cellScreenRect <> invalid
-            cellScreenRect.translation[0] += rowScreenRect.screenPos
-            cellScreenRect.translation[1] += rowScreenRect.screenPos
-            return cellScreenRect
-          end if
-        end if
+      row = m.getRowRenderer(rowIndex)
+      if row <> invalid
+        return row@.getScreenRect(cellIndex, cellScreenPos)
       end if
 
       return invalid
     end function
 
-    private function getRowScreenRect(rowIndex, screenPos = invalid, direction = 0)
+    public function getRowScreenRect(rowIndex, screenPos = invalid, direction = 0)
       return m.viewManager.getScreenRect(rowIndex, screenPos, direction)
     end function
 
     private function onNextFocusIndexChange(index) as void
-
-      ' m.sourceFocusRect = {
-      '   translation: m.focusIndicator.translation
-      '   size: [m.focusIndicator.width, m.focusIndicator.height]
-      ' }
-      ? "NEXT FOCUS" ; formatJson(index)
-      ' m.targetFocusRect = m.getCellScreenRect(index[0], index[1])
-      renderer = m.getCellRenderer(index[0], index[1])
-
-      if renderer <> invalid
-        'bs:disable-next-line
-        rect = renderer.boundingRect()
-        ? "rect1 "; formatjson(rect)
-        ? "rect.p "; formatjson(renderer.getParent().translation)
-        'bs:disable-next-line
-        rect.x = 0 'TODO get row offset
-        rect.y += m.rowsGroup.translation[1]
-        ? "rect2 "; formatjson(rect)
-        m.focusIndicator.translation = [rect.x, rect.y]
-        m.focusIndicator.width = rect.width
-        m.focusIndicator.height = rect.height
-
-      end if
-      return
-      if m.targetFocusRect <> invalid
-        m.focusIndicator.translation = m.targetFocusRect.translation
-        m.focusIndicator.width = m.targetFocusRect.size[0]
-        m.focusIndicator.height = m.targetFocusRect.size[1]
-      end if
-
+      m.targetFocusRect = m.getCellScreenRect(index[0], index[1])
+      m.moveFocusIndicatorToFocusPosition()
     end function
 
-    private function onFocusedRowPercentChange(fraction) as void
-      if m.sourceFocusRect = invalid or m.targetFocusRect = invalid
-        ? "NO FOCUS RECTS! Ensure m.nextFocusIndex was set!"
+    function moveFocusIndicatorToFocusPosition(animated = true as boolean) as void
+      if m.targetFocusRect = invalid
+        m.log.error("no target focus rect!")
         return
       end if
 
-      translation = m.interpolate(m.sourceFocusRect.translation, m.targetFocusRect.translation, fraction)
-      size = m.interpolate(m.sourceFocusRect.size, m.targetFocusRect.size, fraction)
-      ' ? "translation " ; translation
-      ' ? "size " ; size
-      m.focusIndicator.translation = translation
-      m.focusIndicator.width = size[0]
-      m.focusIndicator.height = size[1]
-      ' ? "onFocusedRowPercentChange " ; fraction ; " " ; translation[1]; " " ; m.targetFocusRect.translation[1]
-    end function
+      m.focusAnim.stop()
 
-    private function interpolate(a, b, fraction)
-      if a <> invalid and b <> invalid
-        return [a[0] + (b[0] - a[0]) * fraction, a[1] + (b[1] - a[1]) * fraction]
+      if animated
+        m.focusSizeAnim.setFromToValue([m.focusIndicator.width, m.focusIndicator.height], m.targetFocusRect.size)
+        m.focusMoveAnim.setFromToValue(m.focusIndicator.translation, m.targetFocusRect.translation)
+        m.focusAnim.start()
       else
-        return [0, 0]
+        m.focusIndicator.translation = m.targetFocusRect.translation
+        m.focusIndicator.size = m.targetFocusRect.size
       end if
     end function
+
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ KeyPress
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

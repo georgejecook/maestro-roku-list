@@ -111,10 +111,10 @@ class ListScreen extends mv.BaseScreen
         rowFocusSettings = ml.listMixin.createFocusSettings(0.05, 0.01)
       end if
       if i = 0
-        cellSettings = ml.listMixin.createCellSettings("HeroCell", [1700, 700], 200)
+        cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 200)
         row.settings = ml.listMixin.createRowSettings(cellSettings, rowFocusSettings)
         row.settings.contentOffset = [400, 0]
-      else if i = 1
+      else if i = 1 or i = 4 or i = 5 or i = 8
         cellSettings = ml.listMixin.createCellSettings("SubHeroCell", [900, 320], 100)
         row.settings = ml.listMixin.createRowSettings(cellSettings, rowFocusSettings)
       else
@@ -332,7 +332,7 @@ class ListScreen extends mv.BaseScreen
   '++ list delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   private function onCellWillGainFocus(rowIndex, itemIndex, direction)
-    ? "+SCREEN onCellWillGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
+    ' ? "+SCREEN onCellWillGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
     mioc.setInstance("focusedIndex", {
       row: rowIndex
       cell: itemIndex
@@ -340,7 +340,7 @@ class ListScreen extends mv.BaseScreen
   end function
 
   private function onCellDidGainFocus(rowIndex, itemIndex, direction)
-    ? "+SCREEN onCellDidGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
+    ' ? "+SCREEN onCellDidGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
     mioc.setInstance("focusedIndex", {
       row: rowIndex
       cell: itemIndex

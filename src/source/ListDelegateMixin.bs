@@ -70,8 +70,6 @@ namespace ml.delegateMixin
         "onCellDidLoseFocus": "didLoseFocus"
         "onCellGainingFocus": "gainingFocus"
         "onCellLosingFocus": "losingFocus"
-        "onCellScrollChange": "scrollStart"
-        "onCellScrollChange": "scrollStop"
       }
 
       for each funcName in funcMap
@@ -106,9 +104,7 @@ namespace ml.delegateMixin
     end if
     ' ? "onListEventBridge OBSERVED " ; eventName
 
-    if eventName = "scrollStart" or eventName = "scrollStop"
-      m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction, eventName = "scrollStart")
-    else if eventName = "gainingFocus" or eventName = "losingFocus"
+    if eventName = "gainingFocus" or eventName = "losingFocus"
       m[m.listCellEventMap[eventName]](event.rowIndex, event.index, event.direction, event.fraction)
     else
       m[m.listCellEventMap[eventName]](event.rowIndex, event.index, event.direction)
@@ -135,14 +131,18 @@ namespace ml.delegateMixin
         "onRowDidLoseFocus": "didLoseFocus"
         "onRowGainingFocus": "gainingFocus"
         "onRowLosingFocus": "losingFocus"
-        "onRowScrollChange": "scrollStart"
-        "onRowScrollChange": "scrollStop"
+        "onRowScrollingStart": "scrollStart"
+        "onRowScrollingStop": "scrollStop"
       }
 
       for each funcName in funcMap
         if mc_isFunction(instance[funcName])
           m.listRowEventMap[funcMap[funcName]] = funcName
         end if
+        if mc_isFunction(instance["onRowScrollingChange"])
+          m.listEventMap["onRowScrollingChange"] = "onRowScrollingChange"
+        end if
+
       end for
     end if
 
@@ -171,7 +171,7 @@ namespace ml.delegateMixin
     end if
 
     if eventName = "scrollStart" or eventName = "scrollStop"
-      m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction, eventName = "scrollStart")
+      m.listItemDelegate["onRowScrollingChange"](event.index, eventName = "scrollStart")
     else if eventName = "gainingFocus" or eventName = "losingFocus"
       m.listDelegate[m.listRowEventMap[eventName]](event.index, event.direction, event.fraction)
     else

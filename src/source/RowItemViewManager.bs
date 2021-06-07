@@ -69,7 +69,7 @@ namespace ml
           m.applyrenderStateForCell(id, renderStateMap[id])
         end for
       else
-        ? "ROW IS NOT !! RENDERED" ; m.row.index
+          ' ? "ROW IS NOT !! RENDERED" ; m.row.index
         for each id in renderStateMap
           m.applyrenderStateForCell(id, "none")
         end for
@@ -138,26 +138,40 @@ namespace ml
     end function
 
     override function setIsScrolling(isScrolling)
+      ' ? "++++ setIsScrolling" ; isScrolling;
       m.row.isScrolling = isScrolling
+
       m.owner.isScrolling = isScrolling
       m.isScrolling = isScrolling
+
+      if isScrolling
+        name = "scrollStart"
+      else
+        name = "scrollStop"
+      end if
+
       for each id in m.cellsById
         comp = m.cellsById[id]
-        if isScrolling
-          comp.listEvent = { name: "scrollStart" }
-        else
-          comp.listEvent = { name: "scrollStop" }
-        end if
+        comp.listEvent = { name: name }
+        ' ? "++++ CELL EVENT " ; id ; " " name
       end for
+
+      m.row.listEvent = { name: name }
+      m.owner.listEvent = { name: name, index: m.row.index }
+      ' ? "++++ row - listEvent " ; formatJson(m.row.listEvent)
+      ' ? "++++ owner - listEvent " ; formatJson(m.owner.listEvent)
     end function
 
     override function getScreenRect(index, screenPos = invalid, direction = 0)
       rect = super.getScreenRect(index, screenPos, direction)
 
       if rect <> invalid
-        rect.translation[0] += m.settings.contentOffset[0]
-        rect.translation[1] += m.settings.contentOffset[1]
+        rect.translation[0] = m.settings.contentOffset[0]
+        rect.translation[1] = m.settings.contentOffset[1] + m.settings.screenPos
       end if
+
+      ' rowRect = m.owner@.getRowScreenRect(m.row.index, screenPos, direction)
+      ' rect.translation[1] += rowRect.translation[1]
       return rect
     end function
 

@@ -15,7 +15,7 @@ class HeroCell extends ml.BaseCell
 
   private lastContent
   private isViewCreated = false
-  private posterSize = [1700, 700]
+  private posterSize = [1100, 700]
   private scale = 1
 
   function new()
@@ -34,7 +34,6 @@ class HeroCell extends ml.BaseCell
     })
     m.poster = mc.createSGNode("mv_Poster", m.top, "poster", {
       translation: [0, 0]
-      scaleRotateCenter: [0, 0]
       loadingBitmapUri: "http://via.placeholder.com/1700x700"
       failedBitmapUri: "http://via.placeholder.com/1700x700"
       uri: "http://via.placeholder.com/1700x700"
@@ -54,7 +53,7 @@ class HeroCell extends ml.BaseCell
       m.createViews()
       m.poster.width = m.size[0]
       m.poster.height = m.size[1]
-      m.setScale(0, true)
+      m.setFocusState(0, true)
 
       m.poster.uri = m.lastContent.HDGRIDPOSTERURL
       m.onScrollChange()
@@ -74,57 +73,57 @@ class HeroCell extends ml.BaseCell
   '++ delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  private function onWillEnter(index, direction)
-    ' ? "SC: onCellWillEnter " ; index ; " " ; direction
+  private function onWillEnter(direction)
+    ' ? "SC: onCellWillEnter " ; " " ; direction
     m.onContentChange()
   end function
 
-  private function onWillExit(index, direction)
-    ' ? "SC: onCellWillExit " ; index ; " " ; direction
+  private function onWillExit(direction)
+    ' ? "SC: onCellWillExit " ; " " ; direction
   end function
 
-  private function onDidEnter(index, direction)
-    ' ? "SC: onCellDidEnter " ; index ; " " ; direction
+  private function onDidEnter(direction)
+    ' ? "SC: onCellDidEnter " ; " " ; direction
     ' m.onContentChange()
   end function
 
-  private function onDidExit(index, direction)
-    ' ? "SC: onCellDidExit " ; index ; " " ; direction
+  private function onDidExit(direction)
+    ' ? "SC: onCellDidExit " ; " " ; direction
   end function
 
-  private function onWillGainFocus(index, direction)
-    ' ? "SC: onCellWillGainFocus " ; index ; " " ; direction
+  private function onWillGainFocus(direction)
+    ' ? "SC: onCellWillGainFocus " ; " " ; direction
   end function
 
-  private function onWillLoseFocus(index, direction)
-    ' ? "SC: onCellWillLoseFocus " ; index ; " " ; direction
+  private function onWillLoseFocus(direction)
+    ' ? "SC: onCellWillLoseFocus " ; " " ; direction
   end function
 
-  private function onDidGainFocus(index, direction)
-    ' ? "SC: onCellDidGainFocus " ; index ; " " ; direction
-    m.setScale(1, true)
+  private function onDidGainFocus(direction)
+    ' ? "SC: onCellDidGainFocus " ; " " ; direction
+    m.setFocusState(1, true)
   end function
 
-  private function onDidLoseFocus(index, direction)
-    ' ? "SC: onCellDidLoseFocus " ; index ; " " ; direction
+  private function onDidLoseFocus(direction)
+    ' ? "SC: onCellDidLoseFocus " ; " " ; direction
     if direction = 1
-      m.setScale(1, false)
+      m.setFocusState(1, false)
     end if
   end function
 
-  private function onGainingFocus(index, direction, fraction)
-    ' ? "SC: onGainingFocus " ; index ; " " ; direction ; " "  ; fraction
-    m.setScale(fraction, true)
+  private function onGainingFocus(direction, fraction)
+    ' ? "SC: onGainingFocus " ; " " ; direction ; " "  ; fraction
+    m.setFocusState(fraction, true)
   end function
 
-  private function onLosingFocus(index, direction, fraction)
-    ' ? "SC: onLosingFocus " ; index ; " " ; direction ; " " ; fraction
-    if direction = 1
-      m.setScale(fraction, false)
-    end if
+  private function onLosingFocus(direction, fraction)
+    ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
+    ' if direction = 1
+      m.setFocusState(fraction, false)
+    ' end if
   end function
 
-  private function setScale(fraction, isGaining) as void
+  private function setFocusState(fraction, isGaining) as void
     if isGaining
       m.scale = (fraction + 1)
     else

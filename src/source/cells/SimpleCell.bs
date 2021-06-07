@@ -75,7 +75,8 @@ namespace ml
 
         m.label.text = "C:" + m.lastContent.title
         m.poster.uri = m.lastContent.HDGRIDPOSTERURL
-        m.onScrollChange(0, 0, m.row.isScrolling or m.list.isScrolling)
+        m.label.visible = not (m.row.isScrolling or m.list.isScrolling)
+        ' m.onScrollingChange(m.row.isScrolling or m.list.isScrolling)
       end if
     end function
 
@@ -83,61 +84,56 @@ namespace ml
     '++ delegate
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    private function onScrollChange(index, direction, isScrolling)
-      ' ? "SC: onCellWillEnter " ; index ; " " ; direction
+    private function onScrollingChange(isScrolling)
+      ? "SC: onScrollChange " ; " " ; isScrolling
       m.label.visible = not isScrolling
     end function
 
-    private function onScrollStop(index, direction)
-      ' ? "SC: onCellWillEnter " ; index ; " " ; direction
+    private function onWillEnter(direction)
+      ' ? "SC: onCellWillEnter " ; " " ; direction
       m.onContentChange()
     end function
 
-    private function onWillEnter(index, direction)
-      ' ? "SC: onCellWillEnter " ; index ; " " ; direction
-      m.onContentChange()
+    private function onWillExit(direction)
+      ' ? "SC: onCellWillExit " ; " " ; direction
     end function
 
-    private function onWillExit(index, direction)
-      ' ? "SC: onCellWillExit " ; index ; " " ; direction
-    end function
-
-    private function onDidEnter(index, direction)
-      ' ? "SC: onCellDidEnter " ; index ; " " ; direction
+    private function onDidEnter(direction)
+      ' ? "SC: onCellDidEnter " ; " " ; direction
       ' m.onContentChange()
     end function
 
-    private function onDidExit(index, direction)
-      ' ? "SC: onCellDidExit " ; index ; " " ; direction
+    private function onDidExit(direction)
+      ' ? "SC: onCellDidExit " ; " " ; direction
     end function
 
-    private function onWillGainFocus(index, direction)
-      ' ? "SC: onCellWillGainFocus " ; index ; " " ; direction
+    private function onWillGainFocus(direction)
+      ' ? "SC: onCellWillGainFocus " ; " " ; direction
     end function
 
-    private function onWillLoseFocus(index, direction)
-      ' ? "SC: onCellWillLoseFocus " ; index ; " " ; direction
+    private function onWillLoseFocus(direction)
+      ' ? "SC: onCellWillLoseFocus " ; " " ; direction
     end function
 
-    private function onDidGainFocus(index, direction)
-      ' ? "SC: onCellDidGainFocus " ; index ; " " ; direction
+    private function onDidGainFocus(direction)
+      ' ? "SC: onCellDidGainFocus " ; " " ; direction
       m.setScale(1, true)
     end function
 
-    private function onDidLoseFocus(index, direction)
-      ' ? "SC: onCellDidLoseFocus " ; index ; " " ; direction
+    private function onDidLoseFocus(direction)
+      ' ? "SC: onCellDidLoseFocus " ; " " ; direction
       if direction = 1
         m.setScale(1, false)
       end if
     end function
 
-    private function onGainingFocus(index, direction, fraction)
-      ' ? "SC: onGainingFocus " ; index ; " " ; direction ; " "  ; fraction
+    private function onGainingFocus(direction, fraction)
+      ' ? "SC: onGainingFocus " ; " " ; direction ; " "  ; fraction
       m.setScale(fraction, true)
     end function
 
-    private function onLosingFocus(index, direction, fraction)
-      ' ? "SC: onLosingFocus " ; index ; " " ; direction ; " " ; fraction
+    private function onLosingFocus(direction, fraction)
+      ' ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
       if direction = 1
         m.setScale(fraction, false)
       end if

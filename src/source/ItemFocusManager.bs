@@ -16,7 +16,7 @@ namespace ml
     public didStart = false
     public didFinish = false
     public isRow = false
-    public isNotifying = false
+    public isNotifying = true
 
     private container
     private moveAnimation
@@ -85,6 +85,7 @@ namespace ml
     end function
 
     function onFocusUpdate(fraction) as void
+      ' ? "+++ onFocusUpdate" ; m.name ; " didStart "; m.didStart ; " isNotifying " ; m.isNotifying
       if not m.isNotifying
         return
       end if
@@ -150,6 +151,7 @@ namespace ml
     end function
 
     function setOwnerNextFocusIndex()
+      ' ? "++++ setOwnerNextFocusIndex"
       if m.isRow
         m.viewManager.owner.nextFocusIndex = [m.viewManager.row.index, m.nextIndex]
       else
@@ -162,6 +164,7 @@ namespace ml
     end function
 
     function setOwnerIndexes()
+      ' ? "++++ setOwnerIndexes "; m.nextIndex ; " isRow " ; m.isRow
       if m.isRow
         m.viewManager.owner.focusedCellIndex = m.nextIndex
       else
