@@ -41,14 +41,14 @@ function onContentChange()
 end function
 
 function onScrollChange()
-  isScrolling = m.row.isScrolling or m.list.isScrolling
+  ' isScrolling = m.row.isScrolling or m.list.isScrolling
   ' ? "onCellScrollChange row " ; m.row.isScrolling
   ' ? "onCellScrollChange list " ; m.list.isScrolling
   ' m.label.visible = not isScrolling
   ' m.label2.visible = not isScrolling
 end function
 
-function onInitialStateChange(evt)
+function onInitialStateChange(evt as object)
   state = evt.getData()
   m.list = state.list
   m.row = state.row
@@ -69,49 +69,49 @@ end function
 '++ delegate
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-function onWillEnter(index, direction)
+function onWillEnter(index as integer, direction as integer)
   ' ? "onCellWillEnter " ; index ; " " ; direction
   onContentChange()
 end function
 
-function onWillExit(index, direction)
+function onWillExit(index as integer, direction as integer)
   ' ? "onCellWillExit " ; index ; " " ; direction
 end function
 
-function onDidEnter(index, direction)
+function onDidEnter(index as integer, direction as integer)
   ' ? "onCellDidEnter " ; index ; " " ; direction
   onContentChange()
 end function
 
-function onDidExit(index, direction)
+function onDidExit(index as integer, direction as integer)
   ' ? "onCellDidExit " ; index ; " " ; direction
 end function
 
-function onWillGainFocus(index, direction)
+function onWillGainFocus(index as integer, direction as integer)
   ' ? "onCellWillGainFocus " ; index ; " " ; direction
 end function
 
-function onWillLoseFocus(index, direction)
+function onWillLoseFocus(index as integer, direction as integer)
   ' ? "onCellWillLoseFocus " ; index ; " " ; direction
 end function
 
-function onDidGainFocus(index, direction)
+function onDidGainFocus(index as integer, direction as integer)
   ' ? "onCellDidGainFocus " ; index ; " " ; direction
 end function
 
-function onDidLoseFocus(index, direction)
+function onDidLoseFocus(index as integer, direction as integer)
   ' ? "CELL onCellDidLoseFocus " ; index ; " " ; direction
 end function
 
-function onGainingFocus(index, direction, fraction)
+function onGainingFocus(index as integer, direction as integer, fraction as float)
   setScale(fraction, true)
 end function
 
-function onLosingFocus(index, direction, fraction)
+function onLosingFocus(index as integer, direction as integer, fraction as float)
   setScale(fraction, false)
 end function
 
-function setScale(fraction, isGaining)
+function setScale(fraction as float, isGaining as boolean)
   if isGaining
     m.scale = fraction + 1
   else

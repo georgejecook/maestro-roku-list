@@ -114,7 +114,7 @@ namespace ml
       m.content = invalid
     end function
 
-    private function createEventsBroker(id)
+    private function createEventsBroker(id as string)
       node = createObject("roSGNode", "Node")
       node.id = id
       node.addFields({ "listEvent": {}, "viewportEvents": [] })
@@ -150,11 +150,11 @@ namespace ml
       m.itemScroller.move(0)
     end function
 
-    public function getRowRenderer(index)
+    public function getRowRenderer(index as integer)
       return m.viewManager.getRenderer(index)
     end function
 
-    public function getCellRenderer(rowIndex, cellIndex)
+    public function getCellRenderer(rowIndex as integer, cellIndex as integer)
       row = m.getRowRenderer(rowIndex)
 
       if row <> invalid
@@ -164,7 +164,7 @@ namespace ml
       return invalid
     end function
 
-    public function getCellScreenRect(rowIndex, cellIndex, rowScreenPos = invalid, cellScreenPos = invalid)
+    public function getCellScreenRect(rowIndex as integer, cellIndex as integer, rowScreenPos = invalid as integer, cellScreenPos = invalid as integer)
       ' ? "+++ rowScreenPos"; rowScreenPos
       row = m.getRowRenderer(rowIndex)
       if row <> invalid
@@ -174,11 +174,11 @@ namespace ml
       return invalid
     end function
 
-    public function getRowScreenRect(rowIndex, screenPos = invalid, direction = 0)
+    public function getRowScreenRect(rowIndex as integer, screenPos = invalid as integer, direction = 0 as integer)
       return m.viewManager.getScreenRect(rowIndex, screenPos, direction)
     end function
 
-    private function onNextFocusIndexChange(index) as void
+    private function onNextFocusIndexChange(index as integer) as void
       m.targetFocusRect = m.getCellScreenRect(index[0], index[1])
       focusSettings = ml.listMixin.getFocusSettings(m.content, m.content.getChild(index[0]))
       if focusSettings.focusFeedbackStyle = "none"
@@ -230,7 +230,7 @@ namespace ml
       end if
     end function
 
-    private function getLongPressIntervalForKey(key) as float
+    private function getLongPressIntervalForKey(key as string) as float
       m.log.method("getLongPressIntervalForKey", key)
       if (key = "up" and m.itemScroller.index > 0) or (key = "down" and m.itemScroller.index < m.viewManager.numberOfItems)
         return 0.2
@@ -239,7 +239,7 @@ namespace ml
       end if
     end function
 
-    private function onLongPressStart(key) as boolean
+    private function onLongPressStart(key as string) as boolean
       m.log.method(">>>>onLongPressStart", key)
 
       if (key = "up" and m.itemScroller.index > 0) or (key = "down" and m.itemScroller.index < m.viewManager.numberOfItems)
@@ -255,7 +255,7 @@ namespace ml
       return false
     end function
 
-    private function onLongPressFinish(key) as boolean
+    private function onLongPressFinish(key as string) as boolean
       if key = "up" or key = "down"
         m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
         m.itemScroller.finishAnimating()

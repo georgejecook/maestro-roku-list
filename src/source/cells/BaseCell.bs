@@ -35,7 +35,7 @@ namespace ml
       end if
     end function
 
-    protected function onInitialStateChange(state)
+    protected function onInitialStateChange(state as string)
       m.list = state.list
       m.row = state.row
       m.size = state.size

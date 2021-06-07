@@ -1,5 +1,5 @@
 namespace ml.listMixin
-  function createListContent(rowContent = [], focusSettings = invalid, rowSettings = invalid)
+  function createListContent(rowContent = [] as mc.types.array, focusSettings = invalid as mc.types.node, rowSettings = invalid as mc.types.node)
     content = createObject("roSGNode", "ml_ListContent")
     content.appendChildren(rowContent)
 
@@ -19,7 +19,7 @@ namespace ml.listMixin
     return content
   end function
 
-  function createRowSettings(cellSettings = invalid, focusSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, compName = "ml_HorizontalRow", height = -1)
+  function createRowSettings(cellSettings = invalid as mc.types.node, focusSettings = invalid as mc.types.node, space = 30 as integer, headerSettings = invalid as mc.types.node, screenPos = 0 as integer, compName = "ml_HorizontalRow" as string, height = -1 as integer)
     settings = createObject("roSGNode", "ml_RowSettings")
 
     if cellSettings = invalid
@@ -48,20 +48,19 @@ namespace ml.listMixin
     return settings
   end function
 
-  function createHeaderSettings(labelTranslation = [30, 20], height = 50, font = "font:MediumSystemBold", fontSize = 30)
+  function createHeaderSettings(labelTranslation = [30, 20] as string, height = 50 as integer, fontKey = "MediumBold,20" as string)
     settings = createObject("roSGNode", "ml_HeaderSettings")
 
     settings.update({
       labelTranslation: labelTranslation
       height: height
-      font: font
-      fontSize: fontSize
+      fontKey: fontKey
     })
 
     return settings
   end function
 
-  function createCellSettings(compName = "ml_SimpleCell", size = [300, 500], space = 30, screenPos = 0)
+  function createCellSettings(compName = "ml_SimpleCell" as string, size = [300, 500] as mc.types.array, space = 30 as integer, screenPos = 0 as integer)
     settings = createObject("roSGNode", "ml_CellSettings")
 
     settings.update({
@@ -91,7 +90,7 @@ namespace ml.listMixin
   '   return rowContent
   ' end function
 
-  function createFocusSettings(animSpeed = 0.03, fastAnimSpeed = 0.01, animStyle = "fixed")
+  function createFocusSettings(animSpeed = 0.03 as float, fastAnimSpeed = 0.01 as float, animStyle = "fixed" as string)
     settings = createObject("roSGNode", "ml_FocusSettings")
     settings.update({
       animSpeed: animSpeed
@@ -104,7 +103,7 @@ namespace ml.listMixin
   ' 'usage
   ' 'ON GET JSON DATA
   ' json = m.serverGetDataHomeScreen()
-  ' content = createObjecT("roSGnode", "ContentNode")
+  ' content = createObjecT("roSGNode", "ContentNode")
   ' content.appendChild(makeHeroRow(json.hero))
   ' content.appendChild(makeFavesRow(json.faves))
   ' moviesGridSettings = createGridRowSettings("Cell")
@@ -113,10 +112,10 @@ namespace ml.listMixin
   ' content.appendChild(makeShowRow(show))
   ' end for
 
-  function setTileSettings(compName = "ml_Cell", cellSize = [300, 500])
+  function setTileSettings(compName = "ml_Cell" as string, cellSize = [300, 500] as mc.types.array)
   end function
 
-  function getRowSettings(listContent, rowContent = invalid)
+  function getRowSettings(listContent as mc.types.node, rowContent = invalid as mc.types.node)
     if rowContent <> invalid and rowContent.settings <> invalid
       ' ? " USING ROW SETTINGS " ; rowContent.settings.screenPos
       return rowContent.settings
@@ -130,9 +129,9 @@ namespace ml.listMixin
     end if
   end function
 
-  function getCellSettings(listContent, rowContent = invalid, itemContent = invalid)
+  function getCellSettings(listContent as mc.types.node, rowContent = invalid as mc.types.node, itemContent = invalid as mc.types.node)
     if itemContent <> invalid and itemContent.settings <> invalid
-      return item.settings
+      return itemContent.settings
     else if rowContent <> invalid and rowContent.settings <> invalid and rowContent.settings.cellSettings <> invalid
       return rowContent.settings.cellSettings
     else if listContent <> invalid and listContent.rowSettings <> invalid
@@ -143,14 +142,14 @@ namespace ml.listMixin
     end if
   end function
 
-  function getFocusSettings(listContent, rowContent = invalid)
+  function getFocusSettings(listContent as mc.types.node, rowContent = invalid as mc.types.node)
     if rowContent <> invalid and rowContent.settings <> invalid and rowContent.settings.focusSettings <> invalid
       return rowContent.settings.focusSettings
     else if listContent <> invalid and listContent.rowSettings <> invalid and listContent.rowSettings.focusSettings <> invalid
       return listContent.rowSettings.focusSettings
     else if listContent <> invalid and listContent.focusSettings <> invalid
-      return listContent.focusSettings
       m.log.error("no listContent for list - this should not have been called!")
+      return listContent.focusSettings
     end if
     return invalid
   end function

@@ -21,7 +21,7 @@ namespace tests
       m.container.width = 1920
       m.container.height = 1080
 
-      m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
+      m.viewManager = new tests.TestItemViewManager(m.owner, m.container, 1)
       m.focusManager = { "id": "focusManager" }
       m.scroller = new ml.ItemScroller(m.viewManager, 1)
       m.scroller.focusManager = m.focusManager
@@ -121,7 +121,6 @@ namespace tests
 
     @it("Moving right to left")
     function test()
-      comps = m.scroller.components
       m.stub(m.focusManager, "setFocusPosition")
       m.resetViewPortStates()
       ' m.printStates(0, comps, -1)

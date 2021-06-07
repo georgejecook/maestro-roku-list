@@ -26,7 +26,7 @@ namespace tests
       m.container.width = 1920
       m.container.height = 1080
 
-      m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
+      m.viewManager = new tests.TestItemViewManager(m.owner, m.container, 1)
 
       m.scroller = new ml.ItemScroller(m.viewManager, 1)
       m.configureScroller(1, 20)

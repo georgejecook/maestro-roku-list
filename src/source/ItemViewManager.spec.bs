@@ -21,7 +21,7 @@ namespace tests
       m.container.width = 1920
       m.container.height = 1080
 
-      m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
+      m.viewManager = new tests.TestItemViewManager(m.owner, m.container, 1)
       m.viewManager.lookAheadDistance = 2700
       m.viewManager.lookBehindDistance = 0
 
@@ -147,7 +147,6 @@ namespace tests
       m.viewManager.updateRenderedComponents(1, 0)
       compStates = m.viewManager.getComponentsInViewPort(offset)
 
-      expected = {}
       for each id in trueIds
         strId = str(id).trim()
         m.assertTrue(compStates[strId], "id '" + strId + "' should be true")

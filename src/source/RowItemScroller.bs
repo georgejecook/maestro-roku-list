@@ -2,11 +2,11 @@ import "pkg:/source/ItemScroller.bs"
 
 namespace ml
   class RowItemScroller extends ml.ItemScroller
-    function new(viewManager)
+    function new(viewManager as mc.types.node)
       super(viewManager, 0)
     end function
 
-    override function setFocusOnRenderer(isMoving)
+    override function setFocusOnRenderer(isMoving as boolean)
       if not isMoving
         m.log.info("stopped scrolling on item", m.index)
       end if

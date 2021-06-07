@@ -4,7 +4,7 @@ import "pkg:/source/ListMixin.bs"
 namespace ml
   class ListItemViewManager extends ml.ItemViewManager
 
-    function new(list, container, minPos, maxPos)
+    function new(list as mc.types.node, container as mc.types.node, minPos as integer, maxPos as integer)
       super("ListItemViewManager", list, container, 1, minPos, maxPos)
       m.delegate = list.rowEvents
       'TODO - allow api hooks to tweak this
@@ -12,14 +12,11 @@ namespace ml
       m.lookBehindDistance = maxPos * 2
     end function
 
-    override function getRenderer(index)
+    override function getRenderer(index as integer)
       return m.components[index]
     end function
 
-    override function createRenderers(content)
-
-      y = 0
-      w = m.owner.width
+    override function createRenderers(content as mc.types.node)
 
       if content <> invalid
         index = 0
@@ -40,7 +37,7 @@ namespace ml
       end if
     end function
 
-    function createRow(rowContent, index, settings)
+    function createRow(rowContent as mc.types.node, index as integer, settings as mc.types.node)
       compName = settings.componentName <> invalid ? settings.componentName : "ml_HorizontalRow"
       'TODO - measure height to ascertain how many
       isRendered = index < 4
@@ -86,7 +83,7 @@ namespace ml
 
     end function
 
-    override function applyRenderStateMap(renderStateMap)
+    override function applyRenderStateMap(renderStateMap as mc.types.assocarray)
       for each id in renderStateMap
         comp = m.components[id.toInt()]
 

@@ -91,7 +91,7 @@ namespace ml
     private function onContentChange()
       m.log.info("onContentChange")
       if m.isInitialized
-        if (m._lastContent = invalid or not m._lastContent.isSameNode(m.content))
+        if m._lastContent = invalid or not m._lastContent.isSameNode(m.content)
         m._lastContent = m.content
         if m.content <> invalid
           'configure header here
@@ -145,7 +145,7 @@ namespace ml
       end if
     end function
 
-    private function onListEvent(event)
+    private function onListEvent(event as object)
       if event.name = "willEnter" or event.name = "didEnter"
         for each component in m.cellsGroup.getChildren(-1, 0)
           if component.doesExist("listEvent")
@@ -161,15 +161,15 @@ namespace ml
       end if
     end function
 
-    public function getRenderer(index)
+    public function getRenderer(index as integer)
       return m.viewManager.getRenderer(index)
     end function
 
-    public function getRect(index, useScreenCoords = false)
+    public function getRect(index as integer, useScreenCoords = false as boolean)
       return m.viewManager.getRect(index, useScreenCoords)
     end function
 
-    public function getScreenRect(index, screenPos = invalid, direction = 0)
+    public function getScreenRect(index as integer, screenPos = invalid as integer, direction = 0 as integer)
       return m.viewManager.getScreenRect(index, screenPos, direction)
     end function
 
@@ -189,7 +189,7 @@ namespace ml
       return true
     end function
 
-    private function getLongPressIntervalForKey(key) as float
+    private function getLongPressIntervalForKey(key as string) as float
       m.log.verbose("getLongPressIntervalForKey", key)
       if key = "left" or key = "right"
         return 0.2
@@ -198,7 +198,7 @@ namespace ml
       end if
     end function
 
-    private function onLongPressStart(key) as boolean
+    private function onLongPressStart(key as string) as boolean
       m.log.verbose(">>>>onLongPressStart", key)
 
       if key = "left" or key = "right"
@@ -215,7 +215,7 @@ namespace ml
       return false
     end function
 
-    private function onLongPressFinish(key) as boolean
+    private function onLongPressFinish(key as string) as boolean
       if key = "left" or key = "right"
         m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
         m.itemScroller.finishAnimating()
@@ -225,8 +225,5 @@ namespace ml
       return false
     end function
 
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    '++ delegate
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   end class
 end namespace

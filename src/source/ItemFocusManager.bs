@@ -23,7 +23,7 @@ namespace ml
     private rowIndex
     private delegates
 
-    function new(viewManager, scroller, ownerDelegate = invalid, rowIndex = -1)
+    function new(viewManager as ml.ItemViewManager, scroller as ml.ItemScroller, ownerDelegate = invalid as object, rowIndex = -1 as float)
       super("ItemFocusManager")
       m.rowIndex = rowIndex
       m.viewManager = viewManager
@@ -45,7 +45,7 @@ namespace ml
 
     end function
 
-    function setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
+    function setFocusPosition(index as integer, indexPosition as integer, nextIndex as integer, nextPosition as integer, direction as integer)
       m.log.info(index, indexPosition, nextIndex, nextPosition, direction)
       m.index = index
       m.indexPosition = indexPosition
@@ -59,13 +59,13 @@ namespace ml
       m.onFocusUpdate(0)
     end function
 
-    function onFocusAnimationUpdate(fraction) as void
+    function onFocusAnimationUpdate(fraction as float) as void
       if m.didStart and not m.didFinish
         m.onFocusUpdate(fraction)
       end if
     end function
 
-    function onContainerPositionChange(offset)
+    function onContainerPositionChange(offset as integer)
       distance = abs(m.nextPosition - m.indexPosition)
       currentPos = abs(m.indexPosition - offset)
       ' ? ">>>>>> I:" ; m.index ; " NI:"; m.nextIndex
@@ -84,7 +84,7 @@ namespace ml
       m.onFocusUpdate(fraction)
     end function
 
-    function onFocusUpdate(fraction) as void
+    function onFocusUpdate(fraction as float) as void
       ' ? "+++ onFocusUpdate" ; m.name ; " didStart "; m.didStart ; " isNotifying " ; m.isNotifying
       if not m.isNotifying
         return
@@ -118,7 +118,7 @@ namespace ml
       m.sendEvents(name, nextName, fraction)
     end function
 
-    function sendEvents(name, nextName, fraction)
+    function sendEvents(name as string, nextName as string, fraction as float)
       event = {
         direction: m.direction
         fraction: fraction
