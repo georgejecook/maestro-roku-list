@@ -16,13 +16,14 @@ namespace ml
     public didStart = false
     public didFinish = false
     public isRow = false
+    public isNotifying = true
 
     private container
     private moveAnimation
     private rowIndex
     private delegates
 
-    function new(viewManager, scroller, ownerDelegate = invalid, rowIndex = -1)
+    function new(viewManager as ml.ItemViewManager, scroller as ml.ItemScroller, ownerDelegate = invalid as object, rowIndex = -1 as float)
       super("ItemFocusManager")
       m.rowIndex = rowIndex
       m.viewManager = viewManager
@@ -44,10 +45,8 @@ namespace ml
 
     end function
 
-    function setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
-      ? ">>>>>>>>>>>>>>>>>>>>>"
+    function setFocusPosition(index as integer, indexPosition as integer, nextIndex as integer, nextPosition as integer, direction as integer)
       m.log.info(index, indexPosition, nextIndex, nextPosition, direction)
-      ? ">>>>>>>>>>>>>>>>>>>>>"
       m.index = index
       m.indexPosition = indexPosition
       m.nextIndex = nextIndex
@@ -60,18 +59,17 @@ namespace ml
       m.onFocusUpdate(0)
     end function
 
-    function onFocusAnimationUpdate(fraction) as void
+    function onFocusAnimationUpdate(fraction as float) as void
       if m.didStart and not m.didFinish
-        ' ? "FOCUS ANIM UPDATE "; fraction
         m.onFocusUpdate(fraction)
       end if
     end function
 
-    function onContainerPositionChange(offset)
+    function onContainerPositionChange(offset as integer)
       distance = abs(m.nextPosition - m.indexPosition)
       currentPos = abs(m.indexPosition - offset)
-      ? ">>>>>> I:" ; m.index ; " NI:"; m.nextIndex
-      ? "offset:" ; offset ; " IP:" ; m.indexPosition ; " D:" ; distance ; " C:" ; currentPos ; " DIR:"; m.direction
+      ' ? ">>>>>> I:" ; m.index ; " NI:"; m.nextIndex
+      ' ? "offset:" ; offset ; " IP:" ; m.indexPosition ; " D:" ; distance ; " C:" ; currentPos ; " DIR:"; m.direction
       if distance <> 0
         fraction = currentPos / distance
         ' if m.direction = -1
@@ -83,27 +81,25 @@ namespace ml
         fraction = 0
       end if
 
-      ? m.name + " UPDATE: " ; fraction
       m.onFocusUpdate(fraction)
     end function
 
-    function onFocusUpdate(fraction) as void
+    function onFocusUpdate(fraction as float) as void
+      ' ? "+++ onFocusUpdate" ; m.name ; " didStart "; m.didStart ; " isNotifying " ; m.isNotifying
+      if not m.isNotifying
+        return
+      end if
       if not m.didStart
-        ? "DID START"
         name = "willLoseFocus"
         nextName = "willGainFocus"
         m.didStart = true
         m.setOwnerNextFocusIndex()
       else if fraction = 0
-        ? "FRACTION 0"
         return
       else if fraction = 1
-        ? "FRACTION 1"
-        ? ""
         if m.didFinish
           return
         end if
-        ? "SETTING INDEXES"
         m.didFinish = true
         name = "didLoseFocus"
         nextName = "didGainFocus"
@@ -122,7 +118,7 @@ namespace ml
       m.sendEvents(name, nextName, fraction)
     end function
 
-    function sendEvents(name, nextName, fraction)
+    function sendEvents(name as string, nextName as string, fraction as float)
       event = {
         direction: m.direction
         fraction: fraction
@@ -155,6 +151,7 @@ namespace ml
     end function
 
     function setOwnerNextFocusIndex()
+      ' ? "++++ setOwnerNextFocusIndex"
       if m.isRow
         m.viewManager.owner.nextFocusIndex = [m.viewManager.row.index, m.nextIndex]
       else
@@ -167,15 +164,13 @@ namespace ml
     end function
 
     function setOwnerIndexes()
+      ' ? "++++ setOwnerIndexes "; m.nextIndex ; " isRow " ; m.isRow
       if m.isRow
-        ? "setting ROW focused index to cell" ; m.nextIndex
         m.viewManager.owner.focusedCellIndex = m.nextIndex
       else
-        ? "setting LIST row index to" ; m.nextIndex
         m.viewManager.owner.focusedRowIndex = m.nextIndex
         comp = m.viewManager.getRenderer(m.nextIndex)
         if comp <> invalid
-          ? "setting LIST CELL index " ; comp.focusedCellIndex
           m.viewManager.owner.focusedCellIndex = comp.focusedCellIndex
         end if
       end if

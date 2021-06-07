@@ -1,0 +1,141 @@
+import "pkg:/source/roku_modules/maestro/core/Utils.brs"
+import "pkg:/source/ListMixin.bs"
+import "pkg:/source/ItemDelegateMixin.bs"
+import "pkg:/source/RowItemScroller.bs"
+import "pkg:/source/RowItemViewManager.bs"
+import "pkg:/source/ItemFocusManager.bs"
+import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
+import "pkg:/source/cells/BaseCell.bs"
+
+@node("HeroCell", "mv_BaseView")
+class HeroCell extends ml.BaseCell
+
+  private poster
+  private bgRect
+
+  private lastContent
+  private isViewCreated = false
+  private posterSize = [1100, 700]
+  private scale = 1
+
+  function new()
+    super()
+    m.createViews()
+  end function
+
+  private function createViews() as void
+    if m.isViewCreated
+      return
+    end if
+    m.isViewCreated = true
+    m.bgRect = mc.createSGNode("mv_Rectangle", m.top, "bgRect", {
+      size: m.posterSize
+      color: "#000000"
+    })
+    m.poster = mc.createSGNode("mv_Poster", m.top, "poster", {
+      translation: [0, 0]
+      loadingBitmapUri: "http://via.placeholder.com/1700x700"
+      failedBitmapUri: "http://via.placeholder.com/1700x700"
+      uri: "http://via.placeholder.com/1700x700"
+      loadWidth: m.posterSize[0]
+      loadHeight: m.posterSize[1]
+      size: m.posterSize
+      loadDisplayMode: "zoomtofill"
+    })
+    m.size = m.posterSize
+  end function
+
+  protected override function onContentChange()
+    ' ? " SC 1"
+    if m.content = invalid or not m.content.isSamenode(m.lastContent)
+      ' ? " SC 2"
+      m.lastContent = m.content
+      m.createViews()
+      m.poster.width = m.size[0]
+      m.poster.height = m.size[1]
+      m.setFocusState(0, true)
+
+      m.poster.uri = m.lastContent.HDGRIDPOSTERURL
+      m.onScrollChange()
+    end if
+  end function
+
+  private function onScrollChange()
+    ' ? "SC: onScrollChange " ; m.row.isScrolling ; " " ; m.list.isScrolling
+    isScrolling = m.row.isScrolling or m.list.isScrolling
+    ' ? "SC: onCellScrollChange row " ; m.row.isScrolling
+    '  ? "SC: onCellScrollChange list " ; m.list.isScrolling
+    ' m.label.visible = not isScrolling
+    ' m.label2.visible = not isScrolling
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ delegate
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  private function onWillEnter(direction)
+    ' ? "SC: onCellWillEnter " ; " " ; direction
+    m.onContentChange()
+  end function
+
+  private function onWillExit(direction)
+    ' ? "SC: onCellWillExit " ; " " ; direction
+  end function
+
+  private function onDidEnter(direction)
+    ' ? "SC: onCellDidEnter " ; " " ; direction
+    ' m.onContentChange()
+  end function
+
+  private function onDidExit(direction)
+    ' ? "SC: onCellDidExit " ; " " ; direction
+  end function
+
+  private function onWillGainFocus(direction)
+    ' ? "SC: onCellWillGainFocus " ; " " ; direction
+  end function
+
+  private function onWillLoseFocus(direction)
+    ' ? "SC: onCellWillLoseFocus " ; " " ; direction
+  end function
+
+  private function onDidGainFocus(direction)
+    ' ? "SC: onCellDidGainFocus " ; " " ; direction
+    m.setFocusState(1, true)
+  end function
+
+  private function onDidLoseFocus(direction)
+    ' ? "SC: onCellDidLoseFocus " ; " " ; direction
+    if direction = 1
+      m.setFocusState(1, false)
+    end if
+  end function
+
+  private function onGainingFocus(direction, fraction)
+    ' ? "SC: onGainingFocus " ; " " ; direction ; " "  ; fraction
+    m.setFocusState(fraction, true)
+  end function
+
+  private function onLosingFocus(direction, fraction)
+    ' ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
+    ' if direction = 1
+      m.setFocusState(fraction, false)
+    ' end if
+  end function
+
+  private function setFocusState(fraction, isGaining) as void
+    if isGaining
+      m.scale = (fraction + 1)
+    else
+      m.scale = 2 - (fraction + 1)
+    end if
+    ' m.poster.width = m.posterSize[0] * m.scale
+    ' m.poster.height = m.posterSize[1] * m.scale
+
+    if isGaining
+      m.poster.opacity = 0.3 + fraction
+    else
+      m.poster.opacity = 0.3 + (1 - fraction)
+    end if
+  end function
+end class

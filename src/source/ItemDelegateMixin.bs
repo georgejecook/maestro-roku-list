@@ -5,11 +5,11 @@ namespace ml.itemDelegateMixin
   '  * @memberof module:ml.delegateMixin
   '  * @instance
   '  * @function
-  '  * @description wires up a cell, or row (or some other list item) to method handlers for the delegate events it may receive. This should be used to add listeners to a cell, or a row renderer. You are free to just simply use the events, that come in onlistEventMap, as well.
+  '  * @description wires up a cell, or row (or some other list item) to method handlers for the delegate events it may receive. This should be used to add listeners to a cell, or a row renderer. You are free to just simply use the events, that come in onListEventMap, as well.
   '  * @param {class} instance - target for the delegate; if invalid, then it will default to the methods on node scope
   '  * @returns {returnType} returnDescription
   '  */
-  function setDelegate(instance = invalid)
+  function setDelegate(instance = invalid as object)
     m.listEventMap = {}
     if instance = invalid
       instance = m
@@ -27,6 +27,8 @@ namespace ml.itemDelegateMixin
         "onDidLoseFocus": "didLoseFocus"
         "onGainingFocus": "gainingFocus"
         "onLosingFocus": "losingFocus"
+        "onScrollingStart": "scrollStart"
+        "onScrollingStop": "scrollStop"
       }
 
       for each funcName in funcMap
@@ -34,17 +36,21 @@ namespace ml.itemDelegateMixin
           m.listEventMap[funcMap[funcName]] = funcName
         end if
       end for
+      if mc_isFunction(instance["onScrollingChange"])
+        m.listEventMap["onScrollingChange"] = "onScrollingChange"
+      end if
     end if
 
     m.isObservingListEvents = m.listEventMap.count() > 0
 
     if m.isObservingListEvents
       m.listItemDelegate = instance
+      'bs:disable-next-line
       mc.toggleObserver(m.top, "listEvent", mc.getFunctionName(onListEventBridge))
     end if
   end function
 
-  function onListEventBridge(sgEvent) as void
+  function onListEventBridge(sgEvent as object) as void
     event = sgEvent.getData()
     eventName = event.name
     if not m.isObservingListEvents or m.listEventMap[eventName] = invalid
@@ -53,10 +59,12 @@ namespace ml.itemDelegateMixin
     end if
     ' ? "LEB" ; eventName
 
-    if eventName = "gainingFocus" or eventName = "losingFocus"
-      m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction, event.fraction)
+    if eventName = "scrollStart" or eventName = "scrollStop"
+      m.listItemDelegate["onScrollingChange"](eventName = "scrollStart")
+    else if eventName = "gainingFocus" or eventName = "losingFocus"
+      m.listItemDelegate[m.listEventMap[eventName]](event.direction, event.fraction)
     else
-      m.listItemDelegate[m.listEventMap[eventName]](event.index, event.direction)
+      m.listItemDelegate[m.listEventMap[eventName]](event.direction)
     end if
 
   end function

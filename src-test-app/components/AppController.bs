@@ -1,7 +1,7 @@
 import "pkg:/source/roku_modules/maestro/core/MIOC.brs"
 import "pkg:/source/roku_modules/maestro/core/Tasks.brs"
 import "pkg:/source/roku_modules/maestro/core/Utils.brs"
-
+import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ Initialization
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -14,6 +14,11 @@ function Init()
   tick.control = "start"
   mc.setOrAddNodeField(m.global, "tick", tick)
   mc.tasks.observeNodeField(tick, "fire", onInfoChange, "none")
+  mioc.setInstance("focusedIndex", {
+    row: 0
+    cell: 0
+  })
+
   initFlyweight()
 end function
 
@@ -34,7 +39,9 @@ function initFlyweight()
 end function
 
 function prebakeCells()
-  m.componentPool@.addPreBakedCells(200, "ml_SimpleCell")
+  timer = new mc.utils.DebugTimer("prebake")
+  m.componentPool@.prebakeComponents(70, "ml_SimpleCell")
+  timer.log("prebake")
 end function
 
 
@@ -44,6 +51,8 @@ end function
 
 function onInfoChange()
   m.infoLabel.text = ` Cell Pressure - mList: ${m.componentPool.numberOfComponentsInUse} / ${m.componentPool.numberOfComponents} - sg ${m.cellTracker.numberOfCellsInUse} / ${m.cellTracker.numberOfCells}`
+  focusedIndex = mioc.getInstance("focusedIndex")
+  m.infoLabel.text += ` FOCUS: ${focusedIndex.row}, ${focusedIndex.cell}`
 end function
 
 
@@ -57,4 +66,5 @@ function onFirstShow()
   screen = mc.createSGNode("ListScreen", m.top.findNode("contentGroup"), "listScreen")
   ' screen = mc.createSGNode("RowListScreen", m.top.findNode("contentGroup"), "listScreen")
   mv.setFocus(screen)
+  m.loadingIndicator.isActive = false
 end function

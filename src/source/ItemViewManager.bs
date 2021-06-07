@@ -36,7 +36,7 @@ namespace ml
     public renderedComponents = []
     public isScrolling = false
 
-    function new(name, owner, container, axes, minPos, maxPos)
+    function new(name as string, owner as mc.types.node, container as mc.types.node, axes as mc.types.array, minPos as integer, maxPos as integer)
       super(name)
       m.container = container
       m.contentGroup = container.getParent()
@@ -58,7 +58,7 @@ namespace ml
       m._updateLayout()
     end function
 
-    function setContent(content)
+    function setContent(content as mc.types.node)
       m.log.info("setContent")
       m.content = content
       m.settings = ml.listMixin.getRowSettings(m.owner.content, m.content)
@@ -70,7 +70,7 @@ namespace ml
       m.numberOfItems = m.visibleItems.count()
     end function
 
-    function _createRenderers(content)
+    function _createRenderers(content as mc.types.node)
       m.components = []
       m.visibleComponents = []
       m.visibleItems = []
@@ -89,7 +89,7 @@ namespace ml
       m.updateLayout()
     end function
 
-    function onFocusIndexChange(direction, index)
+    function onFocusIndexChange(direction as integer, index as integer)
       m.updateRenderedComponents(direction, index)
     end function
 
@@ -97,15 +97,15 @@ namespace ml
     '++ util
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    function convertChildTranslationToOwner(containerTranslation)
+    function convertChildTranslationToOwner(containerTranslation as mc.types.array)
       return [m.container.translation[0] + containerTranslation[0], m.container.translation[1] + containerTranslation[1]]
     end function
 
-    function convertOwnerTranslationToChild(ownerTranslation)
+    function convertOwnerTranslationToChild(ownerTranslation as mc.types.array)
       return [m.container.translation[0] - ownerTranslation[0], m.container.translation[1] - ownerTranslation[1]]
     end function
 
-    function getComponentsInViewPort(startOffset)
+    function getComponentsInViewPort(startOffset as integer)
       compStates = {}
 
       sStart = m.screenRect.translation[m.axes] + startOffset
@@ -113,15 +113,19 @@ namespace ml
 
       ' for each comp in m.visibleComponents
       for each comp in m.renderedComponents
-        cRect = m.rects[comp.index]
-        if cRect <> invalid
-          cStart = cRect.translation[m.axes]
-          cEnd = cStart + cRect.size[m.axes]
-          if (cStart >= sStart and cStart <= sEnd) or (cEnd >= sStart and cEnd <= sEnd)
-            compStates[comp.id] = true
-          else
-            compStates[comp.id] = false
+        if comp.index <> invalid
+          cRect = m.rects[comp.index]
+          if cRect <> invalid
+            cStart = cRect.translation[m.axes]
+            cEnd = cStart + cRect.size[m.axes]
+            if (cStart >= sStart and cStart <= sEnd) or (cEnd >= sStart and cEnd <= sEnd)
+              compStates[comp.id] = true
+            else
+              compStates[comp.id] = false
+            end if
           end if
+        else
+          ? "comp index not set!"
         end if
         ' m.log.info(compStates[comp.id], "sStart", sStart, "sEnd", sENd, "cStart", cStart, "cEnd", cENd)
       end for
@@ -129,7 +133,7 @@ namespace ml
       return compStates
     end function
 
-    function setIsScrolling(isScrolling)
+    function setIsScrolling(isScrolling as boolean)
       m.isScrolling = isScrolling
       m.owner.isScrolling = isScrolling
       for each comp in m.visibleComponents
@@ -145,7 +149,7 @@ namespace ml
     '++ visibility state management
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    function updateRenderedComponents(direction, index, force = false) as void
+    function updateRenderedComponents(direction as integer, index as integer, force = false as boolean) as void
       if not force and not m.shouldUpdateRenderedIndexes(direction, index)
         ' ? "not updating rendered indexes - shouldUpdateRenderedIndexes: false"
         return
@@ -156,7 +160,7 @@ namespace ml
       if (m.lastRenderedIndexes <> invalid) and m.lastRenderedIndexes.startIndex = renderedIndexes.startIndex and m.lastRenderedIndexes.endIndex = renderedIndexes.endIndex
         ' this is the same set of comps as last time
         if m.renderedComponents.count() > 0
-          ' and we have seemingly done our inital render; so we can bail.
+          ' and we have seemingly done our initial render; so we can bail.
           return
         end if
       end if
@@ -173,7 +177,7 @@ namespace ml
       m.lastRenderedIndexes = renderedIndexes
     end function
 
-    function shouldUpdateRenderedIndexes(direction, index)
+    function shouldUpdateRenderedIndexes(direction as integer, index as integer)
       ' ? "???? I "; index ; " LI " ; m.lastScrollIndex ; " D " ; direction ; " LD " ; m.lastScrollDirection
       if direction <> m.lastScrollDirection or abs(index - m.lastScrollIndex) > 10 or index = 0
         ' ? " LIST SHOULD UPDATE I "; index ; " LI " ; m.lastScrollIndex ; " D " ; direction ; " LD " ; m.lastScrollDirection
@@ -184,7 +188,7 @@ namespace ml
       return false
     end function
 
-    function getRenderedIndexes(direction, index)
+    function getRenderedIndexes(direction as integer, index as integer)
       indexPos = abs(m.getTargetTranslation(index, direction)[m.axes])
 
       if direction < 0
@@ -213,7 +217,7 @@ namespace ml
       }
     end function
 
-    function createRenderedStateMap(direction, index, renderedIndexes)
+    function createRenderedStateMap(direction as integer, index  as integer, renderedIndexes as integer)
       m.log.method("createRenderedStateMap", m.__className, index, renderedIndexes)
       renderedStateMap = {}
 
@@ -226,7 +230,7 @@ namespace ml
       return renderedStateMap
     end function
 
-    function updateRenderStateMap(renderedStateMap, startIndex, endIndex, state)
+    function updateRenderStateMap(renderedStateMap as mc.types.assocarray, startIndex as integer, endIndex as integer, state as string)
       if startIndex < 0
         startIndex = 0
       end if
@@ -252,7 +256,7 @@ namespace ml
     '++ itemRect positions
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    function getTargetTranslation(index, direction, screenPos = invalid)
+    function getTargetTranslation(index as integer, direction as integer, screenPos = invalid as boolean)
       itemRect = m.rects[index]
 
       if itemRect = invalid
@@ -272,7 +276,7 @@ namespace ml
 
     end function
 
-    function getNextFlowScreenPosition(index, direction)
+    function getNextFlowScreenPosition(index as integer, direction as integer)
       itemRect = m.rects[index]
 
       if itemRect = invalid
@@ -291,7 +295,7 @@ namespace ml
       return invalid
     end function
 
-    function getScreenPositionForItem(itemRect, direction = 0, screenPos = invalid)
+    function getScreenPositionForItem(itemRect as object, direction = 0 as integer, screenPos = invalid as integer)
 
       if itemRect <> invalid
         if screenPos <> invalid
@@ -315,7 +319,7 @@ namespace ml
       return screenPos + m.settings.contentOffset[m.axes]
     end function
 
-    function getOffsetForScreenPosition(itemRect, screenPos)
+    function getOffsetForScreenPosition(itemRect as object, screenPos as integer)
       if itemRect <> invalid
         return itemRect.translation[m.axes] - screenPos
       else
@@ -323,7 +327,7 @@ namespace ml
       end if
     end function
 
-    function getIndexAtPosition(position, direction)
+    function getIndexAtPosition(position as integer, direction as integer)
       'TODO - this will get fiddly when we have wrapping
 
       ' ? " getIndexAtPosition " ; position
@@ -332,26 +336,26 @@ namespace ml
       '   return 0
       ' end if
       p = abs(position)
+      i = 0
       for i = 0 to m.numberOfItems
         itemRect = m.rects[i]
         screenPos = m.getScreenPositionForItem(itemRect, direction)
         itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
         ' ? "i "; i ; " pos "; p ; " ip " ; itemPos ; " sp " ; screenPos
         if itemPos > p
-          return i - 1
+          return mc.clamp(i - 1, 0, m.numberOfItems)
         end if
       end for
 
-      ? " GOT TO END!!!!" ; i - 1
       'we must be at the end! -return last item
-      return i - 1
+      return mc.clamp(i - 1, 0, m.numberOfItems)
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ general item api
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    function getRect(index, useScreenCoords = false)
+    function getRect(index as integer, useScreenCoords = false as boolean)
       rect = m.rects[index]
       if rect <> invalid
         screenRect = {
@@ -374,7 +378,7 @@ namespace ml
       return screenRect
     end function
 
-    function getScreenRect(index, screenPos = invalid, direction = 0)
+    function getScreenRect(index as integer, screenPos = invalid as integer, direction = 0 as integer)
       rect = m.getRect(index)
 
       if rect <> invalid
@@ -396,7 +400,7 @@ namespace ml
     '++ abstract methods
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    function createRenderers(items)
+    function createRenderers(items as mc.types.array)
       m.log.error("You must override this method")
     end function
 
@@ -404,11 +408,11 @@ namespace ml
       m.log.error("You must override this method")
     end function
 
-    function applyRenderStateMap(renderedStateMap)
+    function applyRenderStateMap(renderedStateMap as mc.types.assocarray)
       m.log.error("You must override this method")
     end function
 
-    function getRenderer(index)
+    function getRenderer(index as integer)
       m.log.error("You must override this method")
       return invalid
     end function

@@ -62,7 +62,7 @@ class RowListScreen extends mv.BaseScreen
     for i = 0 to m.numberOfRows - 1
       row = m.createSGNode("ContentNode", invalid, `row_${i}`)
       row.title = "ROW " + str(i)
-      row.appendChildren(m.makeItems(m.defaultCellType, 60))
+      row.appendChildren(m.makeItems(m.defaultCellType, 20))
       rows.push(row)
     end for
     return rows
@@ -101,7 +101,6 @@ class RowListScreen extends mv.BaseScreen
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   private function onKeyPressOption() as boolean
-    ? "pressed option"
     return true
   end function
 
@@ -110,8 +109,6 @@ class RowListScreen extends mv.BaseScreen
   end function
 
   private function onKeyPressBack() as boolean
-    ? "going back!"
-
     if m.top.isRoot <> true
       m.list.isHidden = true
       m.pop()

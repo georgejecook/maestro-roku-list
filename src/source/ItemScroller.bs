@@ -35,7 +35,7 @@ namespace ml
     private isMovingMultiple = false
     private activeOffset = 0
 
-    function new(viewManager, axes)
+    function new(viewManager as ml.ItemViewManager, axes as mc.types.array)
       super("ItemScroller")
       m.viewManager = viewManager
       m.container = m.viewManager.container
@@ -74,7 +74,7 @@ namespace ml
     '++ collection movement
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    function moveToEnd(direction, screenPos = invalid, animated = true, fast = false) as boolean
+    function moveToEnd(direction as integer, screenPos = invalid as integer, animated = true as boolean, fast = false as boolean) as boolean
       if (m.index >= m.viewManager.numberOfItems - 1 and direction = 1) or m.index = 0 and direction = -1
         m.log.info("already at end - ignoring")
         return false
@@ -90,7 +90,7 @@ namespace ml
       return true
     end function
 
-    function move(offset, screenPos = invalid, animated = true, fast = false) as boolean
+    function move(offset as integer, screenPos = invalid as integer, animated = true as boolean, fast = false as boolean) as boolean
       index = m.index + offset
 
       if offset > 0
@@ -118,7 +118,7 @@ namespace ml
 
       index = m.getValidTargetIndex(index, direction)
 
-      m.log.info("move", m.index, offset, index, screenPos, animated, fast)
+      m.log.info(`move I ${m.index} o ${offset}, i ${index}, sp ${screenPos}, animated ${animated}, fast ${fast}`)
 
       if index <> -1
         m.moveToIndex(index, screenPos, animated, fast)
@@ -127,28 +127,35 @@ namespace ml
       return true
     end function
 
-    function getValidTargetIndex(index, direction)
+    function getValidTargetIndex(index as integer, direction as integer)
       if index < 0
-        return 0
+        index = 0
       end if
 
       if index >= m.viewManager.numberOfItems - 1
-        return m.viewManager.numberOfItems - 1
+        index = m.viewManager.numberOfItems - 1
       end if
-      'TODO - check if the item is focusable..
-      'this logic below is broken
-      ' item = m.viewManager.visibleItems[index]
-      ' while item <> invalid and (item.isFocusable = true or item.isFocusable = invalid)  and index < m.viewManager.numberOfItems - 1 and index > -1
-      '   index += direction
-      '   item = m.viewManager.visibleItems[index]
-      ' end while
 
-      return index
+      matchedIndex = -1
+      'TODO - check if the item is focusable..
+      while true
+        item = m.viewManager.visibleItems[index]
+        if item = invalid
+          exit while
+        end if
+        if item.isFocusEnabled = invalid or item.isFocusEnabled = true
+          matchedIndex = index
+          exit while
+        end if
+        index += direction
+      end while
+
+      return matchedIndex
     end function
 
-    function moveToIndex(index, screenPos = invalid, animated = true, fast = false, useCurrentDirection = false)
+    function moveToIndex(index as integer, screenPos = invalid as integer, animated = true as boolean, fast = false as boolean, useCurrentDirection = false as boolean) as boolean
       m.log.info("moveToIndex I", m.index, "NI", index, screenPos, animated)
-
+      direction = 0
       if not useCurrentDirection
         if index < m.index
           direction = -1
@@ -196,8 +203,6 @@ namespace ml
           m.animSpeed = m.settings.animSpeed
         end if
 
-        ? "m.settings.animspeed " ; m.settings.animSpeed
-
         m.toggleScrolling(true)
         ' ? "11111"
         m.setFocusIndex(m.index, true, screenPos)
@@ -212,6 +217,8 @@ namespace ml
         ' ? "222222222222"
         m.setFocusIndex(index, false)
       end if
+
+      return true
     end function
 
 
@@ -220,9 +227,6 @@ namespace ml
       if m.direction = -1
         position = m.container.translation[m.axes] - m.activeOffset
         index = m.viewManager.getIndexAtPosition(position - 1, m.direction)
-        ? "+++++++++++++++ going up"
-        ? ">>>index" ; index; m.nextIndex
-        ? "+++++++++++++++ going up"
         m.moveToIndex(index, invalid, true, false, true)
         return
         '   nextIndex = m.nextIndex + 1
@@ -238,13 +242,13 @@ namespace ml
       end if
     end function
 
-    function setNextIndex(index, screenPos = invalid) as void
+    function setNextIndex(index as integer, screenPos = invalid as integer) as void
       if index >= m.viewManager.numberOfItems
         m.log.info("cannot set index to ", index, "beyond number of vis items")
         return
       end if
 
-      m.log.debug("setNextIndex", index)
+      m.log.info("+++setNextIndex", index)
       if index < 0
         index = 0
       end if
@@ -254,7 +258,6 @@ namespace ml
       m.activeOffset = screenPos
       nextTranslation = m.viewManager.getTargetTranslation(index, m.index, screenPos)
 
-      ? "+++  nextTranslation" ; nextTranslation ; " m.activeOffset" ; m.activeOffset
       if nextTranslation <> invalid
         m.nextPosition = nextTranslation[m.axes]
       else
@@ -268,7 +271,7 @@ namespace ml
       m.toggleScrolling(false)
     end function
 
-    function toggleScrolling(active)
+    function toggleScrolling(active as boolean)
       m.viewManager.setIsScrolling(active)
     end function
 
@@ -276,26 +279,23 @@ namespace ml
     '++ animation callbacks
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    function onAnimationFractionChange(fraction)
-      m.log.info("onAnimationFractionChange", fraction, "multiple", m.isMovingMultiple)
+    function onAnimationFractionChange(fraction as float)
+      m.log.verbose("onAnimationFractionChange", fraction, "multiple", m.isMovingMultiple)
       position = m.container.translation[m.axes] - m.activeOffset
       index = m.viewManager.getIndexAtPosition(position, m.direction)
 
       if fraction = 1
         m.focusManager.onFocusAnimationUpdate(1)
-        ? "===FRACTION 1 TOG SCROLL FALSE" ; index
         m.toggleScrolling(false)
 
         if index <> m.index
-          ? "333333333333"
-          m.setFocusIndex(index, false)
+          m.setFocusIndex(index, false, invalid, false)
         end if
         m.targetIndex = -1
       else if m.isMovingMultiple
         m.focusManager.onContainerPositionChange(position)
         if index <> m.index and index <> m.targetIndex
           m.focusManager.onFocusAnimationUpdate(1)
-          ' ? "444444"
           m.setFocusIndex(index, true)
         end if
       else
@@ -311,26 +311,19 @@ namespace ml
     '  * @function
     '  * @description Responsible for all state updates, and hooks pertaning to focus position.
     '  *       NOTE : does NOT update position - you should be in position when calling this. for efficiency does not recalculate index: you should know the index when you call me!
-    '  * @param {integer} index - the index you KNOW you are on when your move is finished (finished could mean from one index to nextindex, while animating; doesn' have to be targetIndex)
+    '  * @param {integer} index - the index you KNOW you are on when your move is finished (finished could mean from one index to nextindex, while animating; doesn't have to be targetIndex)
     '  * @param {boolean} isMoving - if true, then deltas are calculated for next position, and observers fired if their screen status will change
     '  */
-    function setFocusIndex(index, isMoving, screenPos = invalid)
-      ? ">>>>>>>setFocusIndex "; index ; "isMoving" ; isMoving ; "sp "; screenPos
+    function setFocusIndex(index as integer, isMoving as boolean, screenPos = invalid as integer, notifyFocusManager = true as boolean)
       'This MUST be called infrequently
       ' TODO - check if index is actually changed
       if index = -1
-        ? "aaaaa"
         m.index = 0
         m.setNextIndex(0, screenPos)
       else
         if index >= m.viewManager.numberOfItems - 1
           index = m.viewManager.numberOfItems - 1
         end if
-        ? ">>>>>>>>>>>>>>> SETTING m.index to" ; index
-        ? ">>>>>>>>>>>>>>> SETTING m.index to" ; index
-        ? ">>>>>>>>>>>>>>> SETTING m.index to" ; index
-        ? ">>>>>>>>>>>>>>> SETTING m.index to" ; index
-        ? ">>>>>>>>>>>>>>> SETTING m.index to" ; index
         m.index = index
         m.setNextIndex(m.index + m.direction)
       end if
@@ -343,14 +336,16 @@ namespace ml
 
       m.notifyViewportEvents(true)
 
-      m.focusManager.setFocusPosition(m.index, m.indexPosition, m.nextIndex, m.nextPosition, m.direction)
+      if notifyFocusManager
+        m.focusManager.setFocusPosition(m.index, m.indexPosition, m.nextIndex, m.nextPosition, m.direction)
+      end if
       m.setFocusOnRenderer(isMoving)
     end function
 
-    function setFocusOnRenderer(isMoving)
+    function setFocusOnRenderer(isMoving as boolean)
     end function
 
-    function notifyViewportEvents(isMoving)
+    function notifyViewportEvents(isMoving as boolean)
       'maintain a collection of controls that are in bounds right now:
       m.RCMap = m.viewManager.getComponentsInViewPort(- m.container.translation[m.axes])
 
@@ -365,7 +360,7 @@ namespace ml
       events = []
 
       '1. component was on screen and is going off
-      'or comonent was not on screen and will come on.
+      'or component was not on screen and will come on.
       for each comp in m.viewManager.renderedComponents
         if comp <> invalid
           id = comp.id
@@ -410,7 +405,7 @@ namespace ml
       end for
     end function
 
-    function setCompViewPortStatus(comp, eventName, validState, events)
+    function setCompViewPortStatus(comp as mc.types.node, eventName as string, validState as string, events as mc.types.array)
       if not comp.doesExist("_vs")
         comp.addFields({ _vs: "none" })
       end if

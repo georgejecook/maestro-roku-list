@@ -5,7 +5,7 @@ import "pkg:/source/RowItemScroller.bs"
 import "pkg:/source/RowItemViewManager.bs"
 import "pkg:/source/ItemFocusManager.bs"
 import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
-import "pkg:/source/BaseCell.bs"
+import "pkg:/source/cells/BaseCell.bs"
 
 namespace ml
   @node("ml_SimpleCell", "mv_BaseView")
@@ -59,7 +59,6 @@ namespace ml
         translation: [10, 10]
       })
       m.label = m.top.findNode("label")
-      m.size = m.posterSize
       m.scale = 1
     end function
 
@@ -69,80 +68,77 @@ namespace ml
         ' ? " SC 2"
         m.lastContent = m.content
         m.createViews()
-        m.poster.width = m.size[0]
-        m.poster.height = m.size[1]
+        m.poster.width = m.posterSize[0]
+        m.poster.height = m.posterSize[1]
         m.setScale(0, true)
 
         m.label.text = "C:" + m.lastContent.title
         m.poster.uri = m.lastContent.HDGRIDPOSTERURL
-        m.onScrollChange()
+        m.label.visible = not (m.row.isScrolling or m.list.isScrolling)
+        ' m.onScrollingChange(m.row.isScrolling or m.list.isScrolling)
       end if
-    end function
-
-    private function onScrollChange()
-      ' ? "SC: onScrollChange " ; m.row.isScrolling ; " " ; m.list.isScrolling
-      isScrolling = m.row.isScrolling or m.list.isScrolling
-      ' ? "SC: onCellScrollChange row " ; m.row.isScrolling
-      '  ? "SC: onCellScrollChange list " ; m.list.isScrolling
-      ' m.label.visible = not isScrolling
-      ' m.label2.visible = not isScrolling
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ delegate
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    private function onWillEnter(index, direction)
-      ' ? "SC: onCellWillEnter " ; index ; " " ; direction
+    private function onScrollingChange(isScrolling as boolean)
+      ' ? "SC: onScrollChange " ; " " ; isScrolling
+      m.label.visible = not isScrolling
+    end function
+
+    private function onWillEnter(direction as integer)
+      ' ? "SC: onCellWillEnter " ; " " ; direction
       m.onContentChange()
     end function
 
-    private function onWillExit(index, direction)
-      ' ? "SC: onCellWillExit " ; index ; " " ; direction
+    private function onWillExit(direction as integer)
+      ' ? "SC: onCellWillExit " ; " " ; direction
     end function
 
-    private function onDidEnter(index, direction)
-      ' ? "SC: onCellDidEnter " ; index ; " " ; direction
+    private function onDidEnter(direction as integer)
+      ' ? "SC: onCellDidEnter " ; " " ; direction
       ' m.onContentChange()
     end function
 
-    private function onDidExit(index, direction)
-      ' ? "SC: onCellDidExit " ; index ; " " ; direction
+    private function onDidExit(direction as integer)
+      ' ? "SC: onCellDidExit " ; " " ; direction
     end function
 
-    private function onWillGainFocus(index, direction)
-      ' ? "SC: onCellWillGainFocus " ; index ; " " ; direction
+    private function onWillGainFocus(direction as integer)
+      ' ? "SC: onCellWillGainFocus " ; " " ; direction
     end function
 
-    private function onWillLoseFocus(index, direction)
-      ' ? "SC: onCellWillLoseFocus " ; index ; " " ; direction
+    private function onWillLoseFocus(direction as integer)
+      ' ? "SC: onCellWillLoseFocus " ; " " ; direction
     end function
 
-    private function onDidGainFocus(index, direction)
-      ' ? "SC: onCellDidGainFocus " ; index ; " " ; direction
+    private function onDidGainFocus(direction as integer)
+      ' ? "SC: onCellDidGainFocus " ; " " ; direction
       m.setScale(1, true)
     end function
 
-    private function onDidLoseFocus(index, direction)
-      ' ? "SC: onCellDidLoseFocus " ; index ; " " ; direction
+    private function onDidLoseFocus(direction as integer)
+      ' ? "SC: onCellDidLoseFocus " ; " " ; direction
       if direction = 1
         m.setScale(1, false)
       end if
     end function
 
-    private function onGainingFocus(index, direction, fraction)
-      ' ? "SC: onGainingFocus " ; index ; " " ; direction ; " "  ; fraction
+    private function onGainingFocus(direction as integer, fraction as float)
+      ' ? "SC: onGainingFocus " ; " " ; direction ; " "  ; fraction
       m.setScale(fraction, true)
     end function
 
-    private function onLosingFocus(index, direction, fraction)
-      ' ? "SC: onLosingFocus " ; index ; " " ; direction ; " " ; fraction
+    private function onLosingFocus(direction as integer, fraction as float)
+      ' ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
       if direction = 1
         m.setScale(fraction, false)
       end if
     end function
 
-    private function setScale(fraction, isGaining) as void
+    private function setScale(fraction as float, isGaining as boolean) as void
       ' if isGaining
       '   m.scale = (fraction + 1)
       ' else

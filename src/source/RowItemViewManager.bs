@@ -9,7 +9,7 @@ namespace ml
     public lastRowIsRendered = "none"
     public isFlowSupported = false
 
-    function new(list, row, container, componentPool, cellTracker, minPos, maxPos)
+    function new(list as mc.types.node, row as mc.types.node, container as mc.types.node, componentPool as mc.types.node, cellTracker as mc.types.node, minPos as integer, maxPos as integer)
       super("RowItemViewManager", list, container, 0, minPos, maxPos)
       m.componentPool = componentPool
       m.cellTracker = cellTracker
@@ -24,7 +24,7 @@ namespace ml
     '++ overridden
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    override function createRenderers(content)
+    override function createRenderers(content as mc.types.node)
       'renderers are created as needed
       m.cellsById = {}
     end function
@@ -57,20 +57,19 @@ namespace ml
       end for
     end function
 
-    override function shouldUpdateRenderedIndexes(direction, index)
+    override function shouldUpdateRenderedIndexes(direction as integer, index as integer)
       return true
     end function
 
-    override function applyRenderStateMap(renderStateMap)
+    override function applyRenderStateMap(renderStateMap as mc.types.assocarray)
       m.log.info("ROW applyRenderStateMap", m.row.index, m.row.isRendered)
       m.renderedComponents = []
       if m.row.isRendered
-        ? "ROW IS RENDERED" ; m.row.index ; m.row.renderState
         for each id in renderStateMap
           m.applyrenderStateForCell(id, renderStateMap[id])
         end for
       else
-        ? "ROW IS NOT !! RENDERED" ; m.row.index
+          ' ? "ROW IS NOT !! RENDERED" ; m.row.index
         for each id in renderStateMap
           m.applyrenderStateForCell(id, "none")
         end for
@@ -79,10 +78,10 @@ namespace ml
       m.lastRowIsRendered = m.row.isRendered
     end function
 
-    function applyrenderStateForCell(id, renderState)
-      m.log.info("+RIVM applyrenderStateForCell", id, renderState)
+    function applyrenderStateForCell(id as string, renderState as string)
+      m.log.verbose("applyrenderStateForCell", id, renderState)
       index = id.toInt()
-      isrendered = m.row.isrendered
+      ' isRendered = m.row.isRendered
       item = m.content.getChild(index)
 
       if item <> invalid
@@ -101,11 +100,11 @@ namespace ml
               }
 
               cell.visible = true
-              ' cell.visible = isrendered
+              ' cell.visible = isRendered
 
-              ' ? ">>>>>>>> " ; isrendered
+              ' ? ">>>>>>>> " ; isRendered
 
-              ' if isrendered
+              ' if isRendered
               cell.content = item
               cell.listEvent = { "name": "didEnter" }
               ' end if
@@ -127,41 +126,56 @@ namespace ml
             m.componentPool@.releaseComponent(cell)
             m.cellsById.delete(id)
           else
-            ? " COULD NOT FIND CELL TO RELEASE" ; id
+            'this is almost certainly due to trying to release a cell during setting content
+            ' ? " COULD NOT FIND CELL TO RELEASE" ; id
           end if
         end if
       end if
     end function
 
-    override function getRenderer(index)
+    override function getRenderer(index as integer)
       return m.cellsById[str(index).trim()]
     end function
 
-    override function setIsScrolling(isScrolling)
+    override function setIsScrolling(isScrolling as boolean)
+      ' ? "++++ setIsScrolling" ; isScrolling;
       m.row.isScrolling = isScrolling
+
       m.owner.isScrolling = isScrolling
       m.isScrolling = isScrolling
+
+      if isScrolling
+        name = "scrollStart"
+      else
+        name = "scrollStop"
+      end if
+
       for each id in m.cellsById
         comp = m.cellsById[id]
-        if isScrolling
-          comp.listEvent = { name: "scrollStart" }
-        else
-          comp.listEvent = { name: "scrollStop" }
-        end if
+        comp.listEvent = { name: name }
+        ' ? "++++ CELL EVENT " ; id ; " " name
       end for
+
+      m.row.listEvent = { name: name }
+      m.owner.listEvent = { name: name, index: m.row.index }
+      ' ? "++++ row - listEvent " ; formatJson(m.row.listEvent)
+      ' ? "++++ owner - listEvent " ; formatJson(m.owner.listEvent)
     end function
 
-    override function getScreenRect(index, screenPos = invalid, direction = 0)
+    override function getScreenRect(index as integer, screenPos = invalid as integer, direction = 0 as integer)
       rect = super.getScreenRect(index, screenPos, direction)
 
       if rect <> invalid
-        rect.translation[0] += m.settings.contentOffset[0]
-        rect.translation[1] += m.settings.contentOffset[1]
+        rect.translation[0] = m.settings.contentOffset[0]
+        rect.translation[1] = m.settings.contentOffset[1] + m.settings.screenPos
       end if
+
+      ' rowRect = m.owner@.getRowScreenRect(m.row.index, screenPos, direction)
+      ' rect.translation[1] += rowRect.translation[1]
       return rect
     end function
 
-    override function getNextFlowScreenPosition(index, direction, screenPos)
+    override function getNextFlowScreenPosition(index as integer, direction as integer, screenPos as integer)
       if m.isFlowSupported = true
         itemRect = m.rects[index]
         if itemRect <> invalid

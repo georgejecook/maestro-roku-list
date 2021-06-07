@@ -1,16 +1,18 @@
 import "pkg:/source/ItemScroller.bs"
+import "pkg:/components/roku_modules/maestro/view/mixin/FocusMixin.brs"
+
 namespace ml
   class ListItemScroller extends ml.ItemScroller
-    function new(group)
+    function new(group as mc.types.node)
       super(group, 1)
     end function
 
-    override function setFocusOnRenderer(isMoving)
+    override function setFocusOnRenderer(isMoving as boolean)
       if not isMoving
         m.log.info("stopped scrolling on row", m.index)
         row = m.viewManager.getRenderer(m.index)
         if row <> invalid
-          row.setFocus(true)
+          mv.setFocus(row)
         end if
       end if
     end function

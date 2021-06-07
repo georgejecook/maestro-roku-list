@@ -3,6 +3,12 @@
     name='AppController'
     extends='mv_BaseScreen'>
   <interface>
+    <field
+        id='rowIndex'
+        type='integer' />
+    <field
+        id='cellIndex'
+        type='integer' />
   </interface>
 
   <children>
@@ -13,7 +19,7 @@
         horizAlignment='right'
         translation='[1080,50]'>
 		</LayoutGroup>
-    <Group id='contentGroup'/>
+    <Group id='contentGroup' />
     <Rectangle
         color='#ff0000'
         width='1920'
@@ -23,6 +29,15 @@
         id='infoLabel'
         translation='[50, 1000]'
         color='#ffffff' />
+    <LoadingIndicator
+        id='loadingIndicator'
+        width='1920'
+        height='1080'
+        isActive='true'
+        backgroundVisible='false'
+        translation='[0,300]'
+        text='' />
+
   </children>
 
 </component>

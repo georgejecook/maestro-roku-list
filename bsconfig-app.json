@@ -3,6 +3,7 @@
   "files": [
     "manifest",
     "source/**/*.*",
+    "images/**/*.*",
     "components/**/*.*",
     {
       "src": "../src-test-app/**/*.*",
@@ -16,10 +17,24 @@
   "diagnosticFilters": [
     {
       "src": "**/roku_modules/**/*.*"
+    },
+    {
+      "src": "**/*spec.bs",
+      "codes": ["LINT3011"]
+    },
+    {
+      "src": "**/RALETrackerTask.*"
+    },
+    {
+      "src": "../src-test-app/**/*.*"
     }
   ],
   "emitDefinitions": true,
-  "plugins": ["maestro-roku-bsc-plugin", "roku-log-bsc-plugin"],
+  "plugins": [
+    "maestro-roku-bsc-plugin",
+    "roku-log-bsc-plugin",
+    "@rokucommunity/bslint"
+  ],
   "rooibos": {
     "isRecordingCodeCoverage": false,
     "testsFilePattern": null,
