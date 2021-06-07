@@ -2,6 +2,7 @@ import "pkg:/source/roku_modules/log/LogMixin.brs"
 import "pkg:/source/roku_modules/maestro/core/MIOC.brs"
 import "pkg:/source/roku_modules/maestro/core/Tasks.brs"
 import "pkg:/source/roku_modules/maestro/core/Utils.brs"
+import "pkg:/components/roku_modules/maestro/view/mixin/FocusMixin.brs"
 
 function Init() as void
   createObject("roSGNode", "TrackerTask")
@@ -27,5 +28,5 @@ function begin(args = invalid)
   mioc.createContainer()
   appController = m.top.findNode("mainGroup").createChild("AppController")
   appController@._initialize()
-  appController.setFocus(true)
+  mv.setFocus(appController)
 end function

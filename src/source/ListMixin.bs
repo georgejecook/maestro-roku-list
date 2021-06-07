@@ -19,7 +19,7 @@ namespace ml.listMixin
     return content
   end function
 
-  function createRowSettings(cellSettings = invalid, focusSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, headerSettings = invalid, compName = "ml_HorizontalRow", height = -1)
+  function createRowSettings(cellSettings = invalid, focusSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, compName = "ml_HorizontalRow", height = -1)
     settings = createObject("roSGNode", "ml_RowSettings")
 
     if cellSettings = invalid
@@ -35,7 +35,7 @@ namespace ml.listMixin
     end if
 
     settings.update({
-      rowCompName: compName
+      componentName: compName
       screenPos: screenPos
       height: height
       space: space

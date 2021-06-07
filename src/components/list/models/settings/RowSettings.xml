@@ -4,7 +4,7 @@
     extends='Node'>
   <interface>
     <field
-        id='compName'
+        id='componentName'
         type='string' />
     <field
         id='headerSettings'

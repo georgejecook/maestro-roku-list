@@ -59,7 +59,6 @@ namespace ml
         translation: [10, 10]
       })
       m.label = m.top.findNode("label")
-      m.size = m.posterSize
       m.scale = 1
     end function
 
@@ -69,8 +68,8 @@ namespace ml
         ' ? " SC 2"
         m.lastContent = m.content
         m.createViews()
-        m.poster.width = m.size[0]
-        m.poster.height = m.size[1]
+        m.poster.width = m.posterSize[0]
+        m.poster.height = m.posterSize[1]
         m.setScale(0, true)
 
         m.label.text = "C:" + m.lastContent.title
@@ -85,7 +84,7 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private function onScrollingChange(isScrolling)
-      ? "SC: onScrollChange " ; " " ; isScrolling
+      ' ? "SC: onScrollChange " ; " " ; isScrolling
       m.label.visible = not isScrolling
     end function
 

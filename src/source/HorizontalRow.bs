@@ -23,7 +23,6 @@ namespace ml
     public isInViewport = false
     @observer("onAnimateToItemChange")
     public animateToItem = -1
-    public isHidden = false
     public focusedCellIndex = 0
     public focusedCellPercent = 0.0
     @observer("onIsScrollingChange")
@@ -36,6 +35,8 @@ namespace ml
     private focusManager
     private itemScroller
     private isInitialized = false
+    private wasHidden = false
+    private wasFocusable = true
 
     'debug
     public _vs = "none"
@@ -89,7 +90,8 @@ namespace ml
 
     private function onContentChange()
       m.log.info("onContentChange")
-      if m.isInitialized and (m._lastContent = invalid or not m._lastContent.isSameNode(m.content))
+      if m.isInitialized
+        if (m._lastContent = invalid or not m._lastContent.isSameNode(m.content))
         m._lastContent = m.content
         if m.content <> invalid
           'configure header here
@@ -101,6 +103,22 @@ namespace ml
         m.focusManager.isNotifying = false
         m.itemScroller.reset()
         m.focusManager.isNotifying = true
+      else if m._lastContent <> invalid
+        isListRefreshNeeded = false
+        if m.wasHidden <> m._lastContent.isHidden
+          m.wasHidden = m._lastContent.isHidden
+          isListRefreshNeeded = true
+        end if
+        if m.wasFocusable <> m._lastContent.isFocusEnabled
+          m.wasFocusable = m._lastContent.isFocusEnabled
+          isListRefreshNeeded = true
+        end if
+
+        if isListRefreshNeeded
+          m.owner@.forceUpdate()
+        end if
+      end if
+
       end if
     end function
 

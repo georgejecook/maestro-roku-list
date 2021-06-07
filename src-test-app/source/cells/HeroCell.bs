@@ -117,7 +117,7 @@ class HeroCell extends ml.BaseCell
   end function
 
   private function onLosingFocus(direction, fraction)
-    ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
+    ' ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
     ' if direction = 1
       m.setFocusState(fraction, false)
     ' end if

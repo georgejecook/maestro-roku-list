@@ -41,7 +41,7 @@ namespace ml
     end function
 
     function createRow(rowContent, index, settings)
-      compName = rowContent.rowCompName <> invalid ? rowContent.rowCompName <> invalid : "ml_HorizontalRow"
+      compName = settings.componentName <> invalid ? settings.componentName : "ml_HorizontalRow"
       'TODO - measure height to ascertain how many
       isRendered = index < 4
       return m.createSGNode(compName, m.container, str(index).trim(), {

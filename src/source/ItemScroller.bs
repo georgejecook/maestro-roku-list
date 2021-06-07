@@ -129,21 +129,28 @@ namespace ml
 
     function getValidTargetIndex(index, direction)
       if index < 0
-        return 0
+        index = 0
       end if
 
       if index >= m.viewManager.numberOfItems - 1
-        return m.viewManager.numberOfItems - 1
+        index = m.viewManager.numberOfItems - 1
       end if
-      'TODO - check if the item is focusable..
-      'this logic below is broken
-      ' item = m.viewManager.visibleItems[index]
-      ' while item <> invalid and (item.isFocusable = true or item.isFocusable = invalid)  and index < m.viewManager.numberOfItems - 1 and index > -1
-      '   index += direction
-      '   item = m.viewManager.visibleItems[index]
-      ' end while
 
-      return index
+      matchedIndex = -1
+      'TODO - check if the item is focusable..
+      while true
+        item = m.viewManager.visibleItems[index]
+        if item = invalid
+          exit while
+        end if
+        if item.isFocusEnabled = invalid or item.isFocusEnabled = true
+          matchedIndex = index
+          exit while
+        end if
+        index += direction
+      end while
+
+      return matchedIndex
     end function
 
     function moveToIndex(index, screenPos = invalid, animated = true, fast = false, useCurrentDirection = false)

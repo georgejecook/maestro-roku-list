@@ -180,7 +180,14 @@ namespace ml
 
     private function onNextFocusIndexChange(index) as void
       m.targetFocusRect = m.getCellScreenRect(index[0], index[1])
-      m.moveFocusIndicatorToFocusPosition()
+      focusSettings = ml.listMixin.getFocusSettings(m.content, m.content.getChild(index[0]))
+      if focusSettings.focusFeedbackStyle = "none"
+        m.focusIndicator.visible = false
+      else
+        m.moveFocusIndicatorToFocusPosition()
+        m.focusIndicator.visible = true
+      end if
+
     end function
 
     function moveFocusIndicatorToFocusPosition(animated = true as boolean) as void

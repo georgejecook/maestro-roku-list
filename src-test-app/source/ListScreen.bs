@@ -89,7 +89,7 @@ class ListScreen extends mv.BaseScreen
     end if
 
     timer = new mc.utils.DebugTimer("list")
-    m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30, invalid)
+    m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30)
     m.rowSettings.contentOffset = [500, 0]
     m.focusSettings = ml.listMixin.createFocusSettings(0.05, 0.01)
     content = ml.listMixin.createListContent(m.createData(), m.focusSettings, m.rowSettings)
@@ -112,11 +112,16 @@ class ListScreen extends mv.BaseScreen
       end if
       if i = 0
         cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 200)
+        cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 200)
         row.settings = ml.listMixin.createRowSettings(cellSettings, rowFocusSettings)
         row.settings.contentOffset = [400, 0]
-      else if i = 1 or i = 4 or i = 5 or i = 8
+      else if i = 1 or i = 4 or i = 8
         cellSettings = ml.listMixin.createCellSettings("SubHeroCell", [900, 320], 100)
         row.settings = ml.listMixin.createRowSettings(cellSettings, rowFocusSettings)
+      else if i = 5 or i = 11
+        focusSettings = ml.listMixin.createFocusSettings()
+        focusSettings.focusFeedbackStyle = "none"
+        row.settings = ml.listMixin.createRowSettings(invalid, focusSettings, 30, invalid, 0, "ComplexRow")
       else
         row.settings = ml.listMixin.createRowSettings(m.cellSettings, rowFocusSettings)
       end if

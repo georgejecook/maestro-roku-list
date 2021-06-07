@@ -6,5 +6,10 @@
       <field id='animSpeed' type='float'/>
       <field id='fastAnimSpeed' type='float'/>
       <field id='animStyle' type='string'/>
+      <!-- focus details -->
+      <!-- onTop|underneath|none -->
+      <field id='focusFeedbackStyle' type='string' value='onTop'/>
+      <field id='focusFeedbackUri' type='string' value='pkg:/images/input-focusrect.9.png'/>
+      <field id='focusFeedbackColor' type='string' value='#ffffff'/>
     </interface>
 </component>

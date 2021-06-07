@@ -17,9 +17,10 @@
         type='node' />
     <field
         id='isHidden'
-        type='boolean' />
+        type='boolean'
+        value='false' />
     <field
-        id='isFocusable'
+        id='isFocusEnabled'
         type='boolean'
         value='true' />
     <!-- instance of GroupedRowContent, if this row is part of a grid, or 
