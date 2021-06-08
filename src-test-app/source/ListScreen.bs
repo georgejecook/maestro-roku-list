@@ -292,7 +292,6 @@ class ListScreen extends mv.BaseScreen
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   private function onKeyPressOption() as boolean
-    ? "pressed option"
     return true
   end function
 

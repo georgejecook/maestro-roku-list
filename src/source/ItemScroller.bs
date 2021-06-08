@@ -253,6 +253,9 @@ namespace ml
         index = 0
       end if
       m.nextIndex = index
+
+      m.viewManager.updateScrolling(index)
+
       nextRect = m.viewManager.rects[m.nextIndex]
       screenPos = m.viewManager.getScreenPositionForItem(nextRect, m.direction, screenPos)
       m.activeOffset = screenPos
@@ -272,7 +275,7 @@ namespace ml
     end function
 
     function toggleScrolling(active as boolean)
-      m.viewManager.setIsScrolling(active, m.isMovingMultiple)
+      m.viewManager.setIsScrolling(active, m.isMovingMultiple, m.index)
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

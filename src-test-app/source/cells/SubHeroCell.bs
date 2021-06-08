@@ -59,7 +59,7 @@ class SubHeroCell extends ml.BaseCell
   end function
 
   protected override function onContentChange()
-    ? ">>>>>>>>>>>>>>>>>>> SC 1 "; m.list.isScrolling ; m.row.isScrolling
+    ' ? ">>>>>>>>>>>>>>>>>>> SC 1 "; m.list.isScrolling ; m.row.isScrolling
     if m.content = invalid or not m.content.isSamenode(m.lastContent)
       ' ? " SC 2"
       m.lastContent = m.content

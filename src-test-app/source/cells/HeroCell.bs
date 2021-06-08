@@ -48,7 +48,7 @@ class HeroCell extends ml.BaseCell
       size: m.posterSize
       color: "#000000"
       opacity: 0.5
-      translation: [0,250]
+      translation: [0, 250]
       size: [1100, 300]
     })
     m.label = mc.createSGNode("mv_Label", m.top, "label", {
@@ -56,16 +56,14 @@ class HeroCell extends ml.BaseCell
       horizAlign: "center"
       vertAlign: "center"
       color: "#ffffff"
-      translation: [0,300]
+      translation: [0, 300]
       size: [1100, 100]
     })
     m.size = m.posterSize
   end function
 
   protected override function onContentChange()
-    ' ? " SC 1"
     if m.content = invalid or not m.content.isSamenode(m.lastContent)
-      ' ? " SC 2"
       m.lastContent = m.content
       m.createViews()
       m.poster.width = m.size[0]
@@ -79,16 +77,23 @@ class HeroCell extends ml.BaseCell
     end if
   end function
 
-  private function onScrollingChange(isScrolling as boolean, isLong as boolean)
-    ? "HC: onScrollingChange " ; isScrolling ; " >>> " ; m.top.index
-    textVisible = not (isScrolling and isLong)
-    m.textRect.visible = textVisible
-    m.label.visible = textVisible
-  end function
-
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  private function onScrollingChange(isScrolling as boolean, isLong as boolean)
+    if not isScrolling
+      textVisible = not (isScrolling and isLong)
+      m.textRect.visible = textVisible
+      m.label.visible = textVisible
+    end if
+  end function
+
+  private function onScrollingUpdate(startIndex as integer, currentIndex as integer)
+    textVisible = abs(startIndex - currentIndex) < 3
+    m.textRect.visible = textVisible
+    m.label.visible = textVisible
+  end function
 
   private function onWillEnter(direction)
     ' ? "SC: onCellWillEnter " ; " " ; direction
