@@ -74,7 +74,7 @@ namespace ml
 
         m.label.text = "C:" + m.lastContent.title
         m.poster.uri = m.lastContent.HDGRIDPOSTERURL
-        m.label.visible = not (m.row.isScrolling or m.list.isScrolling)
+        m.label.visible = not (m.list.isScrolling)
         ' m.onScrollingChange(m.row.isScrolling or m.list.isScrolling)
       end if
     end function
@@ -84,7 +84,7 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private function onScrollingChange(isScrolling as boolean)
-      ' ? "SC: onScrollChange " ; " " ; isScrolling
+      ? "SC: onScrollingChange " ; " " ; isScrolling
       m.label.visible = not isScrolling
     end function
 

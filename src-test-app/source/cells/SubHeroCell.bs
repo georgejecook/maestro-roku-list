@@ -51,6 +51,7 @@ class SubHeroCell extends ml.BaseCell
     })
     m.label = mc.createSGNode("mv_Label", m.top, "label", {
       width: m.posterSize[0]
+      fontKey: "mediumBold,30"
       horizAlign: "left"
       translation: [m.posterSize[0] + 20, 10]
     })
@@ -58,28 +59,24 @@ class SubHeroCell extends ml.BaseCell
   end function
 
   protected override function onContentChange()
-    ' ? " SC 1"
+    ? ">>>>>>>>>>>>>>>>>>> SC 1 "; m.list.isScrolling ; m.row.isScrolling
     if m.content = invalid or not m.content.isSamenode(m.lastContent)
       ' ? " SC 2"
       m.lastContent = m.content
       m.createViews()
       m.label.text = "C:" + m.lastContent.title
       m.poster.uri = m.lastContent.HDGRIDPOSTERURL
+      'TODO part of initial state
+      m.onScrollingChange(m.list.isScrolling, false)
     end if
   end function
-
-  ' private function onScrollChange()
-  '   ' ? "SC: onScrollChange " ; m.row.isScrolling ; " " ; m.list.isScrolling
-  '   isScrolling = m.row.isScrolling or m.list.isScrolling
-  '   ' ? "SC: onCellScrollChange row " ; m.row.isScrolling
-  '   '  ? "SC: onCellScrollChange list " ; m.list.isScrolling
-  '   ' m.label.visible = not isScrolling
-  '   ' m.label2.visible = not isScrolling
-  ' end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  private function onScrollingChange(isScrolling as boolean, isLong as boolean)
+    m.label.visible = not (isScrolling and isLong)
+  end function
 
   private function onWillEnter(direction)
     ' ? "SC: onCellWillEnter " ; " " ; direction

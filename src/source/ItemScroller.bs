@@ -272,7 +272,7 @@ namespace ml
     end function
 
     function toggleScrolling(active as boolean)
-      m.viewManager.setIsScrolling(active)
+      m.viewManager.setIsScrolling(active, m.isMovingMultiple)
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
