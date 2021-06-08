@@ -35,6 +35,7 @@ namespace ml
     public lastScrollDirection = 0
     public renderedComponents = []
     public isScrolling = false
+    public scrollingStartIndex = -1
 
     function new(name as string, owner as mc.types.node, container as mc.types.node, axes as mc.types.array, minPos as integer, maxPos as integer)
       super(name)
@@ -133,15 +134,37 @@ namespace ml
       return compStates
     end function
 
-    function setIsScrolling(isScrolling as boolean, isLong as boolean)
+    function setIsScrolling(isScrolling as boolean, isLong as boolean, startIndex as integer)
       m.isScrolling = isScrolling
+      m.scrollingStartIndex = isScrolling ? startIndex: -1
       m.owner.isScrolling = isScrolling
-      for each comp in m.visibleComponents
+      for each comp in m.renderedComponents
         if isScrolling
-          comp.listEvent = { name: "scrollStart", long: isLong }
+          comp.listEvent = {
+            name: "scrollStart"
+            long: isLong
+            startIndex: m.scrollingStartIndex
+          }
         else
-          comp.listEvent = { name: "scrollStop", long: isLong }
+          comp.listEvent = {
+            name: "scrollStop"
+            long: isLong
+            startIndex: m.scrollingStartIndex
+          }
         end if
+      end for
+    end function
+
+    function updateScrolling(currentIndex as integer) as void
+      if currentIndex = m.scrollingStartIndex or m.scrollingStartIndex = -1
+        return
+      end if
+      for each comp in m.renderedComponents
+        comp.listEvent = {
+          name: "scrollUpdate"
+          startIndex: m.scrollingStartIndex
+          currentIndex: currentIndex
+        }
       end for
     end function
 
@@ -217,7 +240,7 @@ namespace ml
       }
     end function
 
-    function createRenderedStateMap(direction as integer, index  as integer, renderedIndexes as integer)
+    function createRenderedStateMap(direction as integer, index as integer, renderedIndexes as integer)
       m.log.method("createRenderedStateMap", m.__className, index, renderedIndexes)
       renderedStateMap = {}
 

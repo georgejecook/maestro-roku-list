@@ -131,6 +131,7 @@ namespace ml.delegateMixin
         "onRowDidLoseFocus": "didLoseFocus"
         "onRowGainingFocus": "gainingFocus"
         "onRowLosingFocus": "losingFocus"
+        "onScrollingUpdate": "scrollUpdate"
       }
 
       for each funcName in funcMap
@@ -138,9 +139,9 @@ namespace ml.delegateMixin
           m.listRowEventMap[funcMap[funcName]] = funcName
         end if
         if mc_isFunction(instance["onRowScrollingChange"])
-        m.listEventMap["scrollStart"] = "onRowScrollingChange"
-        m.listEventMap["scrollStop"] = "onRowScrollingChange"
-      end if
+          m.listEventMap["scrollStart"] = "onRowScrollingChange"
+          m.listEventMap["scrollStop"] = "onRowScrollingChange"
+        end if
 
       end for
     end if
@@ -171,6 +172,8 @@ namespace ml.delegateMixin
 
     if eventName = "scrollStart" or eventName = "scrollStop"
       m.listItemDelegate["onRowScrollingChange"](event.index, eventName = "scrollStart", event.long)
+    else if eventName = "scrollUpdate"
+      m.listItemDelegate["onRowScrollingUpdate"](event.startIndex, event.currentIndex)
     else if eventName = "gainingFocus" or eventName = "losingFocus"
       m.listDelegate[m.listRowEventMap[eventName]](event.index, event.direction, event.fraction)
     else

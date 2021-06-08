@@ -137,13 +137,14 @@ namespace ml
       return m.cellsById[str(index).trim()]
     end function
 
-    override function setIsScrolling(isScrolling as boolean, isLong as boolean) as void
+    override function setIsScrolling(isScrolling as boolean, isLong as boolean, startIndex as integer) as void
       if m.isScrolling = isScrolling
         return
       end if
+      m.scrollingStartIndex = isScrolling ? startIndex: -1
       m.isScrolling = isScrolling
 
-      ? "++++ setIsScrolling" ; isScrolling
+      ' ? "++++ setIsScrolling" ; isScrolling
       m.row.isScrolling = isScrolling
 
       m.owner.isScrolling = isScrolling
@@ -156,11 +157,24 @@ namespace ml
 
       for each id in m.cellsById
         comp = m.cellsById[id]
-        comp.listEvent = { name: name, long: isLong }
+        comp.listEvent = {
+          name: name
+          long: isLong
+          startIndex: startIndex
+        }
       end for
 
-      m.row.listEvent = { name: name, long: isLong }
-      m.owner.listEvent = { name: name, index: m.row.index, long: isLong }
+      m.row.listEvent = {
+        name: name
+        long: isLong
+        startIndex: startIndex
+      }
+      m.owner.listEvent = {
+        name: name
+        index: m.row.index
+        long: isLong
+        startIndex: startIndex
+      }
       ' ? "++++ row - listEvent " ; formatJson(m.row.listEvent)
       ' ? "++++ owner - listEvent " ; formatJson(m.owner.listEvent)
     end function
