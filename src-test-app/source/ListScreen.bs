@@ -10,22 +10,6 @@ class ListScreen extends mv.BaseScreen
   @alwaysnotify
   public removeItems = 0
 
-  @observer("onShowItems")
-  @alwaysnotify
-  public showItems = 0
-
-  @observer("onHideItems")
-  @alwaysnotify
-  public hideItems = 0
-
-  @observer("onShowRows")
-  @alwaysnotify
-  public showRows = 0
-
-  @observer("onHideRows")
-  @alwaysnotify
-  public hideRows = 0
-
   'views
   private list
   private listHolder
@@ -92,7 +76,8 @@ class ListScreen extends mv.BaseScreen
     m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30)
     m.rowSettings.contentOffset = [500, 0]
     m.focusSettings = ml.listMixin.createFocusSettings(0.05, 0.01)
-    content = ml.listMixin.createListContent(m.createData(), m.focusSettings, m.rowSettings)
+    listSettings = ml.listMixin.createListSettings(-1, -1)
+    content = ml.listMixin.createListContent(m.createData(), m.focusSettings, m.rowSettings, listSettings)
     timer.log("makeData")
     m.list.content = content
     timer.log("set content")
@@ -182,12 +167,12 @@ class ListScreen extends mv.BaseScreen
   private function currFocusItemIndex()
   end function
 
-  private function addItems(cellType, number)
-    row = m.list.content.getChild(focusedRow)
+  private function addItems(cellType as string, number as integer)
+    row = m.list.content.getChild(m.list.focusedRowIndex)
     row.appendChildren(m.makeItems(cellType, number))
   end function
 
-  private function makeItems(cellType, number)
+  private function makeItems(cellType as string, number as integer)
     d = createObject("roDateTime")
     nonce = str(d.asSeconds()).trim()
     items = []
@@ -215,77 +200,13 @@ class ListScreen extends mv.BaseScreen
     return items
   end function
 
-  private function onRemoveItems(items)
-    row = m.list.content.getChild(focusedRow)
+  private function onRemoveItems(items as integer)
+    row = m.list.content.getChild(m.list.focusedRowIndex)
 
     startIndex = row.getChildCount() - items
     children = row.getChildren(items, startIndex)
     row.removeChildren(children)
-
   end function
-
-  private function toggleCellState(items, state)
-
-    for each item in items
-      if item <> invalid
-        dynamicCell = m.cellTracker.callFunc("getCellForContentId", item.id)
-        if dynamicCell <> invalid
-          ' ? "setting viewstate on dynamic cell " ; dynamicCell.trackingId ; " content Id " ; item.id
-          dynamicCell.viewState = state
-        end if
-      end if
-    end for
-
-  end function
-
-  private function onHideRows(rows)
-    for i = 0 to rows
-      rowContent = m.list.content.getChild(i + m.list.rowFocused)
-      if rowContent <> invalid
-        rowContent.isHidden = true
-      end if
-    end for
-    m.list@.forceUpdate()
-  end function
-
-
-  private function onShowRows(rows)
-    for i = 0 to rows
-      rowContent = m.list.content.getChild(i + m.list.rowFocused)
-      if rowContent <> invalid
-        rowContent.isHidden = false
-      end if
-    end for
-    m.list@.forceUpdate()
-  end function
-
-  private function getRowItems(row, number)
-    items = []
-    for i = 0 to number
-      items.push(row.getChild(i))
-    end for
-
-    return items
-  end function
-
-  private function onHideItems(items)
-    for i = 0 to items
-      dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
-      if dynamicCell <> invalid
-        dynamicCell.viewState = "hidden"
-      end if
-    end for
-  end function
-
-  private function onShowItems(items)
-    for i = 0 to items
-      dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
-      if dynamicCell <> invalid
-        dynamicCell.viewState = "show"
-      end if
-    end for
-  end function
-
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ keypresses
@@ -322,7 +243,7 @@ class ListScreen extends mv.BaseScreen
     m.list.isHidden = true
   end function
 
-  protected override function onGainedFocus(isSelfFocused)
+  protected override function onGainedFocus(isSelfFocused as boolean)
     super.onGainedFocus(isSelfFocused)
     m.log.info("onGainedFocus", isSelfFocused)
 
@@ -335,7 +256,7 @@ class ListScreen extends mv.BaseScreen
   '++ list delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  private function onCellWillGainFocus(rowIndex, itemIndex, direction)
+  private function onCellWillGainFocus(rowIndex as integer, itemIndex as integer, direction as integer)
     ' ? "+SCREEN onCellWillGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
     mioc.setInstance("focusedIndex", {
       row: rowIndex
@@ -343,7 +264,7 @@ class ListScreen extends mv.BaseScreen
     })
   end function
 
-  private function onCellDidGainFocus(rowIndex, itemIndex, direction)
+  private function onCellDidGainFocus(rowIndex as integer, itemIndex as integer, direction as integer)
     ' ? "+SCREEN onCellDidGainFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
     mioc.setInstance("focusedIndex", {
       row: rowIndex
@@ -352,11 +273,11 @@ class ListScreen extends mv.BaseScreen
   end function
 
 
-  private function onCellDidLoseFocus(rowIndex, itemIndex, direction)
+  private function onCellDidLoseFocus(rowIndex as integer, itemIndex as integer, direction as integer)
     ' ? "+SCREEN onCellDidLoseFocus : R: "; rowIndex ; " I: " ; itemIndex; " D:" ; direction
   end function
 
-  private function onRowDidGainFocus(rowIndex, direction)
+  private function onRowDidGainFocus(rowIndex as integer, direction as integer)
     ' ? "+SCREEN onRowDidGainFocus : R: "; rowIndex ; " D:" ; direction
     ' if direction = -1
     '   row = m.list@.getRowRenderer(rowIndex)
@@ -364,8 +285,8 @@ class ListScreen extends mv.BaseScreen
     ' end if
   end function
 
-  private function onRowDidLoseFocus(rowIndex, direction)
-    row = m.list@.getRowRenderer(rowIndex)
+  private function onRowDidLoseFocus(rowIndex as integer, direction as integer)
+    ' row = m.list@.getRowRenderer(rowIndex)
     ' if direction = 1
     '   row.opacity = 0
     ' end if
@@ -373,7 +294,7 @@ class ListScreen extends mv.BaseScreen
     ' ? "+SCREEN onRowDidLoseFocus : R: "; rowIndex ; " D:" ; direction
   end function
 
-  private function onRowGainingFocus(rowIndex, direction, fraction)
+  private function onRowGainingFocus(rowIndex as integer, direction as integer, fraction as float)
     ' if direction = -1
     '   row = m.list@.getRowRenderer(rowIndex)
     '   row.opacity = fraction
@@ -381,7 +302,7 @@ class ListScreen extends mv.BaseScreen
     ' ? "+SCREEN onRowGainingFocus : R: "; rowIndex ; " D:" ; direction ; " F: " ; fraction
   end function
 
-  private function onRowLosingFocus(rowIndex, direction, fraction)
+  private function onRowLosingFocus(rowIndex as integer, direction as integer, fraction as float)
     ' ? "+SCREEN onRowLosingFocus : R: "; rowIndex ; " D:" ; direction ; " F: " ; fraction
     ' if direction = 1
     '   row = m.list@.getRowRenderer(rowIndex)

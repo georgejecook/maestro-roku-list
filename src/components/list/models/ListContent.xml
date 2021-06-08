@@ -5,6 +5,10 @@
 
   <interface>
     <field
+        id='listSettings'
+        type='node' />
+
+    <field
         id='rowSettings'
         type='node' />
 

@@ -15,23 +15,17 @@ class SubHeroCell extends ml.BaseCell
   private label
   private bgRect
 
-  private lastContent
   private isViewCreated = false
   private posterSize = [450, 320.0]
 
   function new()
     super()
-    m.createViews()
   end function
 
-  private function createViews() as void
-    if m.isViewCreated
-      return
-    end if
-    m.isViewCreated = true
+  protected override function createViews() as void
     m.bgRect = mc.createSGNode("mv_Rectangle", m.top, "bgRect", {
       size: [m.posterSize[0] * 2, m.posterSize[1]]
-      color: "#2222aa"
+      color: "#555555"
     })
     m.poster = mc.createSGNode("mv_Poster", m.top, "poster", {
       translation: [0, 0]
@@ -46,8 +40,9 @@ class SubHeroCell extends ml.BaseCell
     m.rectangle = mc.createSGNode("mv_Rectangle", m.top, "rectangle", {
       opacity: 0.4
       color: "#000000"
-      width: m.posterSize[0] * 2
-      height: 20
+      width: m.posterSize[0]
+      translation: [m.posterSize[0], 0]
+      height: 50
     })
     m.label = mc.createSGNode("mv_Label", m.top, "label", {
       width: m.posterSize[0]
@@ -55,70 +50,67 @@ class SubHeroCell extends ml.BaseCell
       horizAlign: "left"
       translation: [m.posterSize[0] + 20, 10]
     })
-    m.label = m.top.findNode("label")
   end function
 
-  protected override function onContentChange()
-    ' ? ">>>>>>>>>>>>>>>>>>> SC 1 "; m.list.isScrolling ; m.row.isScrolling
-    if m.content = invalid or not m.content.isSamenode(m.lastContent)
-      ' ? " SC 2"
-      m.lastContent = m.content
-      m.createViews()
-      m.label.text = "C:" + m.lastContent.title
-      m.poster.uri = m.lastContent.HDGRIDPOSTERURL
-      'TODO part of initial state
-      m.onScrollingChange(m.list.isScrolling, false)
-    end if
+  protected override function onContentChange(content as mc.types.node)
+    m.label.text = "C:" + content.title
+    m.label.visible = true
+    m.poster.uri = content.HDGRIDPOSTERURL
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
   private function onScrollingChange(isScrolling as boolean, isLong as boolean)
-    m.label.visible = not (isScrolling and isLong)
+    ' ? ">>> OSC i: "; m.index; " s: " ; isScrolling ; " l " ; isLong
+    if not isScrolling
+      m.label.visible = true
+    end if
   end function
 
-  private function onWillEnter(direction)
-    ' ? "SC: onCellWillEnter " ; " " ; direction
-    m.onContentChange()
+  private function onScrollingUpdate(startIndex as integer, currentIndex as integer)
+    ' ? ">>> OSU i: "; m.index; " s: " ; startIndex ; " ci " ; currentIndex
+    textVisible = abs(startIndex - currentIndex) < 2
+    m.label.visible = textVisible
   end function
 
-  private function onWillExit(direction)
+  private function onWillExit(direction as integer)
     ' ? "SC: onCellWillExit " ; " " ; direction
   end function
 
-  private function onDidEnter(direction)
+  private function onDidEnter(direction as integer)
     ' ? "SC: onCellDidEnter " ; " " ; direction
     ' m.onContentChange()
   end function
 
-  private function onDidExit(direction)
+  private function onDidExit(direction as integer)
     ' ? "SC: onCellDidExit " ; " " ; direction
   end function
 
-  private function onWillGainFocus(direction)
+  private function onWillGainFocus(direction as integer)
     ' ? "SC: onCellWillGainFocus " ; " " ; direction
   end function
 
-  private function onWillLoseFocus(direction)
+  private function onWillLoseFocus(direction as integer)
     ' ? "SC: onCellWillLoseFocus " ; " " ; direction
   end function
 
-  private function onDidGainFocus(direction)
+  private function onDidGainFocus(direction as integer)
     ' ? "SC: onCellDidGainFocus " ; " " ; direction
   end function
 
-  private function onDidLoseFocus(direction)
+  private function onDidLoseFocus(direction as integer)
     ' ? "SC: onCellDidLoseFocus " ; " " ; direction
     if direction = 1
     end if
   end function
 
-  private function onGainingFocus(direction, fraction)
+  private function onGainingFocus(direction as integer, fraction as float)
     ' ? "SC: onGainingFocus " ; " " ; direction ; " "  ; fraction
   end function
 
-  private function onLosingFocus(direction, fraction)
+  private function onLosingFocus(direction as integer, fraction as float)
     ' ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
     if direction = 1
     end if

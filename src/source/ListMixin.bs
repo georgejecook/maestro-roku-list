@@ -1,5 +1,5 @@
 namespace ml.listMixin
-  function createListContent(rowContent = [] as mc.types.array, focusSettings = invalid as mc.types.node, rowSettings = invalid as mc.types.node)
+  function createListContent(rowContent = [] as mc.types.array, focusSettings = invalid as mc.types.node, rowSettings = invalid as mc.types.node, listSettings = invalid as mc.types.node)
     content = createObject("roSGNode", "ml_ListContent")
     content.appendChildren(rowContent)
 
@@ -11,9 +11,14 @@ namespace ml.listMixin
       focusSettings = ml.listMixin.createFocusSettings()
     end if
 
+    if listSettings = invalid
+      listSettings = ml.listMixin.createListSettings()
+    end if
+
     content.update({
       rowSettings: rowSettings
       focusSettings: focusSettings
+      listSettings: listSettings
     })
 
     return content
@@ -43,6 +48,17 @@ namespace ml.listMixin
       contentOffset: [0, 0]
       headerSettings: headerSettings
       focusSettings: focusSettings
+    })
+
+    return settings
+  end function
+
+  function createListSettings(lookaheadDistance as integer, lookBehindDistance as integer)
+    settings = createObject("roSGNode", "ml_ListSettings")
+
+    settings.update({
+      lookaheadDistance: lookaheadDistance
+      lookBehindDistance: lookBehindDistance
     })
 
     return settings

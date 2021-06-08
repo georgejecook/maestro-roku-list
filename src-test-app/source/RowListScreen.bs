@@ -68,7 +68,7 @@ class RowListScreen extends mv.BaseScreen
     return rows
   end function
 
-  private function makeItems(cellType, number)
+  private function makeItems(cellType as string, number as integer)
     d = createObject("roDateTime")
     nonce = str(d.asSeconds()).trim()
     items = []
@@ -129,7 +129,7 @@ class RowListScreen extends mv.BaseScreen
     super.onHide()
   end function
 
-  protected override function onGainedFocus(isSelfFocused)
+  protected override function onGainedFocus(isSelfFocused as boolean)
     super.onGainedFocus(isSelfFocused)
     m.log.info("onGainedFocus", isSelfFocused)
 

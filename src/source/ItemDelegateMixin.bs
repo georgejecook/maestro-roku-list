@@ -51,6 +51,12 @@ namespace ml.itemDelegateMixin
   end function
 
   function onListEventBridge(sgEvent as object) as void
+    if m.listItemDelegate.isRecyclePending = true
+      ' ? "recycling delegate that requires recycling"
+      m.listItemDelegate.recycle()
+      return
+    end if
+
     event = sgEvent.getData()
     eventName = event.name
     if not m.isObservingListEvents or m.listEventMap[eventName] = invalid

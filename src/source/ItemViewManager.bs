@@ -37,6 +37,9 @@ namespace ml
     public isScrolling = false
     public scrollingStartIndex = -1
 
+    'stored so we can send it with initialstate
+    public lastScrollEvent as mc.types.assocarray
+
     function new(name as string, owner as mc.types.node, container as mc.types.node, axes as mc.types.array, minPos as integer, maxPos as integer)
       super(name)
       m.container = container
@@ -138,20 +141,16 @@ namespace ml
       m.isScrolling = isScrolling
       m.scrollingStartIndex = isScrolling ? startIndex: -1
       m.owner.isScrolling = isScrolling
+      event = {
+        name: isScrolling ? "scrollStart" : "scrollStop"
+        startIndex: m.scrollingStartIndex
+        long: isLong
+        startIndex: m.scrollingStartIndex
+      }
+      m.lastScrollEvent = isScrolling ? event : invalid
+
       for each comp in m.renderedComponents
-        if isScrolling
-          comp.listEvent = {
-            name: "scrollStart"
-            long: isLong
-            startIndex: m.scrollingStartIndex
-          }
-        else
-          comp.listEvent = {
-            name: "scrollStop"
-            long: isLong
-            startIndex: m.scrollingStartIndex
-          }
-        end if
+        comp.listEvent = event
       end for
     end function
 
@@ -159,12 +158,13 @@ namespace ml
       if currentIndex = m.scrollingStartIndex or m.scrollingStartIndex = -1
         return
       end if
+      m.lastScrollEvent = {
+        name: "scrollUpdate"
+        startIndex: m.scrollingStartIndex
+        currentIndex: currentIndex
+      }
       for each comp in m.renderedComponents
-        comp.listEvent = {
-          name: "scrollUpdate"
-          startIndex: m.scrollingStartIndex
-          currentIndex: currentIndex
-        }
+        comp.listEvent = m.lastScrollEvent
       end for
     end function
 
@@ -270,7 +270,7 @@ namespace ml
           ' ? "ROW "; i ; " rect idx "; rect.index ; " state " ; state
           renderedStateMap[str(rect.index).trim()] = state
         else
-          ? " NO RECT "; i
+          ' ? " NO RECT "; i
         end if
       end for
     end function
