@@ -17,24 +17,17 @@ namespace ml
     private scale
     private bgRect
 
-    private lastContent
-    private isViewCreated = false
     private posterSize = [480.0, 320.0]
 
     function new()
       super()
-      m.createViews()
     end function
 
-    private function createViews() as void
-      if m.isViewCreated
-        return
-      end if
-      m.isViewCreated = true
+    protected override function createViews() as void
       ' scaleRotateCenter: [0, m.posterSize[1]]
       m.bgRect = mc.createSGNode("mv_Rectangle", m.top, "bgRect", {
         size: m.posterSize
-        color: "#2222aa"
+        color: "#555555"
       })
       m.poster = mc.createSGNode("mv_Poster", m.top, "poster", {
         translation: [0, 0]
@@ -51,10 +44,12 @@ namespace ml
         opacity: 0.4
         color: "#000000"
         width: m.posterSize[0]
-        height: 20
+        height: 50
       })
       m.label = mc.createSGNode("mv_Label", m.top, "label", {
         width: m.posterSize[0]
+        fontKey: "mediumBold,40"
+        color: "#ffffff"
         horizAlign: "center"
         translation: [10, 10]
       })
@@ -62,35 +57,32 @@ namespace ml
       m.scale = 1
     end function
 
-    protected override function onContentChange()
+    protected override function onContentChange(content as mc.types.node)
       ' ? " SC 1"
-      if m.content = invalid or not m.content.isSamenode(m.lastContent)
-        ' ? " SC 2"
-        m.lastContent = m.content
-        m.createViews()
-        m.poster.width = m.posterSize[0]
-        m.poster.height = m.posterSize[1]
-        m.setScale(0, true)
+      m.poster.width = m.posterSize[0]
+      m.poster.height = m.posterSize[1]
+      m.setScale(0, true)
 
-        m.label.text = "C:" + m.lastContent.title
-        m.poster.uri = m.lastContent.HDGRIDPOSTERURL
-        m.label.visible = not (m.list.isScrolling)
-        ' m.onScrollingChange(m.row.isScrolling or m.list.isScrolling)
-      end if
+      m.label.text = "C:" + m.content.title
+      m.poster.uri = m.content.HDGRIDPOSTERURL
+      m.label.visible = true
+      ' m.onScrollingChange(m.row.isScrolling or m.list.isScrolling)
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ delegate
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    private function onScrollingChange(isScrolling as boolean)
-      ? "SC: onScrollingChange " ; " " ; isScrolling
-      m.label.visible = not isScrolling
+
+    private function onScrollingChange(isScrolling as boolean, isLong as boolean)
+      if not isScrolling
+        m.label.visible = true
+      end if
     end function
 
-    private function onWillEnter(direction as integer)
-      ' ? "SC: onCellWillEnter " ; " " ; direction
-      m.onContentChange()
+    private function onScrollingUpdate(startIndex as integer, currentIndex as integer)
+      textVisible = abs(startIndex - currentIndex) < 2
+      m.label.visible = textVisible
     end function
 
     private function onWillExit(direction as integer)

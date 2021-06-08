@@ -22,7 +22,7 @@ end function
 '  * @param {paramType} paramDescription
 '  * @returns {returnType} returnDescription
 '  */
-function begin(args = invalid)
+function begin(args = invalid as object)
   m.log.info("begin")
   m.top._global = m.global
   mioc.createContainer()

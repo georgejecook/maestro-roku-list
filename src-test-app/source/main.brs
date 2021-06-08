@@ -1,9 +1,9 @@
-sub Main(args as dynamic)
-  InitScreen()
-end sub
+function Main(args as dynamic)
+  initScreen()
+end function
 
 
-function InitScreen() as void
+function initScreen() as void
   'this will be where you setup your typical roku app
   'it will not be launched when running unit tests
   screen = CreateObject("roSGScreen")

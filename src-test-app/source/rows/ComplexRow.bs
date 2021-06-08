@@ -40,6 +40,7 @@ class ComplexRow extends mv.BaseView
   private videoPlayer
   private button1
   private button2
+  private poster
 
   function new()
     super("ml_HorizontalRow")
@@ -59,15 +60,20 @@ class ComplexRow extends mv.BaseView
       color: "#000000"
       opacity: 1
     })
+    m.poster = m.createSGNode("mv_Poster", m.top, "poster", {
+      uri: "https://i0.wp.com/fuelwar.co.za/wp-content/uploads/2018/10/art-of-fighting-quote-700.jpg?resize=700%2C361"
+      translation: [0, 0]
+      size: [1920, 700]
+    })
     m.button1 = m.createSGNode("Button", m.top, "button1", {
-      text: "Button 1"
-      translation: [500, 300]
+      text: "WHAT IS YOUR STYLE?"
+      translation: [1000, 300]
       width: 800
       height: 80
     })
     m.button2 = m.createSGNode("Button", m.top, "button2", {
-      text: "Button 2"
-      translation: [500, 400]
+      text: "THE ART OF FIGHTING WITHOUT FIGHTING"
+      translation: [1000, 400]
       width: 800
       height: 80
     })
@@ -76,7 +82,7 @@ class ComplexRow extends mv.BaseView
   private function onContentChange()
     m.log.info("onContentChange")
     if m.isInitialized
-      if (m._lastContent = invalid or not m._lastContent.isSameNode(m.content))
+      if m._lastContent = invalid or not m._lastContent.isSameNode(m.content)
         m._lastContent = m.content
         if m.content <> invalid
           'configure stuff
@@ -108,15 +114,15 @@ class ComplexRow extends mv.BaseView
   private function onIsScrollingChange()
   end function
 
-  public function getRenderer(index)
+  public function getRenderer(index as integer)
     return invalid
   end function
 
-  public function getRect(index, useScreenCoords = false)
+  public function getRect(index as integer, useScreenCoords = false as boolean)
     return invalid
   end function
 
-  public function getScreenRect(index, screenPos = invalid, direction = 0)
+  public function getScreenRect(index as integer, screenPos = invalid as integer, direction = 0 as integer)
     return invalid
   end function
 
@@ -150,17 +156,30 @@ class ComplexRow extends mv.BaseView
   '++ delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  '++ delegate
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  private function onDidGainFocus(direction)
+  private function onDidGainFocus(direction as integer)
     ? "CR: onDidGainFocus " ; " " ; direction
     if direction = 1
       m.setFocus(m.button1)
     else
       m.setFocus(m.button2)
+    end if
+  end function
+  private function onWillGainFocus(direction as integer)
+    if direction = 1
+      m.top.opacity = 1
+    end if
+  end function
+
+  private function onGainingFocus(direction as integer, fraction as float)
+    ' ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
+    if direction = -1
+      m.top.opacity = fraction
+    end if
+  end function
+  private function onLosingFocus(direction as integer, fraction as float)
+    ' ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
+    if direction = 1
+      m.top.opacity = 1 - fraction
     end if
   end function
 

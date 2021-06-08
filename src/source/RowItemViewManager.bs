@@ -63,6 +63,8 @@ namespace ml
 
     override function applyRenderStateMap(renderStateMap as mc.types.assocarray)
       m.log.info("ROW applyRenderStateMap", m.row.index, m.row.isRendered)
+      ? ">>>>>>>>>>>>"
+      ? "RC RESET "
       m.renderedComponents = []
       if m.row.isRendered
         for each id in renderStateMap
@@ -75,6 +77,8 @@ namespace ml
         end for
       end if
 
+
+      ? "RENDERED COMPS" ; m.renderedComponents.count()
       m.lastRowIsRendered = m.row.isRendered
     end function
 
@@ -86,17 +90,21 @@ namespace ml
 
       if item <> invalid
         if renderState = "rendered"
-          if m.cellsById[id] = invalid
+          cell = m.cellsById[id]
+          if cell = invalid
             settings = ml.listMixin.getCellSettings(m.owner.content, m.content, item)
             ' ? "GETTING CELL " ; id
             cell = m.componentPool@.getComponent(settings.compName)
 
             if cell <> invalid
-              'TODO - work out what to do around setting content etc here
+              cell.translation = m.rects[index].translation
+              cell.size = m.rects[index].size
+
               cell.initialState = {
                 row: m.row
                 list: m.owner
                 size: m.rects[index].size
+                content: item
               }
 
               cell.visible = true
@@ -105,24 +113,27 @@ namespace ml
               ' ? ">>>>>>>> " ; isRendered
 
               ' if isRendered
-              cell.content = item
               cell.listEvent = { "name": "didEnter" }
               ' end if
 
-              cell.translation = m.rects[index].translation
-              cell.size = m.rects[index].size
+              if m.lastScrollEvent <> invalid
+                cell.listEvent = m.lastScrollEvent
+              end if
+
               m.container.appendChild(cell)
               cell.index = index
               m.cellsById[id] = cell
-              m.renderedComponents.push(cell)
             else
               ? ">>ERR no cell for " ; settings.compName
             end if
           end if
+          if cell <> invalid
+            m.renderedComponents.push(cell)
+          end if
         else
           cell = m.cellsById[id]
           if cell <> invalid
-            ? "RELEASING " ; id
+            ' ? "RELEASING " ; id
             m.componentPool@.releaseComponent(cell)
             m.cellsById.delete(id)
           else
@@ -149,28 +160,22 @@ namespace ml
 
       m.owner.isScrolling = isScrolling
 
-      if isScrolling
-        name = "scrollStart"
-      else
-        name = "scrollStop"
-      end if
+      event = {
+        name: isScrolling ? "scrollStart" : "scrollStop"
+        startIndex: m.scrollingStartIndex
+        long: isLong
+        startIndex: m.scrollingStartIndex
+      }
+      m.lastScrollEvent = isScrolling ? event : invalid
+
 
       for each id in m.cellsById
         comp = m.cellsById[id]
-        comp.listEvent = {
-          name: name
-          long: isLong
-          startIndex: startIndex
-        }
+        comp.listEvent = event
       end for
 
-      m.row.listEvent = {
-        name: name
-        long: isLong
-        startIndex: startIndex
-      }
       m.owner.listEvent = {
-        name: name
+        name: event.name
         index: m.row.index
         long: isLong
         startIndex: startIndex

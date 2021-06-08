@@ -30,7 +30,7 @@
       "src": "**/RALETrackerTask.*"
     },
     {
-      "src": "../src-test-app/**/*.*"
+      "src": "../src-test-app/**/**/RALETrackerTask.*"
     }
   ],
   "emitDefinitions": true,

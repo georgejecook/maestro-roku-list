@@ -7,7 +7,6 @@ namespace ml
     function new(list as mc.types.node, container as mc.types.node, minPos as integer, maxPos as integer)
       super("ListItemViewManager", list, container, 1, minPos, maxPos)
       m.delegate = list.rowEvents
-      'TODO - allow api hooks to tweak this
       m.lookAheadDistance = maxPos * 5
       m.lookBehindDistance = maxPos * 2
     end function

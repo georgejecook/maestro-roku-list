@@ -13,14 +13,17 @@ namespace ml
 
     public index = -1
 
-    @observer("onContentChange")
     public content as mc.types.Node
 
+    ' any item in a list will have this set whenever it gets recycled
     @observer("onInitialStateChange")
     public initialState as mc.types.AssocArray
 
     public listEvent as mc.types.AssocArray
     public size as mc.types.Array
+
+    private isViewCreated = false
+    private isRecyclePending = true
 
     protected list
     protected row
@@ -29,16 +32,48 @@ namespace ml
       ml.itemDelegateMixin.setDelegate()
     end function
 
-    protected function onContentChange()
-      if m.content = invalid or not m.content.isSamenode(m.top.content)
-        'TODO
-      end if
+    private function _createViews()
+      m.createViews()
+      m.isViewCreated = true
+    end function
+
+    private function _onContentChange(content as mc.types.node)
+      m.onContentChange(content)
+      m.isRecyclePending = false
     end function
 
     protected function onInitialStateChange(state as string)
       m.list = state.list
       m.row = state.row
       m.size = state.size
+      m.content = state.content
+      m.isRecyclePending = true
+      if m.isViewCreated
+        m._onContentChange(state.content)
+      end if
     end function
+
+    public function recycle()
+      if not m.isViewCreated
+        m._createViews()
+      end if
+      if m.isRecyclePending
+        m._onContentChange(m.content)
+      end if
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ abstract methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    protected function createViews()
+      'override me!
+    end function
+
+    protected function onContentChange(content as mc.types.node)
+      'override me
+    end function
+
+
   end class
 end namespace
