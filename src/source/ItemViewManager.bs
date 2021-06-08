@@ -133,14 +133,14 @@ namespace ml
       return compStates
     end function
 
-    function setIsScrolling(isScrolling as boolean)
+    function setIsScrolling(isScrolling as boolean, isLong as boolean)
       m.isScrolling = isScrolling
       m.owner.isScrolling = isScrolling
       for each comp in m.visibleComponents
         if isScrolling
-          comp.listEvent = { name: "scrollStart" }
+          comp.listEvent = { name: "scrollStart", long: isLong }
         else
-          comp.listEvent = { name: "scrollStop" }
+          comp.listEvent = { name: "scrollStop", long: isLong }
         end if
       end for
     end function

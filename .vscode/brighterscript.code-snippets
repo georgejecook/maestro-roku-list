@@ -1,0 +1,695 @@
+{
+  "rooibos beforeEach": {
+    "prefix": "beforeEach",
+    "body": [
+      "@beforeEach",
+      "function ${2:namespace}_${3:itGroup}_beforeEach()",
+      "\t$0",
+      "end function"
+    ]
+  },
+  "rooibos afterEach": {
+    "prefix": "afterEach",
+    "body": [
+      "@afterEach",
+      "function ${2:namespace}_${3:itGroup}_afterEach()",
+      "\t$0",
+      "end function"
+    ]
+  },
+  "rooibos setup": {
+    "prefix": "setup",
+    "body": [
+      "@setup",
+      "function ${2:namespace}_setup()",
+      "\t$0",
+      "end function"
+    ]
+  },
+  "rooibos tearDown": {
+    "prefix": "tearDown",
+    "body": [
+      "@tearDown",
+      "function ${2:namespace}_tearDown()",
+      "\t$0",
+      "end function"
+    ]
+  },
+  "rooibos ignore": {
+    "prefix": "ignore",
+    "body": ["@ignore ${1:reason}", "$0"]
+  },
+  "rooibos only": {
+    "prefix": "only",
+    "body": ["@only", "$0"]
+  },
+  "rooibos testSuite": {
+    "prefix": "suite",
+    "body": ["@suite(\"$1\")", "$0"]
+  },
+  "rooibos testcase": {
+    "prefix": "it",
+    "body": ["@it(\"$1\")", "function _()", "\t$0", "end function"]
+  },
+  "rooibos params": {
+    "prefix": "params",
+    "body": ["@params(${1:values})$0"]
+  },
+  "rooibos it": {
+    "prefix": "describe",
+    "body": [
+      "'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
+      "@describe(\"${1:groupName}\")",
+      "'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
+      "",
+      "$0"
+    ]
+  },
+  "rooibos stub": {
+    "prefix": "stub",
+    "body": [
+      "m.stub(${1:target}, \"${2:methodName}\", [${3:methodArgs}], ${4:result})",
+      "$0"
+    ]
+  },
+  "rooibos mock": {
+    "prefix": "expect",
+    "body": [
+      "${1:mockName} = m.mock(${2:target}, \"${3:methodName}\", ${4:expectedNumberOfcalls}, [${5:methodArgs}], ${6:result})",
+      "$0"
+    ]
+  },
+  "rooibos expect": {
+    "prefix": "expect",
+    "body": [
+      "m.expectOnce(${1:target}, \"${2:methodName}\", ${3:expectedNumberOfcalls}, [${4:methodArgs}], ${5:result})",
+      "$0"
+    ]
+  },
+  "rooibos expectOnce": {
+    "prefix": "expectOnce",
+    "body": [
+      "m.expectOnce(${1:target}, \"${2:methodName}\", [${3:methodArgs}], ${4:result})",
+      "$0"
+    ]
+  },
+  "rooibos expectCallfunc": {
+    "prefix": "expectCallfunc",
+    "body": [
+      "m.expectOnce(${1:target}, \"callFunc\", [\"${2:methodName}\", ${3:methodArgs}], ${4:result})",
+      "$0"
+    ]
+  },
+  "rooibos expectObserveNodeField": {
+    "prefix": "eonf",
+    "body": [
+      "m.expectOnce(${1:target}, \"observeNodeField\", [${2:node},\"${3:fieldName}\", m.${4:callback}])",
+      "$0"
+    ]
+  },
+  "rooibos expectUnObserveNodeField": {
+    "prefix": "eunf",
+    "body": [
+      "m.expectOnce(${1:target}, \"unobserveNodeField\", [${2:node},\"${:fieldName}\", m.${4:callback}])",
+      "$0"
+    ]
+  },
+  "rooibos expectObjectOnce": {
+    "prefix": "expectObjectOnce",
+    "body": [
+      "${1:name} = { \"id\" : \"${1:name}\" }",
+      "m.expectOnce(${2:target}, \"${3:methodName}\", [${4:methodArgs}], ${1:name})",
+      "$0"
+    ]
+  },
+  "rooibos expectGetInstance": {
+    "prefix": "expectGetInstance",
+    "body": [
+      "${1:name} = { \"id\" : \"${1:name}\" }",
+      "m.expectOnce(${2:target}, \"getInstance\", [\"${3:instanceName}\"], ${1:name})",
+      "$0"
+    ]
+  },
+  "rooibos expectGetClassInstance": {
+    "prefix": "expectGetClassInstance",
+    "body": [
+      "${1:name} = { \"id\" : \"${1:name}\" }",
+      "m.expectOnce(${2:target}, \"getClassInstance\", [\"${3:instanceName}\"], ${1:name})",
+      "$0"
+    ]
+  },
+  "rooibos expectExpectOnce": {
+    "prefix": "expectExpect",
+    "body": [
+      "${1:name} = { \"id\" : \"${1:name}\" }",
+      "m.expectOnce(${2:target}, \"${3:methodName}\", [${4:methodArgs}], ${1:name})",
+      "m.expectOnce(${1:name}, \"${5:methodName}\", [${6:methodArgs}], ${7:name})",
+      "$0"
+    ]
+  },
+  "rooibos expectNone": {
+    "prefix": "expectNone",
+    "body": ["m.expectNone(${1:target}, \"${2:methodName}\")", "$0"]
+  },
+  "rooibos stub force": {
+    "prefix": "stubForce",
+    "body": [
+      "m.stub(${1:target}, \"${2:methodName}\", [${3:methodArgs}], ${4:result}, true)",
+      "$0"
+    ]
+  },
+  "rooibos mock force": {
+    "prefix": "expectForce",
+    "body": [
+      "${1:mockName} = m.mock(${2:target}, \"${3:methodName}\", ${4:expectedNumberOfcalls}, [${5:methodArgs}], ${6:result}, true)",
+      "$0"
+    ]
+  },
+  "rooibos expect force": {
+    "prefix": "expectForce",
+    "body": [
+      "m.expectOnce(${1:target}, \"${2:methodName}\", ${3:expectedNumberOfcalls}, [${4:methodArgs}], ${5:result}, true)",
+      "$0"
+    ]
+  },
+  "rooibos expectOnce force": {
+    "prefix": "expectOnceForce",
+    "body": [
+      "m.expectOnce(${1:target}, \"${2:methodName}\", [${3:methodArgs}], ${4:result}, true)",
+      "$0"
+    ]
+  },
+  "rooibos expectNone force": {
+    "prefix": "expectForce",
+    "body": ["m.expectNone(${1:target}, \"${2:methodName}\", true)", "$0"]
+  },
+  "rooibos AssertFalse": {
+    "prefix": "assertFalse",
+    "body": ["m.assertFalse(${1:value})", "$0"]
+  },
+  "rooibos AssertAsync": {
+    "prefix": "assertAsync",
+    "body": ["m.AssertAsyncField(${1:value}, $2{:fieldName})", "$0"]
+  },
+  "rooibos AssertTrue": {
+    "prefix": "assertTrue",
+    "body": ["m.assertTrue(${1:value})", "$0"]
+  },
+  "rooibos AssertEqual": {
+    "prefix": "assertEqual",
+    "body": ["m.assertEqual(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertLike": {
+    "prefix": "assertLike",
+    "body": ["m.assertLike(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertNotEqual": {
+    "prefix": "assertNotEqual",
+    "body": ["m.assertNotEqual(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertInvalid": {
+    "prefix": "assertInvalid",
+    "body": ["m.assertInvalid(${1:value})", "$0"]
+  },
+  "rooibos AssertNotInvalid": {
+    "prefix": "assertNotInvalid",
+    "body": ["m.assertNotInvalid(${1:value})", "$0"]
+  },
+  "rooibos AssertAAHasKey": {
+    "prefix": "assertAAHasKey",
+    "body": ["m.assertAAHasKey(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertAANotHasKey": {
+    "prefix": "assertAANotHasKey",
+    "body": ["m.assertAANotHasKey(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertAAHasKeys": {
+    "prefix": "assertAAHasKeys",
+    "body": ["m.assertAAHasKeys(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertAANotHasKeys": {
+    "prefix": "assertAANotHasKeys",
+    "body": ["m.assertAANotHasKeys(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertArrayContains": {
+    "prefix": "assertArrayContains",
+    "body": ["m.assertArrayContains(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertArrayNotContains": {
+    "prefix": "assertArrayNotContains",
+    "body": ["m.assertArrayNotContains(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertArrayContainsSubset": {
+    "prefix": "assertArrayContainsSubset",
+    "body": ["m.assertArrayContainsSubset(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertArrayContainsAAs": {
+    "prefix": "assertArrayContainsAAs",
+    "body": ["m.assertArrayContainsAAs(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertArrayNotContainsSubset": {
+    "prefix": "assertArrayNotContainsSubset",
+    "body": ["m.assertArrayNotContainsSubset(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertArrayCount": {
+    "prefix": "assertArrayCount",
+    "body": ["m.assertArrayCount(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertArrayNotCount": {
+    "prefix": "assertArrayNotCount",
+    "body": ["m.assertArrayNotCount(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertEmpty": {
+    "prefix": "assertEmpty",
+    "body": ["m.assertEmpty(${1:value})", "$0"]
+  },
+  "rooibos AssertNotEmpty": {
+    "prefix": "assertNotEmpty",
+    "body": ["m.assertNotEmpty(${1:value})", "$0"]
+  },
+  "rooibos AssertArrayContainsOnlyValuesOfType": {
+    "prefix": "assertArrayContainsOnlyValuesOfType",
+    "body": [
+      "m.assertArrayContainsOnlyValuesOfType(${1:value}, ${2:expected})",
+      "$0"
+    ]
+  },
+  "rooibos AssertType": {
+    "prefix": "assertType",
+    "body": ["m.assertType(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertSubType": {
+    "prefix": "assertSubType",
+    "body": ["m.assertSubType(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertNodeCount": {
+    "prefix": "assertNodeCount",
+    "body": ["m.assertNodeCount(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertNodeNotCount": {
+    "prefix": "assertNodeNotCount",
+    "body": ["m.assertNodeNotCount(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertNodeEmpty": {
+    "prefix": "assertNodeEmpty",
+    "body": ["m.assertNodeEmpty(${1:value})", "$0"]
+  },
+  "rooibos AssertNodeNotEmpty": {
+    "prefix": "assertNodeNotEmpty",
+    "body": ["m.assertNodeNotEmpty(${1:value})", "$0"]
+  },
+  "rooibos AssertNodeContains": {
+    "prefix": "assertNodeContains",
+    "body": ["m.assertNodeContains(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertNodeNotContains": {
+    "prefix": "assertNodeNotContains",
+    "body": ["m.assertNodeNotContains(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertNodeContainsFields": {
+    "prefix": "assertNodeContainsFields",
+    "body": ["m.assertNodeContainsFields(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertNodeNotContainsFields": {
+    "prefix": "assertNodeNotContainsFields",
+    "body": ["m.assertNodeNotContainsFields(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertAAContainsSubset": {
+    "prefix": "assertAAContainsSubset",
+    "body": ["m.assertAAContainsSubset(${1:value}, ${2:expected})", "$0"]
+  },
+  "rooibos AssertMocks": {
+    "prefix": "assertMocks",
+    "body": ["m.assertMocks(${1:value}, ${2:expected})", "$0"]
+  },
+  "Comment For Function": {
+    "prefix": "commentFunc",
+    "body": [
+      "' /**",
+      "'  * @member ${1:nameOfFunction}",
+      "'  * @memberof module:${2:nameOfClass}",
+      "'  * @instance",
+      "'  * @function",
+      "'  * @description ${3:description}",
+      "'  * @param {${6:paramType}} ${7:paramDescription}",
+      "'  * @returns {${4:returnType}} ${5:returnDescription}",
+      "'  */",
+      "$0"
+    ]
+  },
+  "comment for module": {
+    "prefix": "moduleComment",
+    "body": [
+      "' /**",
+      "'  * @module ${1:nameOfModule}",
+      "'  * @description ${2:description}",
+      "'  */",
+      "$0"
+    ]
+  },
+  "find Node": {
+    "prefix": "fn",
+    "body": ["${1:name} = m.top.findNode(\"${1:name}\")", "$0"]
+  },
+  "type equal": {
+    "prefix": "typeEqual",
+    "body": [
+      "type(box(${1:name})) = (\"${2|roString,invalid,roInt,roBool,roSGNode|}\")$0"
+    ]
+  },
+  "observe field": {
+    "prefix": "observeField",
+    "body": [
+      "${1:name}.observeField(\"${2:field}\", \"on${2:/capitalize}Change\")",
+      "$0"
+    ]
+  },
+  "onKeyEvent function": {
+    "prefix": "onKeyEvent",
+    "body": [
+      "function onKeyEvent(key as string, press as boolean) as Boolean",
+      "\thandled = false",
+      "",
+      "\t${0}",
+      "",
+      "\treturn handled",
+      "end function"
+    ]
+  },
+  "header": {
+    "prefix": "header",
+    "body": [
+      "'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
+      "'++ ${1:comment}",
+      "'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
+      "${0}"
+    ]
+  },
+  "loginfo": {
+    "prefix": "loginfo",
+    "body": ["log_info([m.className, ${1}])", "${0}"]
+  },
+  "logmethod": {
+    "prefix": "logmethod",
+    "body": ["log_method([m.className, ${1}])", "${0}"]
+  },
+  "logerror": {
+    "prefix": "logerror",
+    "body": ["log_error([m.className, ${1}])", "${0}"]
+  },
+  "logdebug": {
+    "prefix": "logdebug",
+    "body": ["log_debug(${1:level}, [m.className, ${2:text}])", "${0}"]
+  },
+  "function": {
+    "prefix": "function",
+    "body": ["function ${1:name}(${2:args}) ${3:as}", "\t${0}", "end function"]
+  },
+  "isCapturingAnyKeyPress": {
+    "prefix": "isCapturingAnyKeyPress",
+    "body": [
+      "function isCapturingAnyKeyPress(key as string, press as boolean) as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "onKeyPressDown": {
+    "prefix": "onKeyPressDown",
+    "body": [
+      "function onKeyPressDown() as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "onKeyPressUp": {
+    "prefix": "onKeyPressUp",
+    "body": [
+      "function onKeyPressUp() as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "onKeyPressLeft": {
+    "prefix": "onKeyPressLeft",
+    "body": [
+      "function onKeyPressLeft() as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "onKeyPressRight": {
+    "prefix": "onKeyPressRight",
+    "body": [
+      "function onKeyPressRight() as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "onKeyPressReplay": {
+    "prefix": "onKeyPressReplay",
+    "body": [
+      "function onKeyPressReplay() as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "onKeyPressRewind": {
+    "prefix": "onKeyPressRewind",
+    "body": [
+      "function onKeyPressRewind() as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "onKeyPressFastForward": {
+    "prefix": "onKeyPressFastForward",
+    "body": [
+      "function onKeyPressFastForward() as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "onKeyPressBack": {
+    "prefix": "onKeyPressBack",
+    "body": [
+      "function onKeyPressBack() as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "onKeyPressOptions": {
+    "prefix": "onKeyPressOptions",
+    "body": [
+      "function onKeyPressOptions() as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "onKeyPressOK": {
+    "prefix": "onKeyPressOK",
+    "body": [
+      "function onKeyPressOK() as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "onKeyPressPlay": {
+    "prefix": "onKeyPressPlay",
+    "body": [
+      "function onKeyPressPlay() as boolean",
+      "\treturn false",
+      "end function"
+    ]
+  },
+  "stubobject": {
+    "prefix": "so",
+    "body": ["${1:name} = { \"id\" : \"${1:name}\" }", "$0"]
+  },
+  "stubiocobject": {
+    "prefix": "sioc",
+    "body": [
+      "m.${1:name} = { \"id\" : \"${1:name}\" }",
+      "mioc.setInstance(\"${1:name}\", m.${1:name})",
+      "$0"
+    ]
+  },
+  "mstubobject": {
+    "prefix": "mso",
+    "body": ["m.${1:name} = { \"id\" : \"${1:name}\" }", "$0"]
+  },
+  "onGainedFocus": {
+    "prefix": "onGainedFocus",
+    "body": [
+      "function onGainedFocus(isSelfFocused as boolean)",
+      "\tsuper.onGainedFocus(isSelfFocused)",
+      "\tif isSelfFocused",
+      "\t\t$0",
+      "\tend if",
+      "end function"
+    ]
+  },
+  "onLostFocus": {
+    "prefix": "onLostFocus",
+    "body": [
+      "function onLostFocus()",
+      "\tsuper.onLostFocus()",
+      "\t$0",
+      "end function"
+    ]
+  },
+  "bsdl": {
+    "prefix": "bsdl",
+    "description": "brighterscript disbale next line",
+    "body": ["'bs:disable-next-line"]
+  },
+  "makePosition": {
+    "prefix": "makePosition",
+    "description": "makePosition",
+    "body": [
+      "${1} = ViewUtils.makeUIBPosition(${2:styles}, \"${3}\", ${4}, ${5})",
+      "${0}"
+    ]
+  },
+  "makeSize": {
+    "prefix": "makeSize",
+    "description": "makeSize",
+    "body": [
+      "${1} = ViewUtils.makeUIBSize(${2:styles}, \"${3}\", ${4}, ${5})",
+      "${0}"
+    ]
+  },
+  "getUIBInt": {
+    "prefix": "getUIBInt",
+    "description": "getUIBInt",
+    "body": ["${1} = ViewUtils.getUIBInt(${2:styles}, \"${3}\", ${4})", "${0}"]
+  },
+  "uibcolor": {
+    "prefix": "uibcolor",
+    "description": "uibcolor",
+    "body": ["${1} = ViewUtils.transposeUIBColor(styles.${2})", "${0}"]
+  },
+  "getcontentfield": {
+    "prefix": "getcontentfield",
+    "description": "getcontentfield",
+    "body": ["${1} = MU.getContentField(styles, \"${2}\", ${3})"]
+  },
+  "cspell-disable-line": {
+    "prefix": "csdl",
+    "description": "cspell disbale next line",
+    "body": ["'// cspell:disable-next-line"]
+  },
+  "cspell-disable": {
+    "prefix": "csd",
+    "description": "cspell disbale",
+    "body": ["'/* cspell:disable */"]
+  },
+  "cspell-enable": {
+    "prefix": "cse",
+    "description": "cspell enable",
+    "body": ["'/* cspell:enable */"]
+  },
+  "asinteger": {
+    "prefix": "ai",
+    "description": "as integer",
+    "body": ["as integer"]
+  },
+  "asnode": {
+    "prefix": "an",
+    "description": "as node",
+    "body": ["as mc.types.node"]
+  },
+  "asarray": {
+    "prefix": "aa",
+    "description": "as array",
+    "body": ["as mc.types.array"]
+  },
+  "asassocarray": {
+    "prefix": "aaa",
+    "description": "as assocarray",
+    "body": ["as mc.types.assocarray"]
+  },
+  "asfloat": {
+    "prefix": "af",
+    "description": "as float",
+    "body": ["as float"]
+  },
+  "asobject": {
+    "prefix": "ao",
+    "description": "as object",
+    "body": ["as object"]
+  },
+  "asboolean": {
+    "prefix": "ab",
+    "description": "as boolean",
+    "body": ["as boolean"]
+  },
+  "asdynamic": {
+    "prefix": "ad",
+    "description": "as dynamic",
+    "body": ["as dynamic"]
+  },
+  "asstring": {
+    "prefix": "as",
+    "description": "as string",
+    "body": ["as string"]
+  },
+  "controltests": {
+    "prefix": "controltests",
+    "description": "",
+    "body": [
+      "namespace tests",
+      "  @suite(\"${1:name} tests\")",
+      "  class ${1:name}Tests extends tests.BaseTestSuite",
+      "",
+      "    private control",
+      "    protected override function beforeEach()",
+      "      super.beforeEach()",
+      "      nodeTop = new rooibos.utils.MockNode(\"top\")",
+      "      m.control = m.createNodeClass(${2:namespace}${1:name}, true, nodeTop, m.global)",
+      "    end function",
+      "",
+      "    $0",
+      "  end class",
+      "end namespace"
+    ]
+  },
+  "onshow": {
+    "prefix": "onshow",
+    "description": "",
+    "body": [
+      "protected override function onShow()",
+      "\tsuper.onShow()",
+      "  $0",
+      "end function"
+    ]
+  },
+  "onfirstshow": {
+    "prefix": "onfirstshow",
+    "description": "",
+    "body": [
+      "protected override function onFirstShow()",
+      "\tsuper.onFirstShow()",
+      "  $0",
+      "end function"
+    ]
+  },
+  "onhide": {
+    "prefix": "onhide",
+    "description": "",
+    "body": [
+      "protected override function onHide()",
+      "\tsuper.onHide()",
+      "  $0",
+      "end function"
+    ]
+  },
+  "createsgnode": {
+    "prefix": "createsgnode",
+    "description": "",
+    "body": [
+      "m.$1 = m.createSGNode(\"$2\", ${3:m.top}, \"$1\", {",
+      "\t$0",
+      "})"
+    ]
+  }
+}

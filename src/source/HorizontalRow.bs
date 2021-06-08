@@ -25,7 +25,7 @@ namespace ml
     public animateToItem = -1
     public focusedCellIndex = 0
     public focusedCellPercent = 0.0
-    @observer("onIsScrollingChange")
+    ' @observer("onIsScrollingChange")
     public isScrolling = false
     public height = 0
     public width = 0
@@ -139,11 +139,11 @@ namespace ml
       end if
     end function
 
-    private function onIsScrollingChange()
-      if m.viewManager <> invalid
-        m.viewManager.setIsScrolling(m.isScrolling)
-      end if
-    end function
+    ' private function onIsScrollingChange()
+    '   if m.viewManager <> invalid
+    '     m.viewManager.setIsScrolling(m.isScrolling, m.isLongPressStarted)
+    '   end if
+    ' end function
 
     private function onListEvent(event as object)
       if event.name = "willEnter" or event.name = "didEnter"

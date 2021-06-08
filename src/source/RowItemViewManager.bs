@@ -69,7 +69,7 @@ namespace ml
           m.applyrenderStateForCell(id, renderStateMap[id])
         end for
       else
-          ' ? "ROW IS NOT !! RENDERED" ; m.row.index
+        ' ? "ROW IS NOT !! RENDERED" ; m.row.index
         for each id in renderStateMap
           m.applyrenderStateForCell(id, "none")
         end for
@@ -137,12 +137,16 @@ namespace ml
       return m.cellsById[str(index).trim()]
     end function
 
-    override function setIsScrolling(isScrolling as boolean)
-      ' ? "++++ setIsScrolling" ; isScrolling;
+    override function setIsScrolling(isScrolling as boolean, isLong as boolean) as void
+      if m.isScrolling = isScrolling
+        return
+      end if
+      m.isScrolling = isScrolling
+
+      ? "++++ setIsScrolling" ; isScrolling
       m.row.isScrolling = isScrolling
 
       m.owner.isScrolling = isScrolling
-      m.isScrolling = isScrolling
 
       if isScrolling
         name = "scrollStart"
@@ -152,12 +156,11 @@ namespace ml
 
       for each id in m.cellsById
         comp = m.cellsById[id]
-        comp.listEvent = { name: name }
-        ' ? "++++ CELL EVENT " ; id ; " " name
+        comp.listEvent = { name: name, long: isLong }
       end for
 
-      m.row.listEvent = { name: name }
-      m.owner.listEvent = { name: name, index: m.row.index }
+      m.row.listEvent = { name: name, long: isLong }
+      m.owner.listEvent = { name: name, index: m.row.index, long: isLong }
       ' ? "++++ row - listEvent " ; formatJson(m.row.listEvent)
       ' ? "++++ owner - listEvent " ; formatJson(m.owner.listEvent)
     end function

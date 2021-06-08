@@ -12,9 +12,11 @@ class HeroCell extends ml.BaseCell
 
   private poster
   private bgRect
+  private textRect
 
   private lastContent
   private isViewCreated = false
+  private label
   private posterSize = [1100, 700]
   private scale = 1
 
@@ -42,6 +44,21 @@ class HeroCell extends ml.BaseCell
       size: m.posterSize
       loadDisplayMode: "zoomtofill"
     })
+    m.textRect = mc.createSGNode("mv_Rectangle", m.top, "bgRect", {
+      size: m.posterSize
+      color: "#000000"
+      opacity: 0.5
+      translation: [0,250]
+      size: [1100, 300]
+    })
+    m.label = mc.createSGNode("mv_Label", m.top, "label", {
+      fontKey: "mediumBold,60"
+      horizAlign: "center"
+      vertAlign: "center"
+      color: "#ffffff"
+      translation: [0,300]
+      size: [1100, 100]
+    })
     m.size = m.posterSize
   end function
 
@@ -56,17 +73,17 @@ class HeroCell extends ml.BaseCell
       m.setFocusState(0, true)
 
       m.poster.uri = m.lastContent.HDGRIDPOSTERURL
-      m.onScrollChange()
+      m.label.text = m.lastContent.title
+      'TODO - this should be part of initial state setting
+      m.onScrollingChange(m.list.isScrolling, false)
     end if
   end function
 
-  private function onScrollChange()
-    ' ? "SC: onScrollChange " ; m.row.isScrolling ; " " ; m.list.isScrolling
-    isScrolling = m.row.isScrolling or m.list.isScrolling
-    ' ? "SC: onCellScrollChange row " ; m.row.isScrolling
-    '  ? "SC: onCellScrollChange list " ; m.list.isScrolling
-    ' m.label.visible = not isScrolling
-    ' m.label2.visible = not isScrolling
+  private function onScrollingChange(isScrolling as boolean, isLong as boolean)
+    ? "HC: onScrollingChange " ; isScrolling ; " >>> " ; m.top.index
+    textVisible = not (isScrolling and isLong)
+    m.textRect.visible = textVisible
+    m.label.visible = textVisible
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -119,7 +136,7 @@ class HeroCell extends ml.BaseCell
   private function onLosingFocus(direction, fraction)
     ' ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
     ' if direction = 1
-      m.setFocusState(fraction, false)
+    m.setFocusState(fraction, false)
     ' end if
   end function
 

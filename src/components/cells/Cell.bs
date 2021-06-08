@@ -36,11 +36,11 @@ function onContentChange()
     m.label2.text = m.content.description + " " + m.content.description
     m.poster.uri = m.content.HDGRIDPOSTERURL
     m.poster2.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
-    onScrollChange()
+    onScrollingChange()
   end if
 end function
 
-function onScrollChange()
+function onScrollingChange()
   ' isScrolling = m.row.isScrolling or m.list.isScrolling
   ' ? "onCellScrollChange row " ; m.row.isScrolling
   ' ? "onCellScrollChange list " ; m.list.isScrolling
@@ -60,7 +60,7 @@ end function
 '   if event.name = "willEnter" or event.name = "didEnter"
 '     onContentChange()
 '   else if event.name = "scrollStart" or event.name = "scrollStop"
-'     onScrollChange()
+'     onScrollingChange()
 '   end if
 ' end function
 
