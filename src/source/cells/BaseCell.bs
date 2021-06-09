@@ -8,33 +8,34 @@ import "pkg:/source/ItemFocusManager.bs"
 import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
 
 namespace ml
-  @node("ml_BaseCell", "Group")
   class BaseCell
 
     public index = -1
 
-    public content as mc.types.Node
 
     ' any item in a list will have this set whenever it gets recycled
     @observer("onInitialStateChange")
     public initialState as mc.types.AssocArray
 
     public listEvent as mc.types.AssocArray
-    public size as mc.types.Array
 
     private isViewCreated = false
     private isRecyclePending = true
 
+    protected content as mc.types.Node
     protected list
     protected row
+    protected size as mc.types.Array
 
     function new()
       ml.itemDelegateMixin.setDelegate()
     end function
 
     private function _createViews()
-      m.createViews()
-      m.isViewCreated = true
+      if m.content <> invalid
+        m.createViews()
+        m.isViewCreated = true
+      end if
     end function
 
     private function _onContentChange(content as mc.types.node)

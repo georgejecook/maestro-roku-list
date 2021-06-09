@@ -106,12 +106,12 @@ namespace ml.listMixin
   '   return rowContent
   ' end function
 
-  function createFocusSettings(animSpeed = 0.03 as float, fastAnimSpeed = 0.01 as float, animStyle = "fixed" as string)
+  function createFocusSettings(animSpeed = 0.03 as float, fastAnimSpeed = 0.01 as float, focusStyle = "fixed" as string)
     settings = createObject("roSGNode", "ml_FocusSettings")
     settings.update({
       animSpeed: animSpeed
       fastAnimSpeed: fastAnimSpeed
-      animStyle: animStyle
+      focusStyle: focusStyle
     })
     return settings
 

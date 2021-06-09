@@ -83,7 +83,7 @@ namespace ml
       '   repeat: true
       ' })
       m.contentGroup = m.createSGNode("Group", m.top, "contentGroup")
-      m.rowsGroup = m.createSGNode("Group", m.top, "rowsGroup")
+      m.rowsGroup = m.createSGNode("Group", m.contentGroup, "rowsGroup")
       m.focusPoint = m.createSGNode("mv_Rectangle", m.top, "focusPoint")
       m.focusIndicator = m.createSGNode("mv_Poster", m.top, "focusIndicator", {
         blendColor: "#ffffff"
@@ -191,12 +191,20 @@ namespace ml
       return m.viewManager.getScreenRect(rowIndex, screenPos, direction)
     end function
 
-    private function onNextFocusIndexChange(index as integer) as void
+    private function onNextFocusIndexChange(index as mc.types.array) as void
       m.targetFocusRect = m.getCellScreenRect(index[0], index[1])
+      settings = ml.listMixin.getRowSettings(m.content, m.content.getChild(index[0]))
+
       focusSettings = ml.listMixin.getFocusSettings(m.content, m.content.getChild(index[0]))
+
       if focusSettings.focusFeedbackStyle = "none"
         m.focusIndicator.visible = false
       else
+        'TODO handle visibility appearing better here - need to wait ro row to pass
+        if focusSettings.focusStyle = "fixed"
+          m.targetFocusRect.translation[0] = settings.contentOffset[0]
+        end if
+
         m.moveFocusIndicatorToFocusPosition()
         m.focusIndicator.visible = true
       end if

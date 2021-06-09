@@ -47,6 +47,9 @@ namespace ml
 
     function setFocusPosition(index as integer, indexPosition as integer, nextIndex as integer, nextPosition as integer, direction as integer)
       m.log.info(index, indexPosition, nextIndex, nextPosition, direction)
+      ' ? "+++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+      ' ? "SFP I: "; index ; " NI "; nextIndex
+
       m.index = index
       m.indexPosition = indexPosition
       m.nextIndex = nextIndex
@@ -68,8 +71,6 @@ namespace ml
     function onContainerPositionChange(offset as integer)
       distance = abs(m.nextPosition - m.indexPosition)
       currentPos = abs(m.indexPosition - offset)
-      ' ? ">>>>>> I:" ; m.index ; " NI:"; m.nextIndex
-      ' ? "offset:" ; offset ; " IP:" ; m.indexPosition ; " D:" ; distance ; " C:" ; currentPos ; " DIR:"; m.direction
       if distance <> 0
         fraction = currentPos / distance
         ' if m.direction = -1
@@ -80,6 +81,8 @@ namespace ml
       else
         fraction = 0
       end if
+      ' ? "offset:" ; offset ; " CP: " ; currentPos ; " P " ; m.indexPosition ;" > "; m.nextPosition ; " D:" ; distance ; " C:" ; " F: ";fraction
+      ' ? " IP " ; m.indexPosition ;" > NIP "; m.nextPosition
 
       m.onFocusUpdate(fraction)
     end function
@@ -131,7 +134,6 @@ namespace ml
         name: nextName
         index: m.nextIndex
       }
-
       event.rowIndex = m.rowIndex
       nextEvent.rowIndex = m.rowIndex
 

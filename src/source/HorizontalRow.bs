@@ -127,7 +127,7 @@ namespace ml
       if settings.height <> -1
         m.height = settings.height
       else
-        m.height = settings.cellSettings.size[1] + settings.contentOffset[1]
+        m.height = settings.cellSettings.size[1]
       end if
       m.bgRect.size = [m.owner.width, m.height]
     end function

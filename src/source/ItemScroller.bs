@@ -204,7 +204,6 @@ namespace ml
         end if
 
         m.toggleScrolling(true)
-        ' ? "11111"
         m.setFocusIndex(m.index, true, screenPos)
         m.viewManager.updateRenderedComponents(m.direction, m.index)
         ' ? "speed"; m.animSpeed ; " target Trans "; targetTranslation ; " m.moveAnimation.fraction "; m.moveAnimation.interpolator.fraction
@@ -214,7 +213,6 @@ namespace ml
         m.container.translation = targetTranslation
         'TODO -check if jump is bigger than a certain amount
         ' m.viewManager.updateRenderedComponents(m.direction, m.index)
-        ' ? "222222222222"
         m.setFocusIndex(index, false)
       end if
 
@@ -223,22 +221,17 @@ namespace ml
 
 
     function finishAnimating() as void
-      ' ? "stop ci " ; m.index ; " ni " ; m.nextIndex
       if m.direction = -1
         position = m.container.translation[m.axes] - m.activeOffset
         index = m.viewManager.getIndexAtPosition(position - 1, m.direction)
         m.moveToIndex(index, invalid, true, false, true)
         return
-        '   nextIndex = m.nextIndex + 1
-        ' else
-        '   nextIndex = m.nextIndex
       end if
       nextIndex = m.nextIndex
       if (nextIndex > -1 and nextIndex < m.viewManager.numberOfItems) and m.index <> nextIndex
-        ' ? "+2Moving to index"
         m.moveToIndex(nextIndex, invalid, true)
       else
-        ' ? "Already in place "; m.index ; " ni "; nextIndex ; " " ; m.viewManager.numberOfItems
+        ' ? "+>>3Already in place "; m.index ; " ni "; nextIndex ; " " ; m.viewManager.numberOfItems
       end if
     end function
 
@@ -259,7 +252,7 @@ namespace ml
       nextRect = m.viewManager.rects[m.nextIndex]
       screenPos = m.viewManager.getScreenPositionForItem(nextRect, m.direction, screenPos)
       m.activeOffset = screenPos
-      nextTranslation = m.viewManager.getTargetTranslation(index, m.index, screenPos)
+      nextTranslation = m.viewManager.getTargetTranslation(index, m.direction, screenPos)
 
       if nextTranslation <> invalid
         m.nextPosition = nextTranslation[m.axes]
@@ -297,8 +290,13 @@ namespace ml
         m.targetIndex = -1
       else if m.isMovingMultiple
         m.focusManager.onContainerPositionChange(position)
+        'hack here..
+        if m.direction = -1
+          index +=1
+        end if
         if index <> m.index and index <> m.targetIndex
           m.focusManager.onFocusAnimationUpdate(1)
+          ' ? "INDEX CHANGED " ; m.index ; " > " ; index ;  " POS "; position
           m.setFocusIndex(index, true)
         end if
       else
@@ -328,6 +326,12 @@ namespace ml
           index = m.viewManager.numberOfItems - 1
         end if
         m.index = index
+        'HACK!
+        ' if m.isMovingMultiple and m.direction = -1
+        '   m.setNextIndex(m.index - m.direction)
+        ' else
+        ' m.setNextIndex(m.index + m.direction)
+        ' end if
         m.setNextIndex(m.index + m.direction)
       end if
 
