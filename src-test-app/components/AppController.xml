@@ -21,7 +21,8 @@
 		</LayoutGroup>
     <Group id='contentGroup' />
     <Rectangle
-        color='#ff0000'
+        color='#444444'
+        opacity='0.5'
         width='1920'
         height='100'
         translation='[0, 1000]' />

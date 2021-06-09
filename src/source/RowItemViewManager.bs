@@ -63,8 +63,6 @@ namespace ml
 
     override function applyRenderStateMap(renderStateMap as mc.types.assocarray)
       m.log.info("ROW applyRenderStateMap", m.row.index, m.row.isRendered)
-      ? ">>>>>>>>>>>>"
-      ? "RC RESET "
       m.renderedComponents = []
       if m.row.isRendered
         for each id in renderStateMap
@@ -77,8 +75,6 @@ namespace ml
         end for
       end if
 
-
-      ? "RENDERED COMPS" ; m.renderedComponents.count()
       m.lastRowIsRendered = m.row.isRendered
     end function
 
