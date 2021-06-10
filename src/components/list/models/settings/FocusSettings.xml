@@ -6,11 +6,11 @@
       <field id='animSpeed' type='float'/>
       <field id='fastAnimSpeed' type='float'/>
       <!-- fixed|floating -->
-      <field id='focusStyle' type='string' value='fixed'/>
+      <field id='animStyle' type='string' value='fixed'/>
 
       <!-- onTop|underneath|none -->
-      <field id='focusFeedbackStyle' type='string' value='onTop'/>
-      <field id='focusFeedbackUri' type='string' value='pkg:/images/input-focusrect.9.png'/>
-      <field id='focusFeedbackColor' type='string' value='#ffffff'/>
+      <field id='feedbackStyle' type='string' value='onTop'/>
+      <field id='feedbackUri' type='string' value='pkg:/images/input-focusrect.9.png'/>
+      <field id='feedbackColor' type='string' value='#ffffff'/>
     </interface>
 </component>

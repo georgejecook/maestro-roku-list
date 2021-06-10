@@ -165,6 +165,13 @@ namespace ml
         m.direction = direction
       end if
 
+      itemRect = m.viewManager.rects[index]
+      if screenPos = invalid and itemRect <> invalid
+        screenPos = itemRect.screenPos
+        ' screenPos = m.screenPos
+      end if
+
+
 
       if m.isFloatingFocus
         m.log.error("floating focus is not supported yet")
@@ -174,13 +181,6 @@ namespace ml
         '   m.moveFocusToIndex(index, nextFlowPosition, animated)
         ' end if
       end if
-
-      itemRect = m.viewManager.rects[index]
-      if screenPos = invalid and itemRect <> invalid
-        screenPos = itemRect.screenPos
-        ' screenPos = m.screenPos
-      end if
-
 
       targetTranslation = m.viewManager.getTargetTranslation(index, direction, screenPos)
 
@@ -194,9 +194,16 @@ namespace ml
 
       m.setNextIndex(m.index + m.direction)
 
-      m.log.info("moving to POS:", targetTranslation[m.axes], animated)
+      'TODO - take into account floating focus
+      isMoveRequired = targetTranslation[m.axes] <> m.container.translation[m.axes]
+      m.log.info("moving", m.container.translation[m.axes], " > ", targetTranslation[m.axes], " pixels. animated? ", animated)
       if animated
 
+        if not isMoveRequired
+          m.log.info("already in place - no need to scroll ", m.index, " >", m.nextIndex)
+          m.setFocusToOnScreenIndex(m.index, m.nextIndex, m.direction)
+          return true
+        end if
         if fast
           m.animSpeed = m.settings.fastAnimSpeed
         else
@@ -219,11 +226,25 @@ namespace ml
       return true
     end function
 
+    private function setFocusToOnScreenIndex(index as integer, nextIndex as integer, direction as integer)
+      m.toggleScrolling(true)
+      m.focusManager.setFocusPosition(index, 0, nextIndex, 0, direction)
+      m.focusManager.onFocusAnimationUpdate(1)
+      m.toggleScrolling(false)
+      m.targetIndex = -1
+      m.index = nextIndex
+      m.setFocusOnRenderer(false)
+    end function
 
     function finishAnimating() as void
       if m.direction = -1
+        ' ? "FINISH BACK"
         position = m.container.translation[m.axes] - m.activeOffset
         index = m.viewManager.getIndexAtPosition(position - 1, m.direction)
+        if index > m.nextIndex
+          index = m.nextIndex
+        end if
+        ' ? "FINISH INDEX" ; index ; " POS "; position ; " I " ; m.index; " NI "; m.nextIndex
         m.moveToIndex(index, invalid, true, false, true)
         return
       end if
@@ -257,6 +278,7 @@ namespace ml
       if nextTranslation <> invalid
         m.nextPosition = nextTranslation[m.axes]
       else
+        ? "COULD NOT GET NEXT POSITION - USING INDEX POS"
         m.nextPosition = m.indexPosition
       end if
     end function
@@ -276,7 +298,8 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     function onAnimationFractionChange(fraction as float)
-      m.log.verbose("onAnimationFractionChange", fraction, "multiple", m.isMovingMultiple)
+      ' m.log.info("onAnimationFractionChange", fraction, "multiple", m.isMovingMultiple)
+
       position = m.container.translation[m.axes] - m.activeOffset
       index = m.viewManager.getIndexAtPosition(position, m.direction)
 
@@ -292,7 +315,7 @@ namespace ml
         m.focusManager.onContainerPositionChange(position)
         'hack here..
         if m.direction = -1
-          index +=1
+          index += 1
         end if
         if index <> m.index and index <> m.targetIndex
           m.focusManager.onFocusAnimationUpdate(1)
@@ -326,12 +349,6 @@ namespace ml
           index = m.viewManager.numberOfItems - 1
         end if
         m.index = index
-        'HACK!
-        ' if m.isMovingMultiple and m.direction = -1
-        '   m.setNextIndex(m.index - m.direction)
-        ' else
-        ' m.setNextIndex(m.index + m.direction)
-        ' end if
         m.setNextIndex(m.index + m.direction)
       end if
 

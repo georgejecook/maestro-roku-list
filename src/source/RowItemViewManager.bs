@@ -32,7 +32,7 @@ namespace ml
       m.log.info("ROW updateLayout")
 
       index = 0
-      m.contentGroup.translation = [0, 0]
+      ' m.contentGroup.translation = [0, 0]
 
       offset = 0
       for each item in m.content.getChildren(-1, 0)
@@ -182,6 +182,7 @@ namespace ml
       rect = super.getScreenRect(index, screenPos, direction)
 
       if rect <> invalid
+
         rect.translation[1] += m.settings.screenPos
       end if
 
