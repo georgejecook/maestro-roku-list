@@ -41,6 +41,7 @@
       "stopOnEntry": false,
       "retainDeploymentArchive": true,
       "retainStagingFolder": true,
+      "autoRunSgDebugCommands": ["chanperf", "fpsdisplay", "logrendezvous"],
       "files": [
         "manifest",
         "source/**/*.*",
