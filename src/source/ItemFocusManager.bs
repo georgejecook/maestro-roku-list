@@ -63,6 +63,8 @@ namespace ml
     end function
 
     function onFocusAnimationUpdate(fraction as float) as void
+      ' ? "ANIM UPDATE "; m.name ; " F " ; fraction
+
       if m.didStart and not m.didFinish
         m.onFocusUpdate(fraction)
       end if
@@ -81,15 +83,16 @@ namespace ml
       else
         fraction = 0
       end if
+      ' ? " OCPC IP " ; m.indexPosition ;" > NIP "; m.nextPosition
       ' ? "offset:" ; offset ; " CP: " ; currentPos ; " P " ; m.indexPosition ;" > "; m.nextPosition ; " D:" ; distance ; " C:" ; " F: ";fraction
-      ' ? " IP " ; m.indexPosition ;" > NIP "; m.nextPosition
 
       m.onFocusUpdate(fraction)
     end function
 
     function onFocusUpdate(fraction as float) as void
-      ' ? "+++ onFocusUpdate" ; m.name ; " didStart "; m.didStart ; " isNotifying " ; m.isNotifying
+      ' ? "+++ onFocusUpdate(" ; m.name ; ") didStart "; m.didStart ; " isNotifying " ; m.isNotifying ; fraction
       if not m.isNotifying
+        ? "NOT NOTIFYING"
         return
       end if
       if not m.didStart
@@ -153,7 +156,7 @@ namespace ml
     end function
 
     function setOwnerNextFocusIndex()
-      ' ? "++++ setOwnerNextFocusIndex"
+      ' ? "++++ setOwnerNextFocusIndex" ; m.nextIndex
       if m.isRow
         m.viewManager.owner.nextFocusIndex = [m.viewManager.row.index, m.nextIndex]
       else
@@ -166,7 +169,6 @@ namespace ml
     end function
 
     function setOwnerIndexes()
-      ' ? "++++ setOwnerIndexes "; m.nextIndex ; " isRow " ; m.isRow
       if m.isRow
         m.viewManager.owner.focusedCellIndex = m.nextIndex
       else

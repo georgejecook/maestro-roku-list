@@ -164,6 +164,7 @@ class ComplexRow extends mv.BaseView
       m.setFocus(m.button2)
     end if
   end function
+
   private function onWillGainFocus(direction as integer)
     if direction = 1
       m.top.opacity = 1
@@ -180,6 +181,13 @@ class ComplexRow extends mv.BaseView
     ' ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
     if direction = 1
       m.top.opacity = 1 - fraction
+    end if
+  end function
+
+  private function onDidLoseFocus(direction as integer)
+    ' ? "SC: onLosingFocus " ; " " ; direction ; " " ; fraction
+    if direction = 1
+      m.top.opacity = 0
     end if
   end function
 

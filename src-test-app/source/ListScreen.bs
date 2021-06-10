@@ -90,7 +90,7 @@ class ListScreen extends mv.BaseScreen
       row = createObject("roSGNode", "ml_RowContent")
       if i = 0
         row0FocusSettings = ml.listMixin.createFocusSettings(0.02, 0.05)
-        cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 20)
+        cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 30)
         row.settings = ml.listMixin.createRowSettings(cellSettings, row0FocusSettings)
         row.settings.contentOffset = [400, 0]
       else if i = 1 or i = 4 or i = 8
@@ -110,38 +110,30 @@ class ListScreen extends mv.BaseScreen
       content.push(row)
       if i <> 0
         if i = 1
-          row.settings.screenPos = 750
-          end if
-          ' if i mod 9 = 0
-          '   row.addFields({ "focusType": "fixed" })
-          '   ' row.addFields({ "focusType": "floatingWrap" })
-          '   row.title += " floating"
-          ' else
-          '   row.addFields({ "focusType": "fixed" })
-          '   row.title += " fixed"
-          ' end if
+          row.settings.screenPos = 730
 
-        ' else if i mod 5 = 0
+        ' end if
+        ' if i mod 9 = 0
+        '   row.addFields({ "focusType": "fixed" })
+        '   ' row.addFields({ "focusType": "floatingWrap" })
+        '   row.title += " floating"
+        ' else
+        '   row.addFields({ "focusType": "fixed" })
+        '   row.title += " fixed"
+        ' end if
+
+        ' else if i = 6
         '   row.settings.screenPos = 200
         '   row.title += " 200"
-        ' else if i mod 5 = 3
-        '   row.settings.screenPos = 400
-        '   row.title += " 400"
-        ' else if i mod 5 = 2
+        else if i = 8
+          row.settings.screenPos = 400
+        ' else if i = 12
         '   row.settings.screenPos = 800
-        '   row.title += " 800"
-        ' else
-        '   row.settings.screenPos = 0
-        '   row.title += " 0"
-        ' end if
+        ' else i = 13
+        '   row.settings.screenPos = 200
+        end if
       end if
 
-      if i = 10 or i = 14 or i = 19 or i = 22 or i = 23 or i = 28
-        cellType = "RectComp"
-        row.addFields({
-          "cellType": cellType
-        })
-      end if
       row.appendChildren(m.makeItems(m.defaultCellType, 20))
     end for
     return content
@@ -273,6 +265,13 @@ class ListScreen extends mv.BaseScreen
 
   private function onRowDidGainFocus(rowIndex as integer, direction as integer)
     ' ? "+SCREEN onRowDidGainFocus : R: "; rowIndex ; " D:" ; direction
+
+    row = m.list@.getRowRenderer(rowIndex)
+    mioc.setInstance("focusedIndex", {
+      row: rowIndex
+      cell: row.focusedCellIndex
+    })
+
     ' if direction = -1
     '   row = m.list@.getRowRenderer(rowIndex)
     '   row.opacity = 1
@@ -280,20 +279,21 @@ class ListScreen extends mv.BaseScreen
   end function
 
   private function onRowDidLoseFocus(rowIndex as integer, direction as integer)
+    ' ? "+SCREEN onRowDidLoseFocus : R: "; rowIndex ; " D:" ; direction
+
     ' row = m.list@.getRowRenderer(rowIndex)
     ' if direction = 1
     '   row.opacity = 0
     ' end if
 
-    ' ? "+SCREEN onRowDidLoseFocus : R: "; rowIndex ; " D:" ; direction
   end function
 
   private function onRowGainingFocus(rowIndex as integer, direction as integer, fraction as float)
+    ' ? "+SCREEN onRowGainingFocus : R: "; rowIndex ; " D:" ; direction ; " F: " ; fraction
     ' if direction = -1
     '   row = m.list@.getRowRenderer(rowIndex)
     '   row.opacity = fraction
     ' end if
-    ' ? "+SCREEN onRowGainingFocus : R: "; rowIndex ; " D:" ; direction ; " F: " ; fraction
   end function
 
   private function onRowLosingFocus(rowIndex as integer, direction as integer, fraction as float)

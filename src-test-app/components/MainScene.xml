@@ -12,7 +12,7 @@
         <field id="_global" type="node" />
 
         <!-- call this when you are ready to go! -->
-        <function name="begin" />
+        <function name="begin"/>
     </interface>
     <children>
       <Group id="mainGroup" />
