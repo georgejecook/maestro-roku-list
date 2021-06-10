@@ -17,7 +17,6 @@ namespace ml
 
       m.lookAheadDistance = maxPos * 1.5
       m.lookBehindDistance = maxPos * 1.5
-
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -33,7 +32,7 @@ namespace ml
       m.log.info("ROW updateLayout")
 
       index = 0
-      m.contentGroup.translation = m.settings.contentOffset
+      m.contentGroup.translation = [0, 0]
 
       offset = 0
       for each item in m.content.getChildren(-1, 0)
@@ -63,8 +62,6 @@ namespace ml
 
     override function applyRenderStateMap(renderStateMap as mc.types.assocarray)
       m.log.info("ROW applyRenderStateMap", m.row.index, m.row.isRendered)
-      ? ">>>>>>>>>>>>"
-      ? "RC RESET "
       m.renderedComponents = []
       if m.row.isRendered
         for each id in renderStateMap
@@ -77,8 +74,6 @@ namespace ml
         end for
       end if
 
-
-      ? "RENDERED COMPS" ; m.renderedComponents.count()
       m.lastRowIsRendered = m.row.isRendered
     end function
 
@@ -98,7 +93,6 @@ namespace ml
 
             if cell <> invalid
               cell.translation = m.rects[index].translation
-              cell.size = m.rects[index].size
 
               cell.initialState = {
                 row: m.row
@@ -188,12 +182,9 @@ namespace ml
       rect = super.getScreenRect(index, screenPos, direction)
 
       if rect <> invalid
-        rect.translation[0] = m.settings.contentOffset[0]
-        rect.translation[1] = m.settings.contentOffset[1] + m.settings.screenPos
+        rect.translation[1] += m.settings.screenPos
       end if
 
-      ' rowRect = m.owner@.getRowScreenRect(m.row.index, screenPos, direction)
-      ' rect.translation[1] += rowRect.translation[1]
       return rect
     end function
 

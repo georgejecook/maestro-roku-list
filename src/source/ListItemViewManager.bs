@@ -61,8 +61,14 @@ namespace ml
         comp.visible = comp.content.isHidden <> true
 
         if comp.visible
-          comp.translation = [0, y]
+          translation = [0, y]
+          contentOffset = settings.contentOffset
+          if contentOffset <> invalid
+            translation[0] += contentOffset[0]
+            translation[1] += contentOffset[1]
+          end if
 
+          comp.translation = translation
           'TODO better handle the whole visibility
 
           y += comp.height + settings.space
