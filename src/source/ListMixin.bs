@@ -64,13 +64,14 @@ namespace ml.listMixin
     return settings
   end function
 
-  function createHeaderSettings(labelTranslation = [30, 20] as string, height = 50 as integer, fontKey = "MediumBold,20" as string)
+  function createHeaderSettings(offset = [30, 20] as string, height = 50 as integer, fontKey = "MediumBold,30" as string, color = "#ffffff" as string)
     settings = createObject("roSGNode", "ml_HeaderSettings")
 
     settings.update({
-      labelTranslation: labelTranslation
+      offset: offset
       height: height
       fontKey: fontKey
+      textColor: color
     })
 
     return settings

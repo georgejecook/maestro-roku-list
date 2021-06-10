@@ -92,10 +92,11 @@ class ListScreen extends mv.BaseScreen
         row0FocusSettings = ml.listMixin.createFocusSettings(.2, .5)
         cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 30)
         row.settings = ml.listMixin.createRowSettings(cellSettings, row0FocusSettings)
+        row.settings.headerSettings.position = "none"
         row.settings.contentOffset = [400, 0]
       else if i = 1 or i = 4 or i = 8
         row1FocusSettings = ml.listMixin.createFocusSettings(.3, .1)
-        row1FocusSettings.feedbackUri = "pkg:/images/circle.png"
+        ' row1FocusSettings.feedbackUri = "pkg:/images/circle.png"
         row1FocusSettings.feedbackColor = "#F4D42A"
         cellSettings = ml.listMixin.createCellSettings("SubHeroCell", [900, 320], 100)
         row.settings = ml.listMixin.createRowSettings(cellSettings, row1FocusSettings)
@@ -114,25 +115,25 @@ class ListScreen extends mv.BaseScreen
         if i = 1
           row.settings.screenPos = 730
 
-        ' end if
-        ' if i mod 9 = 0
-        '   row.addFields({ "focusType": "fixed" })
-        '   ' row.addFields({ "focusType": "floatingWrap" })
-        '   row.title += " floating"
-        ' else
-        '   row.addFields({ "focusType": "fixed" })
-        '   row.title += " fixed"
-        ' end if
+          ' end if
+          ' if i mod 9 = 0
+          '   row.addFields({ "focusType": "fixed" })
+          '   ' row.addFields({ "focusType": "floatingWrap" })
+          '   row.title += " floating"
+          ' else
+          '   row.addFields({ "focusType": "fixed" })
+          '   row.title += " fixed"
+          ' end if
 
-        ' else if i = 6
-        '   row.settings.screenPos = 200
-        '   row.title += " 200"
+          ' else if i = 6
+          '   row.settings.screenPos = 200
+          '   row.title += " 200"
         else if i = 8
           row.settings.screenPos = 400
-        ' else if i = 12
-        '   row.settings.screenPos = 800
-        ' else i = 13
-        '   row.settings.screenPos = 200
+          ' else if i = 12
+          '   row.settings.screenPos = 800
+          ' else i = 13
+          '   row.settings.screenPos = 200
         end if
       end if
 
