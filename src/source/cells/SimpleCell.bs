@@ -48,8 +48,8 @@ namespace ml
       })
       m.label = mc.createSGNode("mv_Label", m.top, "label", {
         width: m.posterSize[0]
-        fontKey: "mediumBold,40"
-        color: "#ffffff"
+        fontKey: "medium,40"
+        color: "#aaaaaa"
         horizAlign: "center"
         translation: [10, 10]
       })
@@ -74,16 +74,16 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-    private function onScrollingChange(isScrolling as boolean, isLong as boolean)
-      if not isScrolling
-        m.label.visible = true
-      end if
-    end function
+    ' private function onScrollingChange(isScrolling as boolean, isLong as boolean)
+    '   if not isScrolling
+    '     m.label.visible = true
+    '   end if
+    ' end function
 
-    private function onScrollingUpdate(startIndex as integer, currentIndex as integer)
-      textVisible = abs(startIndex - currentIndex) < 2
-      m.label.visible = textVisible
-    end function
+    ' private function onScrollingUpdate(startIndex as integer, currentIndex as integer)
+    '   textVisible = abs(startIndex - currentIndex) < 2
+    '   m.label.visible = textVisible
+    ' end function
 
     private function onWillExit(direction as integer)
       ' ? "SC: onCellWillExit " ; " " ; direction
@@ -104,15 +104,23 @@ namespace ml
 
     private function onWillLoseFocus(direction as integer)
       ' ? "SC: onCellWillLoseFocus " ; " " ; direction
+      m.label.fontKey = "medium,40"
+      m.label.color = "#aaaaaa"
+
     end function
 
     private function onDidGainFocus(direction as integer)
       ' ? "SC: onCellDidGainFocus " ; " " ; direction
       m.setScale(1, true)
+      m.label.fontKey = "mediumBold,40"
+      m.label.color = "#ffffff"
+
     end function
 
     private function onDidLoseFocus(direction as integer)
       ' ? "SC: onCellDidLoseFocus " ; " " ; direction
+      m.label.fontKey = "medium,40"
+      m.label.color = "#aaaaaa"
       if direction = 1
         m.setScale(1, false)
       end if

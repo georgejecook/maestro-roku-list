@@ -62,16 +62,18 @@ namespace ml
 
         if comp.visible
           translation = [0, y]
+          yOffset = 0
           contentOffset = settings.contentOffset
           if contentOffset <> invalid
             translation[0] += contentOffset[0]
-            translation[1] += contentOffset[1]
+            yOffset = contentOffset[1]
+            translation[1] += yOffset
           end if
 
           comp.translation = translation
           'TODO better handle the whole visibility
 
-          y += comp.height + settings.space
+          y += comp.height + settings.space + yOffset
           m.rects.push({
             translation: comp.translation
             size: [w, comp.height]

@@ -89,7 +89,7 @@ class ListScreen extends mv.BaseScreen
     for i = 0 to m.numberOfRows - 1
       row = createObject("roSGNode", "ml_RowContent")
       if i = 0
-        row0FocusSettings = ml.listMixin.createFocusSettings(0.05, 0.05)
+        row0FocusSettings = ml.listMixin.createFocusSettings(0.02, 0.05)
         cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 20)
         row.settings = ml.listMixin.createRowSettings(cellSettings, row0FocusSettings)
         row.settings.contentOffset = [400, 0]
@@ -97,31 +97,30 @@ class ListScreen extends mv.BaseScreen
         row1FocusSettings = ml.listMixin.createFocusSettings(0.03, 0.01)
         cellSettings = ml.listMixin.createCellSettings("SubHeroCell", [900, 320], 100)
         row.settings = ml.listMixin.createRowSettings(cellSettings, row1FocusSettings)
+
       else if i = 5 or i = 11
         complexFocusSettings = ml.listMixin.createFocusSettings()
         complexFocusSettings.focusFeedbackStyle = "none"
         row.settings = ml.listMixin.createRowSettings(invalid, complexFocusSettings, 30, invalid, 0, "ComplexRow")
       else
         row.settings = ml.listMixin.createRowSettings(m.cellSettings, rowFocusSettings)
+        row.settings.contentOffset = [700, 100]
       end if
       row.title = "ROW " + str(i)
       content.push(row)
       if i <> 0
         if i = 1
-          row.settings.screenPos = 710
-        end if
-        ' if i mod 9 = 0
-        '   row.addFields({ "focusType": "fixed" })
-        '   ' row.addFields({ "focusType": "floatingWrap" })
-        '   row.title += " floating"
-        ' else
-        '   row.addFields({ "focusType": "fixed" })
-        '   row.title += " fixed"
-        ' end if
+          row.settings.screenPos = 750
+          end if
+          ' if i mod 9 = 0
+          '   row.addFields({ "focusType": "fixed" })
+          '   ' row.addFields({ "focusType": "floatingWrap" })
+          '   row.title += " floating"
+          ' else
+          '   row.addFields({ "focusType": "fixed" })
+          '   row.title += " fixed"
+          ' end if
 
-        ' if i = 1
-        '   row.settings.screenPos = 100
-        '   row.title += " 100"
         ' else if i mod 5 = 0
         '   row.settings.screenPos = 200
         '   row.title += " 200"
