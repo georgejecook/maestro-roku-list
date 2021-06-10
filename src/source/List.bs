@@ -25,7 +25,9 @@ namespace ml
     @observer("onAnimateToRowChange")
     public animateToRow = -1
     ' @observer("onFocusedRowPercentChange")
+    @observer("onFocusedRowIndexChange")
     public focusedRowIndex = 0
+    @observer("onFocusedCellIndexChange")
     public focusedCellIndex = 0
     public focusedRowPercent = 0.0
     public focusedCellPercent = 0.0
@@ -192,6 +194,20 @@ namespace ml
     end function
 
     private function onNextFocusIndexChange(index as mc.types.array) as void
+      m.applyFocusSettings(index, false)
+    end function
+
+    private function onFocusedRowIndexChange(index as integer)
+      row = m.getRowRenderer(index)
+      m.applyFocusSettings([index, row.focusedCellIndex], true)
+    end function
+
+    private function onFocusedCellIndexChange(index as integer)
+      m.applyFocusSettings([m.focusedRowIndex, index], true)
+    end function
+
+
+    private function applyFocusSettings(index as mc.types.array, isInPosition as boolean)
       m.targetFocusRect = m.getCellScreenRect(index[0], index[1])
       settings = ml.listMixin.getRowSettings(m.content, m.content.getChild(index[0]))
 
@@ -206,7 +222,10 @@ namespace ml
         end if
 
         m.moveFocusIndicatorToFocusPosition()
-        m.focusIndicator.visible = true
+        'note - we don't show again until we are in position
+        if isInPosition
+          m.focusIndicator.visible = true
+        end if
       end if
 
     end function
@@ -234,7 +253,7 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private function onKeyPressUp() as boolean
-      m.log.method("onKeyPressUp")
+      m.log.info("onKeyPressUp")
       if m.itemScroller.index > -1
         return m.itemScroller.move(-1)
       else
@@ -243,8 +262,10 @@ namespace ml
     end function
 
     private function onKeyPressDown() as boolean
-      m.log.method("onKeyPressDown")
+      m.log.info("onKeyPressDown")
+      ? "============AA"
       if m.itemScroller.index < m.viewManager.numberOfItems
+        ? "============BB"
         return m.itemScroller.move(1)
       else
         return false
@@ -252,7 +273,7 @@ namespace ml
     end function
 
     private function getLongPressIntervalForKey(key as string) as float
-      m.log.method("getLongPressIntervalForKey", key)
+      m.log.info("getLongPressIntervalForKey", key)
       if (key = "up" and m.itemScroller.index > 0) or (key = "down" and m.itemScroller.index < m.viewManager.numberOfItems)
         return 0.2
       else
@@ -261,7 +282,7 @@ namespace ml
     end function
 
     private function onLongPressStart(key as string) as boolean
-      m.log.method(">>>>onLongPressStart", key)
+      m.log.info(">>>>onLongPressStart", key)
 
       if (key = "up" and m.itemScroller.index > 0) or (key = "down" and m.itemScroller.index < m.viewManager.numberOfItems)
         if key = "up"
