@@ -157,7 +157,7 @@ class ComplexRow extends mv.BaseView
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   private function onDidGainFocus(direction as integer)
-    ? "CR: onDidGainFocus " ; " " ; direction
+    ' ? "CR: onDidGainFocus " ; " " ; direction
     if direction = 1
       m.setFocus(m.button1)
     else

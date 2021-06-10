@@ -74,7 +74,7 @@ class ListScreen extends mv.BaseScreen
 
     timer = new mc.utils.DebugTimer("list")
     m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30)
-    m.focusSettings = ml.listMixin.createFocusSettings(0.05, 0.01)
+    m.focusSettings = ml.listMixin.createFocusSettings(.5, .1)
     listSettings = ml.listMixin.createListSettings(-1, -1)
     content = ml.listMixin.createListContent(m.createData(), m.focusSettings, m.rowSettings, listSettings)
     timer.log("makeData")
@@ -85,22 +85,24 @@ class ListScreen extends mv.BaseScreen
 
   private function createData()
     content = []
-    rowFocusSettings = ml.listMixin.createFocusSettings(0.05, 0.01)
+    rowFocusSettings = ml.listMixin.createFocusSettings(.5, .1)
     for i = 0 to m.numberOfRows - 1
       row = createObject("roSGNode", "ml_RowContent")
       if i = 0
-        row0FocusSettings = ml.listMixin.createFocusSettings(0.02, 0.05)
+        row0FocusSettings = ml.listMixin.createFocusSettings(.2, .5)
         cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 30)
         row.settings = ml.listMixin.createRowSettings(cellSettings, row0FocusSettings)
         row.settings.contentOffset = [400, 0]
       else if i = 1 or i = 4 or i = 8
-        row1FocusSettings = ml.listMixin.createFocusSettings(0.03, 0.01)
+        row1FocusSettings = ml.listMixin.createFocusSettings(.3, .1)
+        row1FocusSettings.feedbackUri = "pkg:/images/circle.png"
+        row1FocusSettings.feedbackColor = "#F4D42A"
         cellSettings = ml.listMixin.createCellSettings("SubHeroCell", [900, 320], 100)
         row.settings = ml.listMixin.createRowSettings(cellSettings, row1FocusSettings)
 
       else if i = 5 or i = 11
         complexFocusSettings = ml.listMixin.createFocusSettings()
-        complexFocusSettings.focusFeedbackStyle = "none"
+        complexFocusSettings.feedbackStyle = "none"
         row.settings = ml.listMixin.createRowSettings(invalid, complexFocusSettings, 30, invalid, 0, "ComplexRow")
       else
         row.settings = ml.listMixin.createRowSettings(m.cellSettings, rowFocusSettings)

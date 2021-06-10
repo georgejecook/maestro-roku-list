@@ -89,44 +89,16 @@ namespace ml.listMixin
     return settings
   end function
 
-  ' function createGridRowSettings(compName = "SimpleTile", numCols = 3, spacing = [20, 20], cellSize = [300, 500], screenPos = 0, headerSettings = invalid)
-  '   'TODO
-  '   return {}
-  ' end function
-
-  ' function createGridRowContent(items, rowSettings)
-  '   rowContent = createObject("roSGNode", "roku_list_GridRowContent")
-  '   rows = []
-  '   for each item in items.getChildren(-1, 0)
-  '     row = createObject("roSGNode", "roku_list_RowContent")
-  '     row.group = rowContent
-  '   end for
-  '   rowContent.rowSettings = rowSettings
-  '   rowContent.appendChildren(rows)
-  '   return rowContent
-  ' end function
-
-  function createFocusSettings(animSpeed = 0.03 as float, fastAnimSpeed = 0.01 as float, focusStyle = "fixed" as string)
+  function createFocusSettings(animSpeed = 3 as float, fastAnimSpeed = 1 as float, animStyle = "fixed" as string)
     settings = createObject("roSGNode", "ml_FocusSettings")
     settings.update({
-      animSpeed: animSpeed
-      fastAnimSpeed: fastAnimSpeed
-      focusStyle: focusStyle
+      animSpeed: animSpeed / 10.0
+      fastAnimSpeed: fastAnimSpeed / 10.0
+      animStyle: animStyle
     })
     return settings
 
   end function
-  ' 'usage
-  ' 'ON GET JSON DATA
-  ' json = m.serverGetDataHomeScreen()
-  ' content = createObjecT("roSGNode", "ContentNode")
-  ' content.appendChild(makeHeroRow(json.hero))
-  ' content.appendChild(makeFavesRow(json.faves))
-  ' moviesGridSettings = createGridRowSettings("Cell")
-  ' myGridRowContent = createGridRowContent(makeGridItems(json.showsGrid), moviesGridSettings)
-  ' for each show in json.shows
-  ' content.appendChild(makeShowRow(show))
-  ' end for
 
   function setTileSettings(compName = "ml_Cell" as string, cellSize = [300, 500] as mc.types.array)
   end function

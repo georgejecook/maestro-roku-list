@@ -233,13 +233,10 @@ namespace ml
       m.toggleScrolling(false)
       m.targetIndex = -1
       m.index = nextIndex
-      ? "---------------------"
-      ? m.index ; m.nextIndex
       m.setFocusOnRenderer(false)
     end function
 
     function finishAnimating() as void
-      ? "FINISH ANIMATING"
       if m.direction = -1
         ' ? "FINISH BACK"
         position = m.container.translation[m.axes] - m.activeOffset
@@ -281,7 +278,7 @@ namespace ml
       if nextTranslation <> invalid
         m.nextPosition = nextTranslation[m.axes]
       else
-        ? "COULD NOT GET NEXT POSITING - USING INDEX POS"
+        ? "COULD NOT GET NEXT POSITION - USING INDEX POS"
         m.nextPosition = m.indexPosition
       end if
     end function
