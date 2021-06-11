@@ -3,117 +3,128 @@ import "pkg:/source/ItemDelegateMixin.bs"
 import "pkg:/source/RowItemScroller.bs"
 import "pkg:/source/RowItemViewManager.bs"
 import "pkg:/source/ItemFocusManager.bs"
-import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
+import "pkg:/source/BaseRow.bs"
 
 namespace ml
-  @node("ml_HorizontalRow", "mv_BaseView")
-  class HorizontalRow extends mv.BaseView
+  @node("ml_HorizontalRow", "ml_BaseRow")
+  class HorizontalRow extends ml.BaseRow
 
-    'public fields
-    @observer("onContentChange")
-    public content as mc.types.Node
-    private _currentContent
-    public index = -1
-    public owner as mc.types.Node
-    @observer("onListEvent")
-    public listEvent as mc.types.Assocarray
-    public renderState = "none"
-    @observer("onIsRenderedChange")
-    public isRendered = false
-    public isInViewport = false
-    @observer("onAnimateToItemChange")
-    public animateToItem = -1
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ additional private state
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     public focusedCellIndex = 0
     public focusedCellPercent = 0.0
-    ' @observer("onIsScrollingChange")
     public isScrolling = false
-    public height = 0
-    public width = 0
 
-    'managers and state
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ managers and private state
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     private viewManager
     private focusManager
     private itemScroller
-    private isInitialized = false
-    private wasHidden = false
-    private wasFocusable = true
     private currentHeaderType = invalid
-    'debug
-    public _vs = "none"
     private settings
 
-    'views
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ views
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     private backgroundGroup
     private cellsGroup
     private contentGroup
     private foregroundGroup
     private header
 
-    'util
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ view tracking
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     private componentPool = m.global.componentPool
-    private cellTracker = m.global.cellTracker
 
     function new()
-      super("ml_HorizontalRow")
-      ml.itemDelegateMixin.setDelegate()
+      super()
     end function
 
-    protected override function initialize()
-      super.initialize()
-      m.createViews()
-      m.createManagers()
-      m.isInitialized = true
-      m.onContentChange()
-    end function
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ initialization
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    private function createViews()
+    protected override function createViews()
       m.backgroundGroup = m.createSGNode("Group", m.top, "backgroundGroup")
       m.contentGroup = m.createSGNode("Group", m.top, "contentGroup")
       m.cellsGroup = m.createSGNode("Group", m.contentGroup, "cellsGroup")
       m.foregroundGroup = m.createSGNode("Group", m.top, "foregroundGroup")
+      m.createManagers()
     end function
 
     private function createManagers()
       m.log.info("createManagers")
-      m.viewManager = new ml.RowItemViewManager(m.owner, m.top, m.cellsGroup, m.componentPool, m.cellTracker, 0, m.width)
+      m.viewManager = new ml.RowItemViewManager(m.owner, m.top, m.cellsGroup, m.componentPool, 0, m.width)
       m.itemScroller = new ml.RowItemScroller(m.viewManager)
       m.focusManager = new ml.ItemFocusManager(m.viewManager, m.itemScroller, m.owner.cellEvents, m.index)
       m.focusManager.name = "ROW FM "
       m.focusManager.isRow = true
     end function
 
-    private function onContentChange()
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ overridden
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    protected override function onContentChange(content as mc.types.node)
       m.log.info("onContentChange")
-      if m.isInitialized
-        if m._currentContent = invalid or not m._currentContent.isSameNode(m.content)
-          m._currentContent = m.content
-          m.settings = ml.listMixin.getRowSettings(m.owner.content, m.content)
-
-          m.configureHeader()
-          m.calculateHeight()
-          m.createManagers()
-          m.viewManager.setContent(m.content)
-          m.focusManager.isNotifying = false
-          m.itemScroller.reset()
-          m.focusManager.isNotifying = true
-        else if m._currentContent <> invalid
-          isListRefreshNeeded = false
-          if m.wasHidden <> m._currentContent.isHidden
-            m.wasHidden = m._currentContent.isHidden
-            isListRefreshNeeded = true
-          end if
-          if m.wasFocusable <> m._currentContent.isFocusEnabled
-            m.wasFocusable = m._currentContent.isFocusEnabled
-            isListRefreshNeeded = true
-          end if
-
-          if isListRefreshNeeded
-            m.owner@.forceUpdate()
-          end if
-        end if
-
+      m.configureHeader()
+      m.calculateHeight()
+      if content <> invalid
+        m.viewManager.setContent(content)
+        m.focusManager.isNotifying = false
+        m.itemScroller.reset()
+        m.focusManager.isNotifying = true
       end if
     end function
+
+    protected override function onIsRenderedChange()
+      if m.viewManager <> invalid
+        m.viewManager.updateRenderedComponents(m.itemScroller.direction, m.itemScroller.index)
+      end if
+    end function
+
+    protected override function onListEvent(event as object)
+      if event.name = "willEnter" or event.name = "didEnter"
+        for each component in m.cellsGroup.getChildren(-1, 0)
+          if component.doesExist("listEvent")
+            component.listEvent = event
+          end if
+        end for
+      end if
+    end function
+
+    protected override function onAnimateToItemChange(index as integer)
+      if m._currentContent <> invalid
+        m.itemScroller.moveToIndex(index)
+      end if
+    end function
+
+    public override function getRenderer(index as integer)
+      return m.viewManager.getRenderer(index)
+    end function
+
+    public override function getRect(index as integer, useScreenCoords = false as boolean)
+      return m.viewManager.getRect(index, useScreenCoords)
+    end function
+
+    public override function getScreenRect(index as integer, screenPos = invalid as integer, direction = 0 as integer)
+      rect = m.viewManager.getScreenRect(index, screenPos, direction)
+      if rect <> invalid
+        rect.translation[1] += m.contentGroup.translation[1]
+      end if
+      return rect
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ header
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private function configureHeader()
       if m._currentContent = invalid
@@ -149,7 +160,20 @@ namespace ml
       end if
     end function
 
-    private function calculateHeight()
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ public api
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ private impl
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    protected override function calculateHeight() as integer
+      if m.settings = invalid
+        return 0
+      end if
+
       if m.settings.height <> -1
         height = m.settings.height
       else
@@ -159,45 +183,7 @@ namespace ml
       if m.header <> invalid
         height += m.settings.headerSettings.height
       end if
-      m.height = height
-    end function
-
-    private function onIsRenderedChange()
-      if m.viewManager <> invalid
-        m.viewManager.updateRenderedComponents(m.itemScroller.direction, m.itemScroller.index)
-      end if
-    end function
-
-    private function onListEvent(event as object)
-      if event.name = "willEnter" or event.name = "didEnter"
-        for each component in m.cellsGroup.getChildren(-1, 0)
-          if component.doesExist("listEvent")
-            component.listEvent = event
-          end if
-        end for
-      end if
-    end function
-
-    private function onAnimateToItemChange()
-      if m.content <> invalid
-        m.itemScroller.moveToIndex(m.animateToItem)
-      end if
-    end function
-
-    public function getRenderer(index as integer)
-      return m.viewManager.getRenderer(index)
-    end function
-
-    public function getRect(index as integer, useScreenCoords = false as boolean)
-      return m.viewManager.getRect(index, useScreenCoords)
-    end function
-
-    public function getScreenRect(index as integer, screenPos = invalid as integer, direction = 0 as integer)
-      rect = m.viewManager.getScreenRect(index, screenPos, direction)
-      if rect <> invalid
-        rect.translation[1] += m.contentGroup.translation[1]
-      end if
-      return rect
+      return height
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

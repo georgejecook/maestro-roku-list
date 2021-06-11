@@ -5,14 +5,12 @@ namespace ml
     public row = invalid
     public cellsById = {}
     public componentPool
-    public cellTracker
     public lastRowIsRendered = "none"
     public isFlowSupported = false
 
-    function new(list as mc.types.node, row as mc.types.node, container as mc.types.node, componentPool as mc.types.node, cellTracker as mc.types.node, minPos as integer, maxPos as integer)
+    function new(list as mc.types.node, row as mc.types.node, container as mc.types.node, componentPool as mc.types.node, minPos as integer, maxPos as integer)
       super("RowItemViewManager", list, container, 0, minPos, maxPos)
       m.componentPool = componentPool
-      m.cellTracker = cellTracker
       m.row = row
 
       m.lookAheadDistance = maxPos * 1.5
