@@ -21,7 +21,6 @@ class ListScreen extends mv.BaseScreen
 
   'state
   public componentPool as mc.types.Node
-  public cellTracker as mc.types.Node
   private contentId = 0
   private rowSettings
   private focusSettings
@@ -46,7 +45,6 @@ class ListScreen extends mv.BaseScreen
     })
     m.listHolder = m.createSGNode("Group", m.top, "listHolder")
     m.componentPool = m.global.componentPool
-    m.cellTracker = m.global.cellTracker
 
     m.list = m.createSGNode("ml_List", m.listHolder, "list", {
       translation: translation
