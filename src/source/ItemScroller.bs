@@ -34,6 +34,7 @@ namespace ml
     private settings
     private isMovingMultiple = false
     private activeOffset = 0
+    private isScrollCancelled = 0
 
     function new(viewManager as ml.ItemViewManager, axes as mc.types.array)
       super("ItemScroller")
@@ -75,6 +76,15 @@ namespace ml
         m.moveToIndex(previousIndex, previousScreenPos, false)
       else
         m.moveToIndex(0, invalid, false)
+      end if
+    end function
+
+    public function cancelScrolling()
+      'this will force the scrolling to stop repeating if we move to another row
+      if m.viewManager.isScrolling
+        m.finishAnimating()
+        m.toggleScrolling(false)
+        m.isMovingMultiple = false
       end if
     end function
 

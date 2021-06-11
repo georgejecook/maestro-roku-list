@@ -190,10 +190,10 @@ namespace ml
     end function
 
     private function onAnimateToItemChange(index as integer)
-      if m.content <> invalid
+      if m._currentContent <> invalid
         row = m.getRowRenderer(m.focusedRowIndex)
         if row <> invalid
-          row.focusedCellIndex = index
+          row.animateToItem = index
         end if
       end if
     end function
