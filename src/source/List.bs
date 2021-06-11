@@ -10,23 +10,33 @@ namespace ml
   @node("ml_List", "mv_BaseView")
   class List extends mv.BaseView
 
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ content
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     @observer("onContentChange")
     public content as mc.types.Node
-
     private _lastContent
-
-    public isScrolling = false
-    public isHidden = false
 
     public width = 1920
     public height = 1080
-    'indicates what to set a row to when it's considered hidden (hidden|partial)
-    public rowHidingMode = "hidden"
+    public isHidden = false
+
     @observer("onAnimateToRowChange")
     public animateToRow = -1
+
+    @observer("onAnimateToItemChange")
+    public animateToItem = -1
+
     ' @observer("onFocusedRowPercentChange")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ state
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    public isScrolling = false
+
     @observer("onFocusedRowIndexChange")
     public focusedRowIndex = 0
+
     @observer("onFocusedCellIndexChange")
     public focusedCellIndex = 0
     public focusedRowPercent = 0.0
@@ -34,18 +44,25 @@ namespace ml
 
     @observer("onNextFocusIndexChange")
     public nextFocusIndex as mc.types.Array
+
+    @alwaysnotify
+    public itemSelected as mc.types.array
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ internal event tracking
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     public cellEvents as mc.types.Node
     public rowEvents as mc.types.Node
-    public listEvent as mc.types.Assocarray
 
-    public rowFocused = 0
-    public itemFocused = 0
-    public itemUnfocused = 0
-    public itemSelected = -1
-    public currFocusItemIndex = 0
+    @alwaysnotify
+    public listEvent as mc.types.Assocarray
     public _focusedRenderer as mc.types.Node
 
-    'managers and state
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ managers and internal state
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     private viewManager
     private focusManager
     private itemScroller
@@ -53,13 +70,19 @@ namespace ml
     private targetFocusRect
     private isInitialized = false
 
-    'views
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ views
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     private focusTimer
     private contentGroup
     private rowsGroup
     private focusPoint
 
-    'TODO make it so focusIndicator can be any view at all, or have different posters based on row settings
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ focusIndicator
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     private focusIndicator
     private focusAnim
     private focusMoveAnim
@@ -68,6 +91,10 @@ namespace ml
     function new()
       super("mv_List")
     end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ initialization
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     protected override function initialize()
       super.initialize()
@@ -79,6 +106,7 @@ namespace ml
     end function
 
     private function createViews()
+      'TODO - might still end up needing this... depends on how floating focus lands
       ' m.focusTimer = m.createSGNode("Timer", m.top, "focusTimer", {
       '   duration: 0.01
       '   control: "start"
@@ -131,7 +159,7 @@ namespace ml
         m.viewManager.setContent(m.content)
         m.itemScroller.reset()
         m.top.clippingrect = [0, 0, m.width, m.height]
-        'FIXME - this is hardcoded
+        'FIXME - this is hardcoded - it could be that the first index is not valid
         m.nextFocusIndex = [0, 0]
       end if
     end function
@@ -143,6 +171,10 @@ namespace ml
       end if
     end function
 
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ callbacks
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     private function onContentChange()
       m.log.info("onContentChange")
       if m.isInitialized and (m._lastContent = invalid or not m._lastContent.isSameNode(m.content))
@@ -151,11 +183,24 @@ namespace ml
       end if
     end function
 
-    private function onAnimateToRowChange()
+    private function onAnimateToRowChange(index as integer)
       if m.content <> invalid
-        m.itemScroller.moveToIndex(m.animateToRow)
+        m.itemScroller.moveToIndex(index)
       end if
     end function
+
+    private function onAnimateToItemChange(index as integer)
+      if m.content <> invalid
+        row = m.getRowRenderer(m.focusedRowIndex)
+        if row <> invalid
+          row.focusedCellIndex = index
+        end if
+      end if
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ public api
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     public function forceUpdate()
       m.viewManager.forceUpdateLayout()
@@ -193,6 +238,10 @@ namespace ml
       return m.viewManager.getScreenRect(rowIndex, screenPos, direction)
     end function
 
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ focus management
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     private function onNextFocusIndexChange(index as mc.types.array) as void
       m.applyFocusSettings(index, false)
     end function
@@ -205,7 +254,6 @@ namespace ml
     private function onFocusedCellIndexChange(index as integer)
       m.applyFocusSettings([m.focusedRowIndex, index], true)
     end function
-
 
     private function applyFocusSettings(index as mc.types.array, isInPosition as boolean)
       m.targetFocusRect = m.getCellScreenRect(index[0], index[1])
@@ -234,7 +282,7 @@ namespace ml
 
     end function
 
-    function moveFocusIndicatorToFocusPosition(animated = true as boolean) as void
+    private function moveFocusIndicatorToFocusPosition(animated = true as boolean) as void
       if m.targetFocusRect = invalid
         m.log.error("no target focus rect!")
         return
@@ -257,7 +305,7 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private function onKeyPressUp() as boolean
-      m.log.info("onKeyPressUp")
+      m.log.verbose("onKeyPressUp")
       if m.itemScroller.index > -1
         return m.itemScroller.move(-1)
       else
@@ -265,8 +313,20 @@ namespace ml
       end if
     end function
 
+    private function onKeyPressOk() as boolean
+      m.log.verbose("onKeyPressOk")
+      m.itemSelected = [m.focusedRowIndex, m.focusedCellIndex]
+      m.listEvent = {
+        name: "itemSelected"
+        index: m.focusedRowIndex
+        cellIndex: m.focusedCellIndex
+      }
+
+      return true
+    end function
+
     private function onKeyPressDown() as boolean
-      m.log.info("onKeyPressDown")
+      m.log.verbose("onKeyPressDown")
       if m.itemScroller.index < m.viewManager.numberOfItems
         return m.itemScroller.move(1)
       else
@@ -275,7 +335,7 @@ namespace ml
     end function
 
     private function getLongPressIntervalForKey(key as string) as float
-      m.log.info("getLongPressIntervalForKey", key)
+      m.log.verbose("getLongPressIntervalForKey", key)
       if (key = "up" and m.itemScroller.index > 0) or (key = "down" and m.itemScroller.index < m.viewManager.numberOfItems)
         return 0.2
       else

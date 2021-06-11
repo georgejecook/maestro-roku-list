@@ -75,7 +75,8 @@ class ListScreen extends mv.BaseScreen
     timer = new mc.utils.DebugTimer("list")
     m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30)
     m.focusSettings = ml.listMixin.createFocusSettings(.5, .1)
-    listSettings = ml.listMixin.createListSettings(-1, -1)
+    listSettings = ml.listMixin.createListSettings(3000, 2000)
+    ' listSettings = ml.listMixin.createListSettings(-1, -1)
     content = ml.listMixin.createListContent(m.createData(), m.focusSettings, m.rowSettings, listSettings)
     timer.log("makeData")
     m.list.content = content
@@ -140,20 +141,6 @@ class ListScreen extends mv.BaseScreen
       row.appendChildren(m.makeItems(m.defaultCellType, 20))
     end for
     return content
-  end function
-
-  private function onItemSelected()
-    print "onItemSelected changed to: "; m.list.itemSelected
-    newScreen = createObject("roSGNode", "ListScreen")
-    m.push(newScreen)
-    mv.setFocus(newScreen)
-  end function
-
-  private function itemUnfocused()
-    print "itemUnfocused changed to: "; m.list.itemUnfocused
-  end function
-
-  private function currFocusItemIndex()
   end function
 
   private function addItems(cellType as string, number as integer)
@@ -306,6 +293,13 @@ class ListScreen extends mv.BaseScreen
     '   row.opacity = 1 - fraction
     ' end if
 
+  end function
+
+  private function onItemSelected(rowIndex as integer, cellIndex as integer)
+    ? ">>>onItemSelected changed to:" ; rowIndex ; "," ; cellIndex
+    ' newScreen = createObject("roSGNode", "ListScreen")
+    ' m.push(newScreen)
+    ' mv.setFocus(newScreen)
   end function
 
 end class

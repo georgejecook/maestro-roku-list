@@ -1,15 +1,8 @@
 namespace ml.delegateMixin
 
-  ' /**
-  '  * @member setDelegate
-  '  * @memberof module:delegateMixin
-  '  * @instance
-  '  * @function
-  '  * @description description
-  '  * @param {MList} list instance to add delegate methods for
-  '  * @param {class} instance, target for the delegate methods - if invalid, then methods will be called on m
-  '  * @returns {returnType} returnDescription
-  '  */
+  ' @param {MList} list instance to add delegate methods for
+  ' @param {class} instance, target for the delegate methods - if invalid, then methods will be called on m
+  ' @returns {returnType} returnDescription
   function setListDelegate(list as mc.types.node, instance = invalid as object)
     if instance = invalid
       instance = m
@@ -17,37 +10,44 @@ namespace ml.delegateMixin
 
     ml.delegateMixin.setListRowDelegate(list, instance)
     ml.delegateMixin.setListCellDelegate(list, instance)
+    ml.delegateMixin.setListDelegate_internal(list, instance)
 
-    if m.isObservingCellEvents or m.isObservingRowEvents
+    if m.isObservingCellEvents or m.isObservingRowEvents or m.isObservingListEvents
       m.listDelegate = instance
     else
       m.listDelegate = invalid
     end if
 
     ' ? "SET LIST DELEGATE: CE "; m.isObservingCellEvents ; " RE " ; m.isObservingRowEvents
-    ml.delegateMixin.toggleDelegateActive(list, m.isObservingCellEvents or m.isObservingRowEvents)
+    ml.delegateMixin.toggleDelegateActive(list)
 
   end function
 
-  function toggleDelegateActive(list as mc.types.node, isActive as boolean)
-    ' ? "TOGGLE ACTIVE "; isActive
-    if isActive
-      if m.isObservingCellEvents
-        ' ? "LISTENING TO CELL EVENTS"
-        mc.toggleObserver(list.cellEvents, "listEvent", mc.getFunctionName(ml.delegateMixin.onCellEventBridge))
-        mc.toggleObserver(list.cellEvents, "viewportEvents", mc.getFunctionName(ml.delegateMixin.onCellEventsBridge))
-      end if
-
-      if m.isObservingRowEvents
-        ' ? "LISTENING TO ROW EVENTS"
-        mc.toggleObserver(list.rowEvents, "listEvent", mc.getFunctionName(ml.delegateMixin.onRowEventBridge))
-        mc.toggleObserver(list.rowEvents, "viewportEvents", mc.getFunctionName(ml.delegateMixin.onRowEventsBridge))
-      end if
+  function toggleDelegateActive(list as mc.types.node)
+    if m.isObservingCellEvents
+      ' ? "LISTENING TO CELL EVENTS"
+      mc.toggleObserver(list.cellEvents, "listEvent", mc.getFunctionName(ml.delegateMixin.onCellEventBridge))
+      mc.toggleObserver(list.cellEvents, "viewportEvents", mc.getFunctionName(ml.delegateMixin.onCellEventsBridge))
     else
       mc.toggleObserver(list.cellEvents, "listEvent")
       mc.toggleObserver(list.cellEvents, "viewportEvents")
+
+    end if
+
+    if m.isObservingRowEvents
+      ' ? "LISTENING TO ROW EVENTS"
+      mc.toggleObserver(list.rowEvents, "listEvent", mc.getFunctionName(ml.delegateMixin.onRowEventBridge))
+      mc.toggleObserver(list.rowEvents, "viewportEvents", mc.getFunctionName(ml.delegateMixin.onRowEventsBridge))
+    else
       mc.toggleObserver(list.rowEvents, "listEvent")
       mc.toggleObserver(list.rowEvents, "viewportEvents")
+    end if
+
+    if m.isObservingListEvents
+      ' ? "LISTENING TO ROW EVENTS"
+      mc.toggleObserver(list, "listEvent", mc.getFunctionName(ml.delegateMixin.onListEventBridge))
+    else
+      mc.toggleObserver(list, "listEvent")
     end if
   end function
 
@@ -113,6 +113,56 @@ namespace ml.delegateMixin
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ list
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function setListDelegate_internal(list as mc.types.node, instance = invalid as object)
+    m.listEventMap = {}
+
+    if instance <> invalid
+      funcMap = {
+        "onItemSelected": "itemSelected"
+      }
+
+      for each funcName in funcMap
+        if mc_isFunction(instance[funcName])
+          m.listEventMap[funcMap[funcName]] = funcName
+        end if
+      end for
+    end if
+
+    m.isObservingListEvents = m.listEventMap.count() > 0
+  end function
+
+  function onListEventBridge(sgEvent as object) as void
+    if m.isObservingListEvents
+      ml.delegateMixin.handleListEvent(sgEvent.getData())
+    end if
+  end function
+
+  function onListEventsBridge(sgEvent as object) as void
+    if m.isObservingListEvents
+      for each event in sgEvent.getData()
+        ml.delegateMixin.handleRowEvent(event)
+      end for
+    end if
+  end function
+
+  function handleListEvent(event as mc.types.assocarray) as void
+    eventName = event.name
+    if not m.isObservingRowEvents or m.listRowEventMap[eventName] = invalid
+      ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
+      return
+    end if
+
+    if eventName = "itemSelected"
+      m.listDelegate.onItemSelected(event.index, event.cellIndex)
+    end if
+
+  end function
+
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ rows
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -131,6 +181,8 @@ namespace ml.delegateMixin
         "onRowDidLoseFocus": "didLoseFocus"
         "onRowGainingFocus": "gainingFocus"
         "onRowLosingFocus": "losingFocus"
+        "onItemSelected": "itemSelected"
+        "onScrollingUpdate": "scrollUpdate"
         "onScrollingUpdate": "scrollUpdate"
       }
 
@@ -166,16 +218,19 @@ namespace ml.delegateMixin
   function handleRowEvent(event as mc.types.assocarray) as void
     eventName = event.name
     if not m.isObservingRowEvents or m.listRowEventMap[eventName] = invalid
-      ' ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
+      ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
       return
     end if
 
+    ? "LE  " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
     if eventName = "scrollStart" or eventName = "scrollStop"
-      m.listItemDelegate["onRowScrollingChange"](event.index, eventName = "scrollStart", event.long)
+      m.listItemDelegate.onRowScrollingChange(event.index, eventName = "scrollStart", event.long)
     else if eventName = "scrollUpdate"
-      m.listItemDelegate["onRowScrollingUpdate"](event.startIndex, event.currentIndex)
+      m.listItemDelegate.onRowScrollingUpdate(event.startIndex, event.currentIndex)
     else if eventName = "gainingFocus" or eventName = "losingFocus"
       m.listDelegate[m.listRowEventMap[eventName]](event.index, event.direction, event.fraction)
+    else if eventName = "onItemSelected"
+      m.listDelegate.onItemSelected(event.index, event.cellIndex)
     else
       m.listDelegate[m.listRowEventMap[eventName]](event.index, event.direction)
     end if

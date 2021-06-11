@@ -1,14 +1,8 @@
 namespace ml.itemDelegateMixin
 
-  ' /**
-  '  * @member setDelegate
-  '  * @memberof module:ml.delegateMixin
-  '  * @instance
-  '  * @function
-  '  * @description wires up a cell, or row (or some other list item) to method handlers for the delegate events it may receive. This should be used to add listeners to a cell, or a row renderer. You are free to just simply use the events, that come in onListEventMap, as well.
-  '  * @param {class} instance - target for the delegate; if invalid, then it will default to the methods on node scope
-  '  * @returns {returnType} returnDescription
-  '  */
+  ' wires up a cell, or row (or some other list item) to method handlers for the delegate events it may receive. This should be used to add listeners to a cell, or a row renderer. You are free to just simply use the events, that come in onListEventMap, as well.
+  ' @param {class} instance - target for the delegate; if invalid, then it will default to the methods on node scope
+  ' @returns {returnType} returnDescription
   function setDelegate(instance = invalid as object)
     m.listEventMap = {}
     if instance = invalid
@@ -47,6 +41,8 @@ namespace ml.itemDelegateMixin
       m.listItemDelegate = instance
       'bs:disable-next-line
       mc.toggleObserver(m.top, "listEvent", mc.getFunctionName(onListEventBridge))
+    else
+      mc.toggleObserver(m.top, "listEvent")
     end if
   end function
 
