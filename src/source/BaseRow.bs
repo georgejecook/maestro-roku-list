@@ -72,10 +72,11 @@ namespace ml
 
     private function _onContentChange()
       m.log.info("onContentChange")
+      ? "ON CONTENT CHANGE!!!"
       if m.isInitialized
         if m._currentContent = invalid or not m._currentContent.isSameNode(m.content)
           m._currentContent = m.content
-          m.settings = ml.listMixin.getRowSettings(m.owner.content, m.content)
+          m.settings = ml.listMixin.getRowSettings(m.owner.content, m._currentContent)
           m.onContentChange(m._currentContent)
           m._calculateHeight()
         else if m._currentContent <> invalid
@@ -100,6 +101,15 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ public api
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public function forceUpdate(keepOldFocusIfPossible = true as boolean) as void
+      if m.owner = invalid or m._currentContent = invalid
+        return
+      end if
+      m.settings = ml.listMixin.getRowSettings(m.owner.content, m._currentContent)
+      m.onContentChange(m._currentContent, keepOldFocusIfPossible = invalid or keepOldFocusIfPossible = true)
+      m._calculateHeight()
+    end function
 
     public function getRenderer(index as integer) as object
       'implement me

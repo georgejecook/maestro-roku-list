@@ -72,14 +72,15 @@ namespace ml
     '++ overridden
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    protected override function onContentChange(content as mc.types.node)
+    protected override function onContentChange(content as mc.types.node, keepOldFocusIfPossible = false as boolean)
       m.log.info("onContentChange")
       m.configureHeader()
       m.calculateHeight()
       if content <> invalid
         m.viewManager.setContent(content)
-        m.focusManager.isNotifying = false
-        m.itemScroller.reset()
+
+        m.focusManager.isNotifying = keepOldFocusIfPossible = invalid or keepOldFocusIfPossible = true
+        m.itemScroller.reset(keepOldFocusIfPossible)
         m.focusManager.isNotifying = true
       end if
     end function
