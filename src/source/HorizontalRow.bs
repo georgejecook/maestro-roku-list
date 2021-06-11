@@ -15,6 +15,7 @@ namespace ml
     public focusedCellIndex = 0
     public focusedCellPercent = 0.0
     public isScrolling = false
+    private isScrollingEnabled = false
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ managers and private state
@@ -187,15 +188,17 @@ namespace ml
 
     private function onKeyPressLeft() as boolean
       m.log.verbose("onKeyPressLeft")
-      if m.isFocused
+      ? "LEFT "; m.isScrollingEnabled
+      if m.isScrollingEnabled
         m.itemScroller.move(-1)
       end if
       return true
     end function
 
     private function onKeyPressRight() as boolean
-      m.log.verbose("onKeyPressRight")
-      if m.isFocused
+    m.log.verbose("onKeyPressRight")
+    ? "RIGh "; m.isScrollingEnabled
+      if m.isScrollingEnabled
         m.itemScroller.move(1)
       end if
       return true
@@ -203,9 +206,11 @@ namespace ml
 
     private function getLongPressIntervalForKey(key as string) as float
       m.log.verbose("getLongPressIntervalForKey", key)
-      if (key = "left" or key = "right") and m.isFocused
+      ? " LONG INTERVAL "; m.isScrollingEnabled ; " " ; m.index
+      if key = "left" or key = "right"
         return 0.2
       else
+        ? " REJECTED " ; m.index
         return 0
       end if
     end function
@@ -213,8 +218,9 @@ namespace ml
     private function onLongPressStart(key as string) as boolean
       m.log.verbose(">>>>onLongPressStart", key)
 
-      if (key = "left" or key = "right") and m.isFocused
-        m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
+      ? "LPS" ; m.isScrollingEnabled ; " " ; m.index
+      if (key = "left" or key = "right") and m.isScrollingEnabled
+        m.log.verbose("long press started on key", key, "going to animate to final scroll position")
         if key = "left"
           m.itemScroller.moveToEnd(-1)
         else
@@ -222,6 +228,8 @@ namespace ml
         end if
 
         return true
+      else
+        ? " REJECTED " ; m.index
       end if
 
       return false
@@ -243,8 +251,16 @@ namespace ml
 
     protected function onWillLoseFocus(direction as integer)
       m.log.verbose("This row will lose focus - cancelling scrolling")
+      ? " WILL LOSE "; m.index
       m.itemScroller.cancelScrolling()
       m.toggleLongPressTimer(0)
+      m.isScrollingEnabled = false
+    end function
+
+    protected function onWillGainFocus(direction as integer)
+      m.log.verbose("This row will gain focus - cancelling scrolling")
+      ? " WILL GAIN "; m.index
+      m.isScrollingEnabled = true
     end function
 
   end class

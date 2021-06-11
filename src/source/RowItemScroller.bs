@@ -6,7 +6,7 @@ namespace ml
       super(viewManager, 0)
     end function
 
-    override function setFocusOnRenderer(isMoving as boolean)
+    override function setFocusOnRenderer(isMoving as boolean, index = invalid as integer)
       if not isMoving
         m.log.info("stopped scrolling on item", m.index)
       end if

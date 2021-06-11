@@ -217,12 +217,12 @@ namespace ml
       isMoveRequired = targetTranslation[m.axes] <> m.container.translation[m.axes]
       m.log.info("moving", m.container.translation[m.axes], " > ", targetTranslation[m.axes], " pixels. animated? ", animated)
       if animated
+
         if fast
           m.animSpeed = m.settings.fastAnimSpeed
         else
           m.animSpeed = m.settings.animSpeed
         end if
-
         if not isMoveRequired
           m.log.info("already in place - no need to scroll ", m.index, " >", m.nextIndex)
           m.setFocusUsingFlowAnim(m.index, m.nextIndex, m.direction)
@@ -251,7 +251,8 @@ namespace ml
       m.flowFocusIndex = nextIndex
       fromItem = m.viewManager.getRenderer(index)
       toItem = m.viewManager.getRenderer(nextIndex)
-      m.viewManager.owner@.startFlowFocus(mc.getMField("top"), fromItem, toItem, m.animSpeed)
+      m.viewManager.owner@.startFlowFocus(mc.getMField("top"), fromItem, toItem, 0.5)
+      ' m.viewManager.owner@.startFlowFocus(mc.getMField("top"), fromItem, toItem, m.animSpeed)
     end function
 
     function onFlowFocusFraction(fraction as float)
@@ -399,10 +400,14 @@ namespace ml
       if notifyFocusManager
         m.focusManager.setFocusPosition(m.index, m.indexPosition, m.nextIndex, m.nextPosition, m.direction)
       end if
-      m.setFocusOnRenderer(isMoving)
+      if isMoving
+        m.setFocusOnRenderer(true, m.nextIndex)
+      else
+        m.setFocusOnRenderer(false)
+      end if
     end function
 
-    function setFocusOnRenderer(isMoving as boolean)
+    function setFocusOnRenderer(isMoving as boolean, index = invalid as integer)
     end function
 
     function notifyViewportEvents(isMoving as boolean)
