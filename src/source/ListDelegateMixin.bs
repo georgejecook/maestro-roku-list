@@ -218,11 +218,11 @@ namespace ml.delegateMixin
   function handleRowEvent(event as mc.types.assocarray) as void
     eventName = event.name
     if not m.isObservingRowEvents or m.listRowEventMap[eventName] = invalid
-      ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
+      ' ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
       return
     end if
 
-    ? "LE  " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
+    ' ? "LE  " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
     if eventName = "scrollStart" or eventName = "scrollStop"
       m.listItemDelegate.onRowScrollingChange(event.index, eventName = "scrollStart", event.long)
     else if eventName = "scrollUpdate"

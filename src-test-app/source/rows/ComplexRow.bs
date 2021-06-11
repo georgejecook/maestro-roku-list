@@ -3,38 +3,22 @@ import "pkg:/source/ItemDelegateMixin.bs"
 import "pkg:/source/RowItemScroller.bs"
 import "pkg:/source/RowItemViewManager.bs"
 import "pkg:/source/ItemFocusManager.bs"
-import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
+import "pkg:/source/BaseRow.bs"
 
-@node("ComplexRow", "mv_BaseView")
-class ComplexRow extends mv.BaseView
+@node("ComplexRow", "ml_BaseRow")
+class ComplextRow extends ml.BaseRow
 
-  'public fields
-  @observer("onContentChange")
-  public content as mc.types.Node
-  private _lastContent
-  public index = -1
-  public owner as mc.types.Node
-  public listEvent as mc.types.Assocarray
-  public renderState = "none"
-  @observer("onIsRenderedChange")
-  public isRendered = false
-  public isInViewport = false
-  @observer("onIsScrollingChange")
-  public isScrolling = false
-  public height = 700
-  public width = 1920
 
-  'managers and state
-  private isInitialized = false
-  private wasHidden = false
-  private wasFocusable = true
-
-  'debug
-  public _vs = "none"
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ state
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   private isButton1Focused = true
 
-  'views
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ vies
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
   private bgRect
   private contentGroup
   private videoPlayer
@@ -43,18 +27,14 @@ class ComplexRow extends mv.BaseView
   private poster
 
   function new()
-    super("ml_HorizontalRow")
-    ml.itemDelegateMixin.setDelegate()
+    super()
   end function
 
-  protected override function initialize()
-    super.initialize()
-    m.createViews()
-    m.isInitialized = true
-    m.onContentChange()
-  end function
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ overridden
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  private function createViews()
+  protected override function createViews()
     m.bgRect = m.createSGNode("mv_Rectangle", m.top, "bgRect", {
       size: [1920, 1080]
       color: "#000000"
@@ -79,51 +59,12 @@ class ComplexRow extends mv.BaseView
     })
   end function
 
-  private function onContentChange()
-    m.log.info("onContentChange")
-    if m.isInitialized
-      if m._lastContent = invalid or not m._lastContent.isSameNode(m.content)
-        m._lastContent = m.content
-        if m.content <> invalid
-          'configure stuff
-        end if
-        'TODO this stuff needs to go to a base row component
-      else if m._lastContent <> invalid
-        isListRefreshNeeded = false
-        if m.wasHidden <> m._lastContent.isHidden
-          m.wasHidden = m._lastContent.isHidden
-          isListRefreshNeeded = true
-        end if
-        if m.wasFocusable <> m._lastContent.isFocusEnabled
-          m.wasFocusable = m._lastContent.isFocusEnabled
-          isListRefreshNeeded = true
-        end if
-
-        if isListRefreshNeeded
-          m.owner@.forceUpdate()
-        end if
-      end if
-
-    end if
+  protected override function onContentChange(content as mc.types.node)
+    'do stuff with content here
   end function
 
-  private function onIsRenderedChange()
-    ' ? "onIsRenderedChange " ; m.isRendered
-  end function
-
-  private function onIsScrollingChange()
-  end function
-
-  public function getRenderer(index as integer)
-    return invalid
-  end function
-
-  public function getRect(index as integer, useScreenCoords = false as boolean)
-    return invalid
-  end function
-
-  public function getScreenRect(index as integer, screenPos = invalid as integer, direction = 0 as integer)
-    return invalid
+  protected override function calculateHeight() as integer
+    return 700
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
