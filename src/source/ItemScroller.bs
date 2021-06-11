@@ -22,7 +22,7 @@ namespace ml
     public nextIndex = 0
     public nextPosition = 0
     public targetIndex = 0
-    public container = invalid
+    public container as mc.types.node
     public direction = 0
     public axes = 0 'x = 0, y =1
     public screenPos = 0
@@ -36,14 +36,15 @@ namespace ml
     private activeOffset = 0
     private isScrollCancelled = 0
 
+    'flow focus state
+    private flowFocusIndex = -1
+
     function new(viewManager as ml.ItemViewManager, axes as mc.types.array)
       super("ItemScroller")
       m.viewManager = viewManager
       m.container = m.viewManager.container
       m.axes = axes
       m.moveAnimation = new mv.animations.Move(m.container, 1, m.container.translation, m.container.translation)
-      'need to move the animation node out of the container
-      ' m.viewManager.owner.appendChild(m.moveAnimation.node)
       m.moveAnimation.observeFraction(m.onAnimationFractionChange, m)
     end function
 
@@ -216,16 +217,16 @@ namespace ml
       isMoveRequired = targetTranslation[m.axes] <> m.container.translation[m.axes]
       m.log.info("moving", m.container.translation[m.axes], " > ", targetTranslation[m.axes], " pixels. animated? ", animated)
       if animated
-
-        if not isMoveRequired
-          m.log.info("already in place - no need to scroll ", m.index, " >", m.nextIndex)
-          m.setFocusToOnScreenIndex(m.index, m.nextIndex, m.direction)
-          return true
-        end if
         if fast
           m.animSpeed = m.settings.fastAnimSpeed
         else
           m.animSpeed = m.settings.animSpeed
+        end if
+
+        if not isMoveRequired
+          m.log.info("already in place - no need to scroll ", m.index, " >", m.nextIndex)
+          m.setFocusUsingFlowAnim(m.index, m.nextIndex, m.direction)
+          return true
         end if
 
         m.toggleScrolling(true)
@@ -244,14 +245,31 @@ namespace ml
       return true
     end function
 
-    private function setFocusToOnScreenIndex(index as integer, nextIndex as integer, direction as integer)
+    private function setFocusUsingFlowAnim(index as integer, nextIndex as integer, direction as integer)
       m.toggleScrolling(true)
       m.focusManager.setFocusPosition(index, 0, nextIndex, 0, direction)
-      m.focusManager.onFocusAnimationUpdate(1)
-      m.toggleScrolling(false)
-      m.targetIndex = -1
-      m.index = nextIndex
-      m.setFocusOnRenderer(false)
+      m.flowFocusIndex = nextIndex
+      fromItem = m.viewManager.getRenderer(index)
+      toItem = m.viewManager.getRenderer(nextIndex)
+      m.viewManager.owner@.startFlowFocus(mc.getMField("top"), fromItem, toItem, m.animSpeed)
+    end function
+
+    function onFlowFocusFraction(fraction as float)
+      m.log.info("onAnimationFractionChange", fraction, "multiple", m.isMovingMultiple)
+
+      if fraction = 1
+        m.focusManager.onFocusAnimationUpdate(1)
+        m.toggleScrolling(false)
+        m.index = m.flowFocusIndex
+        m.setFocusOnRenderer(false)
+        m.targetIndex = -1
+        if m.isMovingMultiple
+          m.moveToEnd(m.direction)
+        end if
+      else
+        m.focusManager.onFocusAnimationUpdate(fraction)
+      end if
+
     end function
 
     function finishAnimating() as void
