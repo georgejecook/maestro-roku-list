@@ -65,9 +65,17 @@ namespace ml
       end if
     end function
 
-    public function reset()
+    public function reset(keepOldFocusIfPossible = false as boolean)
+      previousIndex = m.index
+      previousScreenPos = m.screenPos
+
       m.onViewManagerUpdate()
-      m.moveToIndex(0, invalid, false)
+      if keepOldFocusIfPossible
+        m.moveToIndex(-1, invalid, false)
+        m.moveToIndex(previousIndex, previousScreenPos, false)
+      else
+        m.moveToIndex(0, invalid, false)
+      end if
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -147,31 +147,21 @@ class ListScreen extends mv.BaseScreen
   end function
 
   private function makeItems(cellType as string, number as integer)
-    d = createObject("roDateTime")
-    nonce = str(d.asSeconds()).trim()
     items = []
     for i = 0 to number
-      child = createObject("roSGNode", "ContentNode")
-      child.id = str(m.contentId).trim()
-      child.description = "some really long " + child.id + "text in here " + child.id
-      ' child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(230).trim() + "/360/300?n=" + nonce
-      child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/340/340?n=" + nonce
-      ' child.HDGRIDPOSTERURL = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
-      child.title = `Item ${child.id} [${i}]`
-
-      ' if m.contentId mod 5 = 0
-      '   cellType = "SimpleCell"
-      ' else if m.contentId mod 7 = 0
-      '   cellType = "ComplexCell"
-      ' end if
-
-      ' child.addFields({
-      '   "cellType": cellType
-      ' })
-      items.push(child)
-      m.contentId++
+      items.push(m.makeItem(cellType, `Item ${m.contentId} [${i}]`))
     end for
     return items
+  end function
+
+  private function makeItem(cellType as string, title as string) as mc.types.node
+    child = createObject("roSGNode", "ContentNode")
+    child.id = str(m.contentId).trim()
+    child.description = "some really long " + child.id + "text in here " + child.id
+    child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/340/340"
+    child.title = title
+    m.contentId++
+    return child
   end function
 
   private function onRemoveItems(items as integer)
@@ -293,8 +283,15 @@ class ListScreen extends mv.BaseScreen
 
   end function
 
-  private function onItemSelected(rowIndex as integer, cellIndex as integer)
-    ? ">>>onItemSelected changed to:" ; rowIndex ; "," ; cellIndex
+  private function onItemSelected(rowIndex as integer, itemIndex as integer)
+    ? ">>>onItemSelected changed to:" ; rowIndex ; "," ; itemIndex
+    rowContent = m.list.content.getChild(rowIndex)
+    title = `NEW Item ${m.contentId}`
+    child = m.makeItem("SimpleCell", title)
+    rowContent.insertChild(child, itemIndex)
+    ' rowContent.removeChild(child)
+    row = m.list@.getRowRenderer(rowIndex)
+    row@.forceUpdate()
     ' newScreen = createObject("roSGNode", "ListScreen")
     ' m.push(newScreen)
     ' mv.setFocus(newScreen)
