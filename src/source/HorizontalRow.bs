@@ -1,5 +1,4 @@
 import "pkg:/source/ListMixin.bs"
-import "pkg:/source/ItemDelegateMixin.bs"
 import "pkg:/source/RowItemScroller.bs"
 import "pkg:/source/RowItemViewManager.bs"
 import "pkg:/source/ItemFocusManager.bs"
@@ -16,6 +15,7 @@ namespace ml
     public focusedCellIndex = 0
     public focusedCellPercent = 0.0
     public isScrolling = false
+    private isScrollingEnabled = false
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ managers and private state
@@ -102,7 +102,7 @@ namespace ml
     end function
 
     protected override function onAnimateToItemChange(index as integer)
-      if m._currentContent <> invalid
+      if m._content <> invalid
         m.itemScroller.moveToIndex(index)
       end if
     end function
@@ -123,53 +123,6 @@ namespace ml
       return rect
     end function
 
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    '++ header
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    private function configureHeader()
-      if m._currentContent = invalid
-        m.cleanHeader()
-      else
-        headerSettings = m.settings.headerSettings
-        if m.currentHeaderType = invalid or m.currentHeaderType <> headerSettings.compName
-          m.cleanHeader()
-          if headerSettings.position = "onTop"
-            m.header = m.createSGNode(headerSettings.compName, m.foregroundGroup, "header")
-          else if headerSettings.position = "underneath"
-            m.header = m.createSGNode(headerSettings.compName, m.backgroundGroup, "header")
-          end if
-        end if
-
-        if m.header <> invalid
-          m.header.translation = [- m.settings.contentOffset[0], 0] 'cancel out this row's offset
-          m.header.width = m.width
-          m.header.height = headerSettings.height
-          m.header@.setContent(m._currentContent, headerSettings)
-          m.contentGroup.translation = [0, headerSettings.height]
-        else
-          m.contentGroup.translation = [0, 0]
-        end if
-      end if
-    end function
-
-    private function cleanHeader()
-      if m.currentHeaderType <> invalid
-        m.currentHeaderType = invalid
-        m.header.getParent().removeChild(m.header)
-        m.header = invalid
-      end if
-    end function
-
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    '++ public api
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    '++ private impl
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
     protected override function calculateHeight() as integer
       if m.settings = invalid
         return 0
@@ -187,27 +140,77 @@ namespace ml
       return height
     end function
 
+    public override function onFlowFocusFraction(fraction as float)
+      m.itemScroller.onFlowFocusFraction(fraction)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ header
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function configureHeader()
+      if m._content = invalid
+        m.cleanHeader()
+      else
+        headerSettings = m.settings.headerSettings
+        if m.currentHeaderType = invalid or m.currentHeaderType <> headerSettings.compName
+          m.cleanHeader()
+          if headerSettings.position = "onTop"
+            m.header = m.createSGNode(headerSettings.compName, m.foregroundGroup, "header")
+          else if headerSettings.position = "underneath"
+            m.header = m.createSGNode(headerSettings.compName, m.backgroundGroup, "header")
+          end if
+        end if
+
+        if m.header <> invalid
+          m.header.translation = [- m.settings.contentOffset[0], 0] 'cancel out this row's offset
+          m.header.width = m.width
+          m.header.height = headerSettings.height
+          m.header@.setContent(m._content, headerSettings)
+          m.contentGroup.translation = [0, headerSettings.height]
+        else
+          m.contentGroup.translation = [0, 0]
+        end if
+      end if
+    end function
+
+    private function cleanHeader()
+      if m.currentHeaderType <> invalid
+        m.currentHeaderType = invalid
+        m.header.getParent().removeChild(m.header)
+        m.header = invalid
+      end if
+    end function
+
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ KeyPress
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private function onKeyPressLeft() as boolean
       m.log.verbose("onKeyPressLeft")
-      m.itemScroller.move(-1)
+      ? "LEFT "; m.isScrollingEnabled
+      if m.isScrollingEnabled
+        m.itemScroller.move(-1)
+      end if
       return true
     end function
 
     private function onKeyPressRight() as boolean
-      m.log.verbose("onKeyPressRight")
-      m.itemScroller.move(1)
+    m.log.verbose("onKeyPressRight")
+    ? "RIGh "; m.isScrollingEnabled
+      if m.isScrollingEnabled
+        m.itemScroller.move(1)
+      end if
       return true
     end function
 
     private function getLongPressIntervalForKey(key as string) as float
       m.log.verbose("getLongPressIntervalForKey", key)
+      ? " LONG INTERVAL "; m.isScrollingEnabled ; " " ; m.index
       if key = "left" or key = "right"
         return 0.2
       else
+        ? " REJECTED " ; m.index
         return 0
       end if
     end function
@@ -215,8 +218,9 @@ namespace ml
     private function onLongPressStart(key as string) as boolean
       m.log.verbose(">>>>onLongPressStart", key)
 
-      if key = "left" or key = "right"
-        m.log.verbose("long press finished on key", key, "going to animate to final scroll position")
+      ? "LPS" ; m.isScrollingEnabled ; " " ; m.index
+      if (key = "left" or key = "right") and m.isScrollingEnabled
+        m.log.verbose("long press started on key", key, "going to animate to final scroll position")
         if key = "left"
           m.itemScroller.moveToEnd(-1)
         else
@@ -224,6 +228,8 @@ namespace ml
         end if
 
         return true
+      else
+        ? " REJECTED " ; m.index
       end if
 
       return false
@@ -237,6 +243,24 @@ namespace ml
       end if
 
       return false
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ delegate
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    protected function onWillLoseFocus(direction as integer)
+      m.log.verbose("This row will lose focus - cancelling scrolling")
+      ? " WILL LOSE "; m.index
+      m.itemScroller.cancelScrolling()
+      m.toggleLongPressTimer(0)
+      m.isScrollingEnabled = false
+    end function
+
+    protected function onWillGainFocus(direction as integer)
+      m.log.verbose("This row will gain focus - cancelling scrolling")
+      ? " WILL GAIN "; m.index
+      m.isScrollingEnabled = true
     end function
 
   end class

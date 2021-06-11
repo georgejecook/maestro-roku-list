@@ -16,7 +16,7 @@ namespace ml
 
     @observer("onContentChange")
     public content as mc.types.Node
-    private _lastContent
+    private _content
 
     public width = 1920
     public height = 1080
@@ -28,7 +28,6 @@ namespace ml
     @observer("onAnimateToItemChange")
     public animateToItem = -1
 
-    ' @observer("onFocusedRowPercentChange")
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ state
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -78,6 +77,7 @@ namespace ml
     private contentGroup
     private rowsGroup
     private focusPoint
+    private focusPointAnim
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ focusIndicator
@@ -87,6 +87,8 @@ namespace ml
     private focusAnim
     private focusMoveAnim
     private focusSizeAnim
+    private flowFocusMoveAnim
+    private flowFocusDelegate
 
     function new()
       super("mv_List")
@@ -114,15 +116,20 @@ namespace ml
       ' })
       m.contentGroup = m.createSGNode("Group", m.top, "contentGroup")
       m.rowsGroup = m.createSGNode("Group", m.contentGroup, "rowsGroup")
-      m.focusPoint = m.createSGNode("mv_Rectangle", m.top, "focusPoint")
       m.focusIndicator = m.createSGNode("mv_Poster", m.top, "focusIndicator", {
         blendColor: "#ffffff"
         uri: "pkg:/images/input-focusrect.9.png"
         visible: true
       })
+      m.focusPoint = m.createSGNode("mv_Rectangle", m.top, "focusPoint", {
+        color: "#ff0000"
+        size: [20, 20]
+      })
     end function
 
     private function createAnims()
+      m.flowFocusMoveAnim = new mv.animations.Move(m.focusPoint, 0.2, [0, 0], [0, 0])
+      m.flowFocusMoveAnim.observeFraction(m.onFlowFocusFractionChange, m)
       m.focusMoveAnim = new mv.animations.Move(m.focusIndicator, 0.2, [0, 0], [0, 0])
       m.focusSizeAnim = new mv.animations.Size(m.focusIndicator, 0.2, [0, 0], [0, 0])
       m.focusAnim = new mv.animations.Parallel(m.focusIndicator, [
@@ -177,8 +184,8 @@ namespace ml
 
     private function onContentChange()
       m.log.info("onContentChange")
-      if m.isInitialized and (m._lastContent = invalid or not m._lastContent.isSameNode(m.content))
-        m._lastContent = m.content
+      if m.isInitialized and (m._content = invalid or not m._content.isSameNode(m.content))
+        m._content = m.content
         m.resetState()
       end if
     end function
@@ -190,10 +197,10 @@ namespace ml
     end function
 
     private function onAnimateToItemChange(index as integer)
-      if m.content <> invalid
+      if m._content <> invalid
         row = m.getRowRenderer(m.focusedRowIndex)
         if row <> invalid
-          row.focusedCellIndex = index
+          row.animateToItem = index
         end if
       end if
     end function
@@ -300,6 +307,32 @@ namespace ml
       end if
     end function
 
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ flow focus support
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public function startFlowFocus(scrollingComponent as mc.types.node, source as mc.types.node, target as mc.types.node, speed as float)
+      'TODO - finish animation if existing delegate
+      m.flowFocusDelegate = scrollingComponent
+      m.flowFocusMoveAnim.setFromToValue(source.translation, target.translation)
+      m.flowFocusMoveAnim.animateTo(target.translation, speed)
+      m.flowFocusMoveAnim.start()
+    end function
+
+    public function cancelFlowFocus()
+      m.flowFocusMoveAnim.stop()
+      m.flowFocusDelegate = invalid
+    end function
+
+    private function onFlowFocusFractionChange(fraction as float)
+      if m.flowFocusDelegate <> invalid
+        m.flowFocusDelegate@.onFlowFocusFraction(fraction)
+      end if
+    end function
+
+    public function onFlowFocusFraction(fraction as float)
+      m.itemScroller.onFlowFocusFraction(fraction)
+    end function
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ KeyPress
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

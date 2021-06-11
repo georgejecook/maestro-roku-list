@@ -15,7 +15,7 @@ namespace ml
 
     @observer("_onContentChange")
     public content as mc.types.Node
-    private _currentContent
+    private _content
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ public control fields
@@ -74,19 +74,19 @@ namespace ml
       m.log.info("onContentChange")
       ? "ON CONTENT CHANGE!!!"
       if m.isInitialized
-        if m._currentContent = invalid or not m._currentContent.isSameNode(m.content)
-          m._currentContent = m.content
-          m.settings = ml.listMixin.getRowSettings(m.owner.content, m._currentContent)
-          m.onContentChange(m._currentContent)
+        if m._content = invalid or not m._content.isSameNode(m.content)
+          m._content = m.content
+          m.settings = ml.listMixin.getRowSettings(m.owner.content, m._content)
+          m.onContentChange(m._content)
           m._calculateHeight()
-        else if m._currentContent <> invalid
+        else if m._content <> invalid
           isListRefreshNeeded = false
-          if m.wasHidden <> m._currentContent.isHidden
-            m.wasHidden = m._currentContent.isHidden
+          if m.wasHidden <> m._content.isHidden
+            m.wasHidden = m._content.isHidden
             isListRefreshNeeded = true
           end if
-          if m.wasFocusable <> m._currentContent.isFocusEnabled
-            m.wasFocusable = m._currentContent.isFocusEnabled
+          if m.wasFocusable <> m._content.isFocusEnabled
+            m.wasFocusable = m._content.isFocusEnabled
             isListRefreshNeeded = true
           end if
 
@@ -103,11 +103,11 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     public function forceUpdate(keepOldFocusIfPossible = true as boolean) as void
-      if m.owner = invalid or m._currentContent = invalid
+      if m.owner = invalid or m._content = invalid
         return
       end if
-      m.settings = ml.listMixin.getRowSettings(m.owner.content, m._currentContent)
-      m.onContentChange(m._currentContent, keepOldFocusIfPossible = invalid or keepOldFocusIfPossible = true)
+      m.settings = ml.listMixin.getRowSettings(m.owner.content, m._content)
+      m.onContentChange(m._content, keepOldFocusIfPossible = invalid or keepOldFocusIfPossible = true)
       m._calculateHeight()
     end function
 
@@ -163,6 +163,9 @@ namespace ml
     end function
 
     protected function onListEvent(event as object)
+    end function
+
+    public function onFlowFocusFraction(fraction as float)
     end function
 
   end class
