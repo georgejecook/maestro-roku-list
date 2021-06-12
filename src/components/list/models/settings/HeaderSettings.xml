@@ -39,7 +39,7 @@
 
     <field
         id='backgroundVisible'
-        value='true'
+        value='false'
         type='boolean' />
 
     <!-- use this to get exact control over the label -->

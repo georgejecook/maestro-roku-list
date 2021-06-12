@@ -21,6 +21,7 @@ class RowHeader
     m.bgRect = mc.createSGNode("mv_Rectangle", m.top, "bgRect", {
     })
     m.label = mc.createSGNode("mv_Label", m.top, "label", {
+      vertAlign: "center"
     })
   end function
 
@@ -30,6 +31,7 @@ class RowHeader
       m.createViews()
       if m.content <> invalid
         m.label.visible = true
+        m.label.size = [m.width, m.height]
         m.bgRect.size = [m.width, m.height]
 
 
