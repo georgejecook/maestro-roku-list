@@ -188,17 +188,15 @@ namespace ml
 
     private function onKeyPressLeft() as boolean
       m.log.verbose("onKeyPressLeft")
-      ? "LEFT "; m.isScrollingEnabled
-      if m.isScrollingEnabled
+      if m.canScroll("left")
         m.itemScroller.move(-1)
       end if
       return true
     end function
 
     private function onKeyPressRight() as boolean
-    m.log.verbose("onKeyPressRight")
-    ? "RIGh "; m.isScrollingEnabled
-      if m.isScrollingEnabled
+      m.log.verbose("onKeyPressRight")
+      if m.canScroll("right")
         m.itemScroller.move(1)
       end if
       return true
@@ -206,20 +204,21 @@ namespace ml
 
     private function getLongPressIntervalForKey(key as string) as float
       m.log.verbose("getLongPressIntervalForKey", key)
-      ? " LONG INTERVAL "; m.isScrollingEnabled ; " " ; m.index
-      if key = "left" or key = "right"
+      if m.canScroll(key)
         return 0.2
       else
-        ? " REJECTED " ; m.index
         return 0
       end if
+    end function
+
+    private function canScroll(key as string)
+      return (m.isScrollingEnabled and m._content <> invalid and m._content.getChildCount() > 0) and ((key = "left" and m.itemScroller.index > 0) or (key = "right" and m.itemScroller.index < m._content.getChildCount()))
     end function
 
     private function onLongPressStart(key as string) as boolean
       m.log.verbose(">>>>onLongPressStart", key)
 
-      ? "LPS" ; m.isScrollingEnabled ; " " ; m.index
-      if (key = "left" or key = "right") and m.isScrollingEnabled
+      if m.canScroll(key)
         m.log.verbose("long press started on key", key, "going to animate to final scroll position")
         if key = "left"
           m.itemScroller.moveToEnd(-1)
@@ -228,8 +227,6 @@ namespace ml
         end if
 
         return true
-      else
-        ? " REJECTED " ; m.index
       end if
 
       return false
