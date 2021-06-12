@@ -6,6 +6,7 @@ import "pkg:/source/RowItemViewManager.bs"
 import "pkg:/source/ItemFocusManager.bs"
 import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
 import "pkg:/source/cells/BaseCell.bs"
+import "pkg:/source/roku_modules/maestro/view/Animation.brs"
 
 @node("HeroCell", "Group")
 class HeroCell extends ml.BaseCell
@@ -16,8 +17,11 @@ class HeroCell extends ml.BaseCell
 
   private isViewCreated = false
   private label
+  private labelGroup
+  private labelAnim
   private size = [1100, 700]
   private scale = 1
+  private isLabelVisible = false
 
   function new()
     super()
@@ -38,14 +42,17 @@ class HeroCell extends ml.BaseCell
       size: m.size
       loadDisplayMode: "zoomToFill"
     })
-    m.textRect = mc.createSGNode("mv_Rectangle", m.top, "bgRect", {
+    m.labelGroup = mc.createSGNode("Group", m.top, "labelGroup", {
+
+    })
+    m.textRect = mc.createSGNode("mv_Rectangle", m.labelGroup, "bgRect", {
       size: m.size
       color: "#000000"
       opacity: 0.5
       translation: [0, 250]
       size: [m.size[0], 300]
     })
-    m.label = mc.createSGNode("mv_Label", m.top, "label", {
+    m.label = mc.createSGNode("mv_Label", m.labelGroup, "label", {
       fontKey: "mediumBold,60"
       horizAlign: "center"
       vertAlign: "center"
@@ -53,6 +60,7 @@ class HeroCell extends ml.BaseCell
       translation: [0, 300]
       size: [m.size[0], 100]
     })
+    m.labelAnim = new mv.animations.Fade(m.labelGroup, 0.2, 1, 0)
   end function
 
   protected override function onContentChange(content as mc.types.node)
@@ -66,21 +74,31 @@ class HeroCell extends ml.BaseCell
     ' m.onScrollingChange(m.list.isScrolling, false)
   end function
 
+  private function toggleLabelVisible(visible as boolean)
+    if m.isLabelVisible <> visible
+      m.isLabelVisible = visible
+      if visible
+        m.labelAnim.animateTo(1, 0.2)
+      else
+        m.labelAnim.animateTo(0, 0.2)
+      end if
+      m.labelAnim.start()
+    end if
+  end function
+
+
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   private function onScrollingChange(isScrolling as boolean, isLong as boolean)
     if not isScrolling
-      m.textRect.visible = true
-      m.label.visible = true
+      m.toggleLabelVisible(true)
     end if
   end function
 
   private function onScrollingUpdate(startIndex as integer, currentIndex as integer)
-    textVisible = abs(startIndex - currentIndex) < 2
-    m.textRect.visible = textVisible
-    m.label.visible = textVisible
+    m.toggleLabelVisible(abs(startIndex - currentIndex) < 2)
   end function
 
   private function onDidGainFocus(direction as integer)

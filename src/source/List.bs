@@ -73,11 +73,9 @@ namespace ml
     '++ views
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    private focusTimer
     private contentGroup
     private rowsGroup
     private focusPoint
-    private focusPointAnim
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ focusIndicator
@@ -87,8 +85,10 @@ namespace ml
     private focusAnim
     private focusMoveAnim
     private focusSizeAnim
-    private flowFocusMoveAnim
     private flowFocusDelegate
+    private focusPointAnim
+    private dummyFocusView
+    private dummyFocusAnim
 
     function new()
       super("mv_List")
@@ -109,11 +109,6 @@ namespace ml
 
     private function createViews()
       'TODO - might still end up needing this... depends on how floating focus lands
-      ' m.focusTimer = m.createSGNode("Timer", m.top, "focusTimer", {
-      '   duration: 0.01
-      '   control: "start"
-      '   repeat: true
-      ' })
       m.contentGroup = m.createSGNode("Group", m.top, "contentGroup")
       m.rowsGroup = m.createSGNode("Group", m.contentGroup, "rowsGroup")
       m.focusIndicator = m.createSGNode("mv_Poster", m.top, "focusIndicator", {
@@ -125,13 +120,19 @@ namespace ml
         color: "#ff0000"
         size: [20, 20]
       })
+      m.dummyFocusView = m.createSGNode("mv_Rectangle", m.top, "focusPoint", {
+        color: "#00ff00"
+        size: [20, 20]
+      })
     end function
 
     private function createAnims()
-      m.flowFocusMoveAnim = new mv.animations.Move(m.focusPoint, 0.2, [0, 0], [0, 0])
-      m.flowFocusMoveAnim.observeFraction(m.onFlowFocusFractionChange, m)
+      m.focusPointAnim = new mv.animations.Move(m.focusPoint, 0.2, [0, 0], [0, 0])
+      m.focusPointAnim.observeFraction(m.onFlowFocusFractionChange, m)
       m.focusMoveAnim = new mv.animations.Move(m.focusIndicator, 0.2, [0, 0], [0, 0])
       m.focusSizeAnim = new mv.animations.Size(m.focusIndicator, 0.2, [0, 0], [0, 0])
+      m.dummyFocusAnim = new mv.animations.Size(m.dummyFocusView, 0.5, [0, 0], [0, 0])
+      m.dummyFocusAnim.observeFraction(m.updateFocusIndicatorForFraction, m)
       m.focusAnim = new mv.animations.Parallel(m.focusIndicator, [
         m.focusMoveAnim
         m.focusSizeAnim
@@ -263,6 +264,7 @@ namespace ml
     end function
 
     private function applyFocusSettings(index as mc.types.array, isInPosition as boolean)
+      m.sourceFocusRect = m.targetFocusRect
       m.targetFocusRect = m.getCellScreenRect(index[0], index[1])
       settings = ml.listMixin.getRowSettings(m.content, m.content.getChild(index[0]))
 
@@ -295,15 +297,52 @@ namespace ml
         return
       end if
 
-      m.focusAnim.stop()
+      m.focusAnim.pause()
+      ? "ANIMATING RECT"
+      ' m.dummyFocusAnim.pause()
 
       if animated
-        m.focusSizeAnim.setFromToValue([m.focusIndicator.width, m.focusIndicator.height], m.targetFocusRect.size)
-        m.focusMoveAnim.setFromToValue(m.focusIndicator.translation, m.targetFocusRect.translation)
-        m.focusAnim.start()
+        ' m.focusSizeAnim.setFromToValue([m.focusIndicator.width, m.focusIndicator.height], m.targetFocusRect.size)
+        ' m.focusMoveAnim.setFromToValue(m.focusIndicator.translation, m.targetFocusRect.translation)
+        ' m.focusAnim.start()
+        ' m.dummyFocusAnim.animateToWithSpeed(m.targetFocusRect.translation, 0.01)
+        m.dummyFocusAnim.start()
       else
         m.focusIndicator.translation = m.targetFocusRect.translation
         m.focusIndicator.size = m.targetFocusRect.size
+      end if
+    end function
+
+    private function updateFocusIndicatorForFraction(fraction as float) as void
+      if m.sourceFocusRect = invalid or m.targetFocusRect = invalid
+        ? "NO FOCUS RECTS! Ensure m.targetFocusRect and m.sourcefocusR3ct was set!"
+        return
+      end if
+
+      translation = m.interpolate(m.sourceFocusRect.translation, m.targetFocusRect.translation, fraction)
+      size = m.interpolate(m.sourceFocusRect.size, m.targetFocusRect.size, fraction)
+      m.focusIndicator.translation = translation
+      m.focusIndicator.width = size[0]
+      m.focusIndicator.height = size[1]
+      ' ? "onFocusedRowPercentChange " ; fraction ; " " ; translation[1]; " " ; m.targetFocusRect.translation[1]
+    end function
+
+    private function getTranslationCorrectedForScreenEdge(translation as mc.types.array, itemTranslation as mc.types.array) as mc.types.array
+      if m.itemScroller.direction = 1
+        ? "MOVING DOWN T: "; translation ; " IT: "; itemTranslation
+      else if m.itemScroller.direction = -1
+        ? "MOVING UP T: "; translation ; " IT: "; itemTranslation
+        ' if itemTran
+      end if
+
+      return translation
+    end function
+
+    private function interpolate(a as mc.types.array, b as mc.types.array, fraction as float) as mc.types.array
+      if a <> invalid and b <> invalid
+        return [a[0] + (b[0] - a[0]) * fraction, a[1] + (b[1] - a[1]) * fraction]
+      else
+        return [0, 0]
       end if
     end function
 
@@ -312,15 +351,16 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     public function startFlowFocus(scrollingComponent as mc.types.node, source as mc.types.node, target as mc.types.node, speed as float)
+
       'TODO - finish animation if existing delegate
       m.flowFocusDelegate = scrollingComponent
-      m.flowFocusMoveAnim.setFromToValue(source.translation, target.translation)
-      m.flowFocusMoveAnim.animateTo(target.translation, speed)
-      m.flowFocusMoveAnim.start()
+      m.focusPointAnim.setFromToValue(source.translation, target.translation)
+      m.focusPointAnim.animateTo(target.translation, speed / 10)
+      m.focusPointAnim.start()
     end function
 
     public function cancelFlowFocus()
-      m.flowFocusMoveAnim.stop()
+      m.focusPointAnim.pause()
       m.flowFocusDelegate = invalid
     end function
 
