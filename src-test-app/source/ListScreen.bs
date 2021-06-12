@@ -92,7 +92,7 @@ class ListScreen extends mv.BaseScreen
         cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 30)
         row.settings = ml.listMixin.createRowSettings(cellSettings, row0FocusSettings)
         row.settings.headerSettings.position = "none"
-        row.settings.contentOffset = [70, 0]
+        row.settings.contentOffset = [400, -50]
       else if i = 1 or i = 4 or i = 8
         row1FocusSettings = ml.listMixin.createFocusSettings(.3, .1)
         ' row1FocusSettings.feedbackUri = "pkg:/images/circle.png"
