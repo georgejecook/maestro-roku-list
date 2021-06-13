@@ -9,7 +9,7 @@ I totally reinvented the way lists work on roku, purposefully eschewing the para
 
 ## Status: (really really close)
 
-Maestro list is approachign completion. It's currently being rolled out on some forward thinking clients, who I thank most graciously for understanding the reasons for this project and supporting it's development.
+Maestro list is approaching completion. It's currently being rolled out on some forward thinking clients, who I thank most graciously for understanding the reasons for this project and supporting it's development.
 
 ## Sample app
   - `npm i`
