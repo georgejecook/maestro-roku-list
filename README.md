@@ -7,6 +7,18 @@ Lists on roku, without the headache and heartbreak
 This lists solves a myriad of problems I've faced on roku, building top tier channels, and complex architectures at applicaster, smithsonian and other places. It is built specifically to facilitate an experience similar to netflix, with a simple programming model.
 I totally reinvented the way lists work on roku, purposefully eschewing the paradigms the platforms uses, in lieu of programming models that are familiar to non-roku programmers and much easier to work with.
 
+## Status: (really really close)
+
+Maestro list is approachign completion. It's currently being rolled out on some forward thinking clients, who I thank most graciously for understanding the reasons for this project and supporting it's development.
+
+## Sample app
+  - `npm i`
+  - `npm run ropm`
+  - open this project in vscode
+  - set your ip address and password in `.env`
+  - run the run target `App`
+
+
 ## Features
 
  - Hyper-performant, with highly customizable performance
@@ -124,3 +136,13 @@ I totally reinvented the way lists work on roku, purposefully eschewing the para
     row = m.list@.getRowRenderer(rowIndex)
   end function
 ```
+
+## TODO
+ - There are a bunch of key issues I am actively working on
+ - Documentation
+
+## Does this project work without maestro-roku framework?
+You can probably make it work without it; if you find a way to do that, which won't cause me too much pain, pm me and we can see what we can do there
+
+## Does this project work without using brighterscript?
+Possibly. But why aren't you using brighterscript? you're mugging yourself.
