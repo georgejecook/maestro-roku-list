@@ -119,6 +119,7 @@ namespace ml
       m.focusPoint = m.createSGNode("mv_Rectangle", m.top, "focusPoint", {
         color: "#ff0000"
         size: [20, 20]
+        visible: false
       })
       m.dummyFocusView = m.createSGNode("mv_Rectangle", m.top, "focusPoint", {
         color: "#00ff00"
@@ -264,9 +265,9 @@ namespace ml
     end function
 
     private function applyFocusSettings(index as mc.types.array, isInPosition as boolean)
+      settings = ml.listMixin.getRowSettings(m.content, m.content.getChild(index[0]))
       m.sourceFocusRect = m.targetFocusRect
       m.targetFocusRect = m.getCellScreenRect(index[0], index[1])
-      settings = ml.listMixin.getRowSettings(m.content, m.content.getChild(index[0]))
 
       focusSettings = ml.listMixin.getFocusSettings(m.content, m.content.getChild(index[0]))
 
@@ -276,6 +277,9 @@ namespace ml
         if focusSettings.animStyle = "fixed"
           m.targetFocusRect.translation[0] = settings.contentOffset[0]
         end if
+
+        m.targetFocusRect.indicatorTranslation = [m.targetFocusRect.translation[0] + focusSettings.feedbackOffsets[0], m.targetFocusRect.translation[1] + focusSettings.feedbackOffsets[1]]
+        m.targetFocusRect.indicatorSize = [m.targetFocusRect.size[0] + focusSettings.feedbackOffsets[2] - focusSettings.feedbackOffsets[0], m.targetFocusRect.size[1] + focusSettings.feedbackOffsets[3] - focusSettings.feedbackOffsets[1]]
 
         m.focusIndicator.blendColor = focusSettings.feedbackColor
         m.focusIndicator.uri = focusSettings.feedbackUri
@@ -298,7 +302,7 @@ namespace ml
       end if
 
       m.focusAnim.pause()
-      ? "ANIMATING RECT"
+      ' ? "ANIMATING RECT"
       ' m.dummyFocusAnim.pause()
 
       if animated
@@ -308,8 +312,8 @@ namespace ml
         ' m.dummyFocusAnim.animateToWithSpeed(m.targetFocusRect.translation, 0.01)
         m.dummyFocusAnim.start()
       else
-        m.focusIndicator.translation = m.targetFocusRect.translation
-        m.focusIndicator.size = m.targetFocusRect.size
+        m.focusIndicator.translation = m.targetFocusRect.indicatorTranslation
+        m.focusIndicator.size = m.targetFocusRect.indicatorSize
       end if
     end function
 
@@ -319,8 +323,8 @@ namespace ml
         return
       end if
 
-      translation = m.interpolate(m.sourceFocusRect.translation, m.targetFocusRect.translation, fraction)
-      size = m.interpolate(m.sourceFocusRect.size, m.targetFocusRect.size, fraction)
+      translation = m.interpolate(m.sourceFocusRect.indicatorTranslation, m.targetFocusRect.indicatorTranslation, fraction)
+      size = m.interpolate(m.sourceFocusRect.indicatorSize, m.targetFocusRect.indicatorSize, fraction)
       m.focusIndicator.translation = translation
       m.focusIndicator.width = size[0]
       m.focusIndicator.height = size[1]
@@ -329,9 +333,9 @@ namespace ml
 
     private function getTranslationCorrectedForScreenEdge(translation as mc.types.array, itemTranslation as mc.types.array) as mc.types.array
       if m.itemScroller.direction = 1
-        ? "MOVING DOWN T: "; translation ; " IT: "; itemTranslation
+        ' ? "MOVING DOWN T: "; translation ; " IT: "; itemTranslation
       else if m.itemScroller.direction = -1
-        ? "MOVING UP T: "; translation ; " IT: "; itemTranslation
+        ' ? "MOVING UP T: "; translation ; " IT: "; itemTranslation
         ' if itemTran
       end if
 

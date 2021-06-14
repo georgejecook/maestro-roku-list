@@ -72,7 +72,8 @@ class ListScreen extends mv.BaseScreen
 
     timer = new mc.utils.DebugTimer("list")
     m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30)
-    m.focusSettings = ml.listMixin.createFocusSettings(.5, .1)
+
+    m.focusSettings = ml.listMixin.createFocusSettings(.5, .1, "fixed", [-50, -50, 50, 50])
     ' listSettings = ml.listMixin.createListSettings(3000, 2000)
     listSettings = ml.listMixin.createListSettings(-1, -1)
     content = ml.listMixin.createListContent(m.createData(), m.focusSettings, m.rowSettings, listSettings)
@@ -84,21 +85,23 @@ class ListScreen extends mv.BaseScreen
 
   private function createData()
     content = []
-    rowFocusSettings = ml.listMixin.createFocusSettings(.5, .1)
+    rowFocusSettings = ml.listMixin.createFocusSettings(.3, .1, "fixed", [-20, -20, 20, 20])
     for i = 0 to m.numberOfRows - 1
       row = createObject("roSGNode", "ml_RowContent")
       if i = 0
-        row0FocusSettings = ml.listMixin.createFocusSettings(.2, .5)
+        row0FocusSettings = ml.listMixin.createFocusSettings(.2, .5, "fixed", [-20, -20, 20, 20])
         cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 30)
         row.settings = ml.listMixin.createRowSettings(cellSettings, row0FocusSettings)
         row.settings.headerSettings.position = "none"
-        row.settings.contentOffset = [400, -50]
+        row.settings.contentOffset = [400, -30]
       else if i = 1 or i = 4 or i = 8
-        row1FocusSettings = ml.listMixin.createFocusSettings(.3, .1)
+        row1FocusSettings = ml.listMixin.createFocusSettings(.5, .1, "fixed", [30, 30, -30, -30])
         ' row1FocusSettings.feedbackUri = "pkg:/images/circle.png"
         row1FocusSettings.feedbackColor = "#F4D42A"
+        headerSettings = ml.listMixin.createHeaderSettings([30, 20], 80, "mediumBold,50", "#ffff00")
         cellSettings = ml.listMixin.createCellSettings("SubHeroCell", [900, 320], 100)
-        row.settings = ml.listMixin.createRowSettings(cellSettings, row1FocusSettings)
+        row.settings = ml.listMixin.createRowSettings(cellSettings, row1FocusSettings, 30, headerSettings)
+        row.settings.contentOffset = [100, 0]
 
       else if i = 5 or i = 11
         complexFocusSettings = ml.listMixin.createFocusSettings()
@@ -106,7 +109,7 @@ class ListScreen extends mv.BaseScreen
         row.settings = ml.listMixin.createRowSettings(invalid, complexFocusSettings, 30, invalid, 0, "ComplexRow")
       else
         row.settings = ml.listMixin.createRowSettings(m.cellSettings, rowFocusSettings)
-        row.settings.contentOffset = [100, 100]
+        row.settings.contentOffset = [100, 30]
       end if
       row.title = "ROW " + str(i)
       content.push(row)
