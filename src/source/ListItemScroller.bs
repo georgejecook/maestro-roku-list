@@ -11,9 +11,9 @@ namespace ml
       row = invalid
       if index <> invalid
         row = m.viewManager.getRenderer(index)
-        ? " SETTING FOCUS TO MANUAL ROW "; index
+        ' ? " SETTING FOCUS TO MANUAL ROW "; index
       else if not isMoving
-        ? " setting focus to row "; index
+        ' ? " setting focus to row "; index
         row = m.viewManager.getRenderer(m.index)
       end if
 

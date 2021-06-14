@@ -90,12 +90,16 @@ namespace ml.listMixin
     return settings
   end function
 
-  function createFocusSettings(animSpeed = 3 as float, fastAnimSpeed = 1 as float, animStyle = "fixed" as string)
+  function createFocusSettings(animSpeed = 3 as float, fastAnimSpeed = 1 as float, animStyle = "fixed" as string, offsets = invalid as mc.types.array)
     settings = createObject("roSGNode", "ml_FocusSettings")
+    if offsets = invalid
+      offsets = [0, 0, 0, 0]
+    end if
     settings.update({
       animSpeed: animSpeed / 10.0
       fastAnimSpeed: fastAnimSpeed / 10.0
       animStyle: animStyle
+      feedbackOffsets: offsets
     })
     return settings
 

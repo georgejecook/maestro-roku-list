@@ -72,7 +72,6 @@ namespace ml
 
     private function _onContentChange()
       m.log.info("onContentChange")
-      ? "ON CONTENT CHANGE!!!"
       if m.isInitialized
         if m._content = invalid or not m._content.isSameNode(m.content)
           m._content = m.content

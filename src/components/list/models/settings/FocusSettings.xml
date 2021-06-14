@@ -12,5 +12,7 @@
       <field id='feedbackStyle' type='string' value='onTop'/>
       <field id='feedbackUri' type='string' value='pkg:/images/input-focusrect.9.png'/>
       <field id='feedbackColor' type='string' value='#ffffff'/>
+      <!-- offset the left, right, top, bottom of the focus rect -->
+      <field id='feedbackOffsets' type='array' value='[0,0,0,0]'/>
     </interface>
 </component>

@@ -151,7 +151,7 @@ namespace ml.delegateMixin
   function handleListEvent(event as mc.types.assocarray) as void
     eventName = event.name
     if not m.isObservingRowEvents or m.listRowEventMap[eventName] = invalid
-      ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
+      ' ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
       return
     end if
 

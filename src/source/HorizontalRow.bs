@@ -248,7 +248,7 @@ namespace ml
 
     protected function onWillLoseFocus(direction as integer)
       m.log.verbose("This row will lose focus - cancelling scrolling")
-      ? " WILL LOSE "; m.index
+      ' ? " WILL LOSE "; m.index
       m.itemScroller.cancelScrolling()
       m.toggleLongPressTimer(0)
       m.isScrollingEnabled = false
@@ -256,7 +256,7 @@ namespace ml
 
     protected function onWillGainFocus(direction as integer)
       m.log.verbose("This row will gain focus - cancelling scrolling")
-      ? " WILL GAIN "; m.index
+      ' ? " WILL GAIN "; m.index
       m.isScrollingEnabled = true
     end function
 
