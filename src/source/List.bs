@@ -233,7 +233,6 @@ namespace ml
         if rect = invalid
           return rowScreenRect
         end if
-        rect.translation[1] += rowScreenRect.screenPos
         return rect
       end if
 

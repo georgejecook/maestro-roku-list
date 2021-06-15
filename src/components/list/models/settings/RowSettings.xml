@@ -31,7 +31,7 @@
     <field
         id='peekNextPixels'
         type='integer'
-        value='100' />
+        value='0' />
     <field
         id='height'
         type='integer'

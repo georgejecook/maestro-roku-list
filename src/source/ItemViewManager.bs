@@ -356,10 +356,11 @@ namespace ml
       for i = 0 to m.numberOfItems
         itemRect = m.rects[i]
         screenPos = m.getScreenPositionForItem(itemRect, direction)
-        itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
+        'the offset is already factored in
+        itemPos = m.getOffsetForScreenPosition(itemRect, 0)
         if itemPos > p
-          ' ? "i "; i ; " pos "; p ; " ip " ; itemPos ; " sp " ; screenPos
-          ' ? "+++++!!! MATCHED ITEM INDEX "; i
+          ' ? "i "; i ; "pos"; position ; " p "; p ; " ip " ; itemPos ; " sp " ; screenPos
+          ' ? "+++++!!! MATCHED ITEM INDEX "; i -1
           return mc.clamp(i - 1, 0, m.numberOfItems)
         end if
       end for
