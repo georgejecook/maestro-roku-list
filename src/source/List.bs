@@ -82,9 +82,6 @@ namespace ml
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private focusIndicator
-    private focusAnim
-    private focusMoveAnim
-    private focusSizeAnim
     private flowFocusDelegate
     private focusPointAnim
     private dummyFocusView
@@ -130,14 +127,8 @@ namespace ml
     private function createAnims()
       m.focusPointAnim = new mv.animations.Move(m.focusPoint, 0.2, [0, 0], [0, 0])
       m.focusPointAnim.observeFraction(m.onFlowFocusFractionChange, m)
-      m.focusMoveAnim = new mv.animations.Move(m.focusIndicator, 0.2, [0, 0], [0, 0])
-      m.focusSizeAnim = new mv.animations.Size(m.focusIndicator, 0.2, [0, 0], [0, 0])
       m.dummyFocusAnim = new mv.animations.Size(m.dummyFocusView, 0.5, [0, 0], [0, 0])
       m.dummyFocusAnim.observeFraction(m.updateFocusIndicatorForFraction, m)
-      m.focusAnim = new mv.animations.Parallel(m.focusIndicator, [
-        m.focusMoveAnim
-        m.focusSizeAnim
-      ])
     end function
 
     private function initManagers()
@@ -234,10 +225,16 @@ namespace ml
     end function
 
     public function getCellScreenRect(rowIndex as integer, cellIndex as integer, rowScreenPos = invalid as integer, cellScreenPos = invalid as integer)
-      ' ? "+++ rowScreenPos"; rowScreenPos
+      rowScreenRect = m.viewManager.getScreenRect(rowIndex, rowScreenPos)
+
       row = m.getRowRenderer(rowIndex)
       if row <> invalid
-        return row@.getScreenRect(cellIndex, cellScreenPos)
+        rect = row@.getScreenRect(cellIndex, cellScreenPos)
+        if rect = invalid
+          return rowScreenRect
+        end if
+        rect.translation[1] += rowScreenRect.screenPos
+        return rect
       end if
 
       return invalid
@@ -301,15 +298,7 @@ namespace ml
         return
       end if
 
-      m.focusAnim.pause()
-      ' ? "ANIMATING RECT"
-      ' m.dummyFocusAnim.pause()
-
       if animated
-        ' m.focusSizeAnim.setFromToValue([m.focusIndicator.width, m.focusIndicator.height], m.targetFocusRect.size)
-        ' m.focusMoveAnim.setFromToValue(m.focusIndicator.translation, m.targetFocusRect.translation)
-        ' m.focusAnim.start()
-        ' m.dummyFocusAnim.animateToWithSpeed(m.targetFocusRect.translation, 0.01)
         m.dummyFocusAnim.start()
       else
         m.focusIndicator.translation = m.targetFocusRect.indicatorTranslation
@@ -323,6 +312,8 @@ namespace ml
         return
       end if
 
+      pointTranslation = m.interpolate(m.sourceFocusRect.translation, m.targetFocusRect.translation, fraction)
+      m.focusPoint.translation = pointTranslation
       translation = m.interpolate(m.sourceFocusRect.indicatorTranslation, m.targetFocusRect.indicatorTranslation, fraction)
       size = m.interpolate(m.sourceFocusRect.indicatorSize, m.targetFocusRect.indicatorSize, fraction)
       m.focusIndicator.translation = translation

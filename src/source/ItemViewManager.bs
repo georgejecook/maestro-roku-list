@@ -397,8 +397,7 @@ namespace ml
 
     function getScreenRect(index as integer, screenPos = invalid as integer, direction = 0 as integer)
       rect = m.getRect(index)
-      if rect <> invalid
-        rect.screenPos = m.getScreenPositionForItem(rect, direction, screenPos)
+      if rect <> invalid and rect.screenPos <> invalid
         rect.translation[m.axes] += rect.screenPos
       end if
       return rect
