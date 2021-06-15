@@ -63,10 +63,6 @@ class ComplextRow extends ml.BaseRow
     'do stuff with content here
   end function
 
-  protected override function calculateHeight() as integer
-    return 700
-  end function
-
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ KeyPress
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

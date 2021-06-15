@@ -21,8 +21,9 @@ namespace ml
         index = 0
         for each rowContent in content.getChildren(-1, 0)
           settings = ml.listMixin.getRowSettings(m.content, rowContent)
+          rect = m.getRect(index)
 
-          comp = m.createRow(rowContent, index, settings)
+          comp = m.createRow(rowContent, index, settings, rect.height)
           if comp <> invalid
             comp.index = index
             comp.renderState = "none"
@@ -36,7 +37,7 @@ namespace ml
       end if
     end function
 
-    function createRow(rowContent as mc.types.node, index as integer, settings as mc.types.node)
+    function createRow(rowContent as mc.types.node, index as integer, settings as mc.types.node, height as integer)
       compName = settings.componentName <> invalid ? settings.componentName : "ml_HorizontalRow"
       'TODO - measure height to ascertain how many
       isRendered = index < 4
@@ -47,6 +48,7 @@ namespace ml
         owner: m.owner
         index: index
         width: m.owner.width
+        height: height
         'TODO - measure the heights.
         isInViewport: isRendered
       })
@@ -59,6 +61,7 @@ namespace ml
       for each comp in m.components
         settings = ml.listMixin.getRowSettings(m.content, comp.content)
         comp.visible = comp.content.isHidden <> true
+        comp.height = m.calculateRowHeight(settings)
 
         if comp.visible
           translation = [0, y]
@@ -109,6 +112,24 @@ namespace ml
 
     override function getFocusSettings()
       return m.content.focusSettings
+    end function
+
+    ' @params{ml_RowSettings} settings for the current row
+    private function calculateRowHeight(settings as mc.types.node) as integer
+      if settings = invalid
+        return 0
+      end if
+
+      if settings.height <> -1
+        height = settings.height
+      else
+        height = settings.cellSettings.size[1]
+      end if
+
+      if settings.headerSettings.position <> "none"
+        height += settings.headerSettings.height
+      end if
+      return height
     end function
 
   end class

@@ -77,7 +77,6 @@ namespace ml
           m._content = m.content
           m.settings = ml.listMixin.getRowSettings(m.owner.content, m._content)
           m.onContentChange(m._content)
-          m._calculateHeight()
         else if m._content <> invalid
           isListRefreshNeeded = false
           if m.wasHidden <> m._content.isHidden
@@ -107,7 +106,6 @@ namespace ml
       end if
       m.settings = ml.listMixin.getRowSettings(m.owner.content, m._content)
       m.onContentChange(m._content, keepOldFocusIfPossible = invalid or keepOldFocusIfPossible = true)
-      m._calculateHeight()
     end function
 
     public function getRenderer(index as integer) as object
@@ -123,18 +121,6 @@ namespace ml
     public function getScreenRect(index as integer, screenPos = invalid as integer, direction = 0 as integer) as object
       'implement me
       return invalid
-    end function
-
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    '++ private impl
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    private function _calculateHeight()
-      height = m.calculateHeight()
-      if height = -1
-        height = m.settings.height
-      end if
-      m.height = height
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -155,10 +141,6 @@ namespace ml
 
     protected function onAnimateToItemChange(index as integer)
       'implement me
-    end function
-
-    protected function calculateHeight() as integer
-      return -1
     end function
 
     protected function onListEvent(event as object)
