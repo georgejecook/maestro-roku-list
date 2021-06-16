@@ -80,6 +80,7 @@ namespace ml
           height = comp.height + settings.space + yOffset
           if settings.peekNextPixels <> 0
             screenPos = 1080 - (height + settings.peekNextPixels)
+            settings.screenPos = screenPos
           end if
 
           y += height
