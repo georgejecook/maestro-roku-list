@@ -171,7 +171,7 @@ namespace ml
     private function onKeyPressLeft() as boolean
       m.log.verbose("onKeyPressLeft")
       if m.canScroll("left")
-        m.itemScroller.move(-1)
+        m.itemScroller.moveFromPress(-1)
       end if
       return true
     end function
@@ -179,7 +179,7 @@ namespace ml
     private function onKeyPressRight() as boolean
       m.log.verbose("onKeyPressRight")
       if m.canScroll("right")
-        m.itemScroller.move(1)
+        m.itemScroller.moveFromPress(1)
       end if
       return true
     end function

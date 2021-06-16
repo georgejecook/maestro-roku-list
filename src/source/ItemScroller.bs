@@ -109,6 +109,33 @@ namespace ml
       return true
     end function
 
+    private function moveFromPress(direction as integer) as boolean
+      index = m.index + direction
+
+      if direction = 1 and m.index = m.viewManager.numberOfItems - 1
+        m.log.info("already at end")
+        return false
+      else if index = -1
+        m.log.info("already at start")
+        return false
+      end if
+
+      if (m.viewManager.isScrolling or m.isMovingMultiple) and m.direction = direction
+        m.log.info("was already scrolling - trying to keep moving")
+        index = m.getValidTargetIndex(m.targetIndex + direction, direction)
+        if index <> -1
+          m.targetIndex = index
+          m.isMovingMultiple = true
+          return true
+        else
+          return false
+        end if
+      else
+        return m.move(direction)
+      end if
+    end function
+
+
     function move(offset as integer, screenPos = invalid as integer, animated = true as boolean, fast = false as boolean) as boolean
       index = m.index + offset
 
@@ -119,19 +146,18 @@ namespace ml
         end if
         direction = 1
       else
-        if m.index = -1
+        if index = -1
           m.log.info("already at start")
           return false
         end if
         direction = -1
       end if
 
-
-      ' if m.direction = direction and abs(offset) = 1 and m.viewManager.isScrolling
-      '   'TODO - we might want to detect this at the list, and have a cache of next move there
-      '   m.log.info("was already scrolling - ignoring", m.viewManager.isScrolling)
-      '   return false
-      ' end if
+      if m.direction = direction and abs(offset) = 1 and m.viewManager.isScrolling
+        'TODO - we might want to detect this at the list, and have a cache of next move there
+        m.log.info("was already scrolling - ignoring", m.viewManager.isScrolling)
+        return false
+      end if
 
       m.isMovingMultiple = abs(offset) > 1
 
@@ -263,6 +289,7 @@ namespace ml
         m.toggleScrolling(false)
         m.index = m.flowFocusIndex
         m.setFocusOnRenderer(false)
+        'FIXME - this is wrong
         m.targetIndex = -1
         if m.isMovingMultiple
           m.moveToEnd(m.direction)
@@ -328,6 +355,9 @@ namespace ml
 
     function toggleScrolling(active as boolean)
       m.viewManager.setIsScrolling(active, m.isMovingMultiple, m.index)
+      if not active
+        m.isMovingMultiple = false
+      end if
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -339,6 +369,7 @@ namespace ml
 
       position = m.container.translation[m.axes] - m.activeOffset
       index = m.viewManager.getIndexAtPosition(position, m.direction)
+      ' ? ">> AFC " ; fraction ; " pos " ; position ; " AO " ; m.activeOffset ; " i " ; index
 
       if fraction = 1
         m.focusManager.onFocusAnimationUpdate(1)
@@ -347,7 +378,11 @@ namespace ml
         if index <> m.index
           m.setFocusIndex(index, false, invalid, false)
         end if
-        m.targetIndex = -1
+        if m.isMovingMultiple and m.targetIndex <> m.index
+          m.move(m.direction)
+        else
+          m.targetIndex = -1
+        end if
       else if m.isMovingMultiple
         m.focusManager.onContainerPositionChange(position)
         'hack here..

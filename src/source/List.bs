@@ -62,11 +62,11 @@ namespace ml
     '++ managers and internal state
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    private viewManager
-    private focusManager
-    private itemScroller
-    private sourceFocusRect
-    private targetFocusRect
+    private viewManager as ml.ListItemViewManager
+    private focusManager as ml.ItemFocusManager
+    private itemScroller as ml.ListItemScroller
+    private sourceFocusRect as object
+    private targetFocusRect as object
     private isInitialized = false
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -230,7 +230,9 @@ namespace ml
       row = m.getRowRenderer(rowIndex)
       if row <> invalid
         rect = row@.getScreenRect(cellIndex, cellScreenPos)
-        if rect = invalid
+        if rect <> invalid
+          ' rect.translation[1] += rowScreenRect.screenPos
+        else
           return rowScreenRect
         end if
         return rect
@@ -367,6 +369,9 @@ namespace ml
     public function onFlowFocusFraction(fraction as float)
       m.itemScroller.onFlowFocusFraction(fraction)
     end function
+
+    private currentDirection = 0
+
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ KeyPress
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -374,7 +379,8 @@ namespace ml
     private function onKeyPressUp() as boolean
       m.log.verbose("onKeyPressUp")
       if m.itemScroller.index > -1
-        return m.itemScroller.move(-1)
+        ' return m.itemScroller.move(-1)
+        return m.itemScroller.moveFromPress(-1)
       else
         return false
       end if
@@ -395,7 +401,8 @@ namespace ml
     private function onKeyPressDown() as boolean
       m.log.verbose("onKeyPressDown")
       if m.itemScroller.index < m.viewManager.numberOfItems
-        return m.itemScroller.move(1)
+        ' return m.itemScroller.move(1)
+        return m.itemScroller.moveFromPress(1)
       else
         return false
       end if
