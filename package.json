@@ -1,6 +1,6 @@
 {
   "name": "maestro-roku-list",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "Fast, flexible list example, extracted from maestro framework",
   "main": "index.js",
   "directories": {
@@ -94,6 +94,11 @@
     "noprefix": [
       "maestro"
     ]
+  },
+  "auto-changelog": {
+    "template": "keepachangelog",
+    "commitLimit": false,
+    "tag-pattern": ".+"
   },
   "scripts": {
     "build": "node scripts/run.js && ts-node scripts/move-generated-files.js",

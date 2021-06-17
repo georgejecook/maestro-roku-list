@@ -75,7 +75,6 @@ namespace ml
     protected override function onContentChange(content as mc.types.node, keepOldFocusIfPossible = false as boolean)
       m.log.info("onContentChange")
       m.configureHeader()
-      m.calculateHeight()
       if content <> invalid
         m.viewManager.setContent(content)
 
@@ -121,23 +120,6 @@ namespace ml
         rect.translation[1] += m.contentGroup.translation[1]
       end if
       return rect
-    end function
-
-    protected override function calculateHeight() as integer
-      if m.settings = invalid
-        return 0
-      end if
-
-      if m.settings.height <> -1
-        height = m.settings.height
-      else
-        height = m.settings.cellSettings.size[1]
-      end if
-
-      if m.header <> invalid
-        height += m.settings.headerSettings.height
-      end if
-      return height
     end function
 
     public override function onFlowFocusFraction(fraction as float)
@@ -189,7 +171,7 @@ namespace ml
     private function onKeyPressLeft() as boolean
       m.log.verbose("onKeyPressLeft")
       if m.canScroll("left")
-        m.itemScroller.move(-1)
+        m.itemScroller.moveFromPress(-1)
       end if
       return true
     end function
@@ -197,7 +179,7 @@ namespace ml
     private function onKeyPressRight() as boolean
       m.log.verbose("onKeyPressRight")
       if m.canScroll("right")
-        m.itemScroller.move(1)
+        m.itemScroller.moveFromPress(1)
       end if
       return true
     end function
